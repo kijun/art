@@ -28,10 +28,10 @@ public class Sector {
             Planet newPlanet = null;
             while (newPlanet == null) {
                 // create planet params
-                var x = col*Consts.sectorSize; // midpoint
-                var y = row*Consts.sectorSize; // midpoint
-                x += Consts.sectorSize * (Random.value - 0.5);
-                y += Consts.sectorSize * (Random.value - 0.5);
+                float x = col*Consts.sectorSize; // midpoint
+                float y = row*Consts.sectorSize; // midpoint
+                x += Consts.sectorSize * (Random.value - 0.5f);
+                y += Consts.sectorSize * (Random.value - 0.5f);
                 var radius = RandomHelper.Between(Consts.planetMinRadius, Consts.planetMaxRadius);
 
                 newPlanet = new Planet(x, y, radius);
