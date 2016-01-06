@@ -20,7 +20,7 @@ public class Sector {
 
     public int col, row;
 
-    List<Planet> planets = new List<Planet>();
+    public List<Planet> planets = new List<Planet>();
 
     public Sector(int col, int row) {
         this.col = col; this.row = row;
