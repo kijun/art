@@ -6,6 +6,7 @@ public class Player : MonoBehaviour {
     public float rotationConst = 5f;
 
     private Rigidbody2D rg2d;
+    private List<Artifact> inventory;
 
 	// Use this for initialization
 	void Awake () {
@@ -40,4 +41,11 @@ public class Player : MonoBehaviour {
             rg2d.AddForce(inputDir);
         }
 	}
+
+    void OnTriggerEnter2D (Collider2D other) {
+        Artifact art = other.GetComponent<Artifact>();
+        if (art != null) {
+            art.ShrinkAndHide();
+        }
+    }
 }

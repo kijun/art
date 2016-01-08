@@ -23,8 +23,6 @@ public class SpaceshipController : MonoBehaviour {
     }
 }
 
-//public class Artifact {
-//}
 
 public class StarField {
 }

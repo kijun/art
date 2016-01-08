@@ -91,14 +91,3 @@ public class Planet {
     }
 }
 
-public class Artifact : MonoBehaviour{
-    public string poem;
-
-    void OnCollisionEnter2D(Collision2D coll) {
-//        if (coll.gameObject.tag == "Player")
-    }
-}
-
-public class Inventory {
-    public List<Artifact> artifacts = new List<Artifact>();
-}
