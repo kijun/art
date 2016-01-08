@@ -9,7 +9,7 @@ public class BoardManager : MonoBehaviour {
 
     public Count planetsPerSector = new Count(2, 5);
     public Count artifactsPerSector = new Count(1,2);
-    public int sectorSize = 10;
+    public int sectorSize = 30;
 
     private PlanetarySystem sys;
     private Transform player;
@@ -30,7 +30,6 @@ public class BoardManager : MonoBehaviour {
         RenderAdjacentSectors(prevSector);
     }
 
-
     // MONOBEHAVIOUR
     void FixedUpdate() {
         if (!GameManager.instance.journeying) return;
@@ -44,7 +43,7 @@ public class BoardManager : MonoBehaviour {
 
     // SECTOR HELPERS
     Sector CurrentSector() {
-        var ssize = Consts.sectorSize;
+        var ssize = sectorSize;
         Vector2 pos = player.position;
         int x = Mathf.FloorToInt((pos.x - ssize/2.0f)/ssize);
         int y = Mathf.FloorToInt((pos.y - ssize/2.0f)/ssize);
