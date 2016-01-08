@@ -1,16 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Coord {
-    public int x, y;
-
-    public Coord() : this(0, 0) { }
-
-    public Coord(int x, int y) {
-        this.x = x; this.y = y;
-    }
-}
-
+/*
 public class RenderSectors : MonoBehaviour {
 
     public GameObject planetPrefab;
@@ -20,7 +11,7 @@ public class RenderSectors : MonoBehaviour {
     Sector prevSector;
     HashSet<Sector>renderedSectors = new HashSet<Sector>();
 
-	// Use this for initialization
+    // Use this for initialization
 
     void Awake () {
         player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -66,9 +57,9 @@ public class RenderSectors : MonoBehaviour {
     void RemoveSector(int i, int j) {
     }
 
-	// Update is called once per frame
-	void Update () {
-	}
+    // Update is called once per frame
+    void Update () {
+    }
 
     void FixedUpdate () {
         // if current sector is different then unfold, recreate
@@ -85,3 +76,4 @@ public class RenderSectors : MonoBehaviour {
         // TODO: remove sectors
     }
 }
+*/

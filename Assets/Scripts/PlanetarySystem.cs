@@ -3,14 +3,20 @@ using System.Collections.Generic;
 
 public class PlanetarySystem {
 
-    Dictionary<int, Dictionary<int, Sector>> sectors = new Dictionary<int, Dictionary<int, Sector>>();
+    private Dictionary<int, Dictionary<int, Sector>> sectors;
+    private int sectorSize;
+
+    public PlanetarySystem (int sectorSize) {
+        sectors = new Dictionary<int, Dictionary<int, Sector>>();
+        this.sectorSize = sectorSize;
+    }
 
     public Sector GetSector(int col, int row) {
         if (!sectors.ContainsKey(col)) {
             sectors[col] = new Dictionary<int, Sector>();
         }
         if (!sectors[col].ContainsKey(row)) {
-            sectors[col][row] = new Sector(col, row);
+            sectors[col][row] = new Sector(col, row, sectorSize);
         }
         return sectors[col][row];
     }
@@ -18,12 +24,13 @@ public class PlanetarySystem {
 
 public class Sector {
 
-    public int col, row;
+    public int col, row, size;
 
     public List<Planet> planets = new List<Planet>();
 
-    public Sector(int col, int row) {
-        this.col = col; this.row = row;
+    public Sector(int col, int row, int sectorSize) {
+        this.col = col; this.row = row; this.size = sectorSize;
+
         for (int i=0; i<Consts.sectorDensity; i++) {
             Planet newPlanet = null;
             while (newPlanet == null) {
@@ -45,6 +52,25 @@ public class Sector {
             planets.Add(newPlanet);
         }
     }
+
+    public Vector2 Origin {
+        get {
+            return new Vector2(col * size, row * size);
+        }
+    }
+
+    public int Size {
+        get {
+            return size;
+        }
+    }
+
+    public Vector2 RandomPoint() {
+        var o = Origin;
+        var radius = size/2f;
+        return new Vector2(Random.Range(o.x - radius, o.x + radius),
+                           Random.Range(o.y - radius, o.y + radius));
+    }
 }
 
 public class Planet {
@@ -65,4 +91,14 @@ public class Planet {
     }
 }
 
+public class Artifact : MonoBehaviour{
+    public string poem;
 
+    void OnCollisionEnter2D(Collision2D coll) {
+//        if (coll.gameObject.tag == "Player")
+    }
+}
+
+public class Inventory {
+    public List<Artifact> artifacts = new List<Artifact>();
+}
