@@ -47,7 +47,7 @@ public class BoardManager : MonoBehaviour {
         Vector2 pos = player.position;
         int x = Mathf.FloorToInt((pos.x - ssize/2.0f)/ssize);
         int y = Mathf.FloorToInt((pos.y - ssize/2.0f)/ssize);
-        Debug.Log("For pos: " + pos + "Current Sector (" + x + ", " + y + ")");
+        //Debug.Log("For pos: " + pos + "Current Sector (" + x + ", " + y + ")");
         return sys.GetSector(x, y);
     }
 
