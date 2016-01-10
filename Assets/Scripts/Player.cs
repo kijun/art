@@ -6,7 +6,7 @@ public class Player : MonoBehaviour {
     public float rotationConst = 5f;
 
     private Rigidbody2D rg2d;
-    private List<Artifact> inventory;
+    private List<Artifact> inventory = new List<Artifact>();
 
 	// Use this for initialization
 	void Awake () {
@@ -46,6 +46,21 @@ public class Player : MonoBehaviour {
         Artifact art = other.GetComponent<Artifact>();
         if (art != null) {
             art.ShrinkAndHide();
+            UIManager.instance.ShowText(art.poetry);
+            inventory.Add(art);
         }
+    }
+
+    void OnCollisionEnter2D(Collision2D coll) {
+        // if planet
+        // play destroy animation
+        foreach (var art in inventory) {
+            art.transform.position = transform.position;
+            art.transform.localScale = Vector3.one;
+            art.GetComponent<Rigidbody2D>().isKinematic = false;
+            art.GetComponent<Rigidbody2D>().AddForce(new Vector2(1,1), ForceMode2D.Impulse);
+        }
+        inventory.Clear();
+        // end game
     }
 }
