@@ -62,5 +62,6 @@ public class Player : MonoBehaviour {
         }
         inventory.Clear();
         // end game
+        //GameManager.instance.EndGame();
     }
 }

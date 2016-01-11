@@ -20,18 +20,22 @@ public class GameManager : MonoBehaviour {
         boardScript = GetComponent<BoardManager>();
         journeying = false;
 
-        InitGame();
+        //ShowIntro();
+
+        //InitGame();
         // setup ship
         // show UI
-        StartGame(); // TODO change
+        //StartGame(); // TODO change
     }
 
-    void InitGame() {
+    public void StartGame() {
+        journeying = true;
         boardScript.SetupScene();
     }
 
-    void StartGame() {
-        journeying = true;
+    public void EndGame() {
+        // show UI
+        journeying = false;
     }
 }
 
