@@ -31,6 +31,7 @@ public class Sector {
     public Sector(int col, int row, int sectorSize) {
         this.col = col; this.row = row; this.size = sectorSize;
 
+        /*
         for (int i=0; i<Consts.sectorDensity; i++) {
             Planet newPlanet = null;
             while (newPlanet == null) {
@@ -51,6 +52,7 @@ public class Sector {
             }
             planets.Add(newPlanet);
         }
+        */
     }
 
     public Vector2 Origin {

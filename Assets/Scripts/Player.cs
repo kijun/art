@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public class Player : MonoBehaviour {
 
     public float rotationConst = 5f;
+    public float maxYSpeed = 4f;
+    public float thrust = 4f;
 
     private Rigidbody2D rg2d;
     private List<Artifact> inventory = new List<Artifact>();
@@ -11,6 +13,7 @@ public class Player : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         rg2d = GetComponent<Rigidbody2D>();
+        rg2d.AddTorque(100, ForceMode2D.Impulse);
 	}
 
 	// Update is called once per frame
@@ -20,6 +23,14 @@ public class Player : MonoBehaviour {
 
         var inputDir = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         //rg2d.rotation
+        //
+        if (rg2d.velocity.y < maxYSpeed) {
+            rg2d.AddForce(new Vector2(0, thrust));
+        }
+        //rg2d.AddForce(new Vector2(inputDir.x, 0));
+        rg2d.AddTorque(-1f * rotationConst * Time.deltaTime);
+        //if (Camera.main.< rg2d.position.x
+        return;
 
         if (inputDir != Vector2.zero) {
             var radRotation = rg2d.rotation / 360f * 2 * Mathf.PI;

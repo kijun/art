@@ -10,6 +10,8 @@ public class Loader : MonoBehaviour {
             Instantiate(gameManager);
         if (SoundManager.instance == null)
             Instantiate(soundManager);
+
+        GameManager.instance.StartGame();
     }
 }
 

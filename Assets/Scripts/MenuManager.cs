@@ -39,18 +39,20 @@ public class MenuManager : MonoBehaviour {
     }
 
     public void MusicOnPressed() {
-        Application.OpenURL("http://listenonrepeat.com/watch/?v=6liAgg4SN88");
+        //Application.OpenURL("http://listenonrepeat.com/watch/?v=6liAgg4SN88");
         ActivateButton(playButton);
     }
 
     public void PlayPressed() {
         canvas.gameObject.SetActive(false);
-        GameManager.instance.StartGame();
+        Application.LoadLevel("Game");
+        //GameManager.instance.StartGame();
     }
 
     public void ReplayPressed() {
         canvas.gameObject.SetActive(false);
-        GameManager.instance.StartGame();
+        Application.LoadLevel("Game");
+        //GameManager.instance.StartGame();
     }
 
     // state management

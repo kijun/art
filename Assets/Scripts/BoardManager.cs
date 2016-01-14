@@ -22,7 +22,7 @@ public class BoardManager : MonoBehaviour {
         // init members
         sys = new PlanetarySystem(sectorSize);
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        player.position = new Vector2(0f, 0f);
+        //player.position = new Vector2(0f, 0f);
         renderedSectors = new HashSet<Sector>();
         prevSector = CurrentSector();
 
@@ -88,14 +88,17 @@ public class BoardManager : MonoBehaviour {
     }
 
     void InstantiateWithoutOverlap(GameObject prefab, Sector sector) {
-        Vector2 origin = sector.RandomPoint();
         Vector2 size = prefab.GetComponent<Collider2D>().bounds.size;
-        Vector2 botLeft = new Vector2(origin.x - size.x/2f, origin.y - size.y/2f);
-        Vector2 topRight = new Vector2(origin.x + size.x/2f, origin.y + size.y/2f);
+        Vector2 origin, botLeft, topRight;
+        //= sector.RandomPoint();
+        //Vector2 botLeft = new Vector2(origin.x - size.x/2f, origin.y - size.y/2f);
+        //Vector2 topRight = new Vector2(origin.x + size.x/2f, origin.y + size.y/2f);
 
-        while (Physics2D.OverlapArea(botLeft, topRight)) {
+        do {
             origin = sector.RandomPoint();
-        }
+            botLeft = new Vector2(origin.x - size.x/2f, origin.y - size.y/2f);
+            topRight = new Vector2(origin.x + size.x/2f, origin.y + size.y/2f);
+        } while (Physics2D.OverlapArea(botLeft, topRight));
 
         var go = Instantiate(prefab);
         go.transform.position = origin;
