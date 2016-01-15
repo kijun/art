@@ -1,57 +1,79 @@
 ﻿using UnityEngine;
+//using System;
+using System.Collections;
 using System.Collections.Generic;
+
 
 public class Player : MonoBehaviour {
 
     public float rotationConst = 5f;
     public float maxYSpeed = 4f;
+    public float maxXSpeed = 2f;
+    public float xSpeed = 1f;
+    public float ySpeed = 1f;
     public float thrust = 4f;
 
+    public int maxHealth = 100;
+    public int damagePerHit = 30;
+    public Count spinTorque = new Count(30, 100);
+    public float spinDuration = 2f;
+
+    public enum State {
+        Start,
+        Normal,
+        Hit,
+        Destroyed
+    }
+
+    private float spinUntil;
+    private State currentState = State.Start;
+    private int health;
     private Rigidbody2D rg2d;
     private List<Artifact> inventory = new List<Artifact>();
 
 	// Use this for initialization
 	void Awake () {
         rg2d = GetComponent<Rigidbody2D>();
-        rg2d.AddTorque(100, ForceMode2D.Impulse);
+        health = maxHealth;
 	}
 
 	// Update is called once per frame
 	void FixedUpdate () {
+        switch (currentState) {
+            case State.Start:
+                if (GameManager.instance.journeying) {
+                    currentState = State.Normal;
+                }
+                break;
+            case State.Normal:
+                float xdir = Input.GetAxis("Horizontal");
+                float ydir = Input.GetAxis("Vertical");
+                // left, right
+                if (Mathf.Abs(xdir) > float.Epsilon) {
+                    xdir = Mathf.Sign(xdir);
+                    if ((xdir > 0 & rg2d.velocity.x < xdir * maxXSpeed) ||
+                        (xdir < 0 & rg2d.velocity.x > xdir * maxXSpeed)) {
+                        rg2d.AddForce(new Vector2(xdir*xSpeed, 0));
+                    }
+                }
 
-        if (!GameManager.instance.journeying) return;
-
-        var inputDir = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        //rg2d.rotation
-        //
-        if (rg2d.velocity.y < maxYSpeed) {
-            rg2d.AddForce(new Vector2(0, thrust));
+                // up
+                if (ydir > float.Epsilon) {
+                    if (Mathf.Abs(rg2d.velocity.y) < maxYSpeed) {
+                        rg2d.AddForce(new Vector2(0, ySpeed));
+                    }
+                    // animate
+                }
+                break;
+            case State.Hit:
+                if (Time.time > spinUntil) {
+                    currentState = State.Normal;
+                }
+                break;
+            case State.Destroyed:
+                break;
         }
-        //rg2d.AddForce(new Vector2(inputDir.x, 0));
-        rg2d.AddTorque(-1f * rotationConst * Time.deltaTime);
-        //if (Camera.main.< rg2d.position.x
-        return;
-
-        if (inputDir != Vector2.zero) {
-            var radRotation = rg2d.rotation / 360f * 2 * Mathf.PI;
-            var rot = new Vector2(Mathf.Sin(-1 * radRotation), Mathf.Cos(radRotation));
-
-            float zDir = Vector3.Cross(rot, inputDir).z;
-            float angle = Vector2.Angle(inputDir, rot);
-
-            //Debug.Log("angle " + angle + " input " + inputDir + " rot " + rot + " zdir " + zDir);
-
-            if (zDir < -1 * float.Epsilon) {
-                Debug.Log("turn left");
-                rg2d.AddTorque(-1f * rotationConst * Time.deltaTime);
-            } else if (zDir > float.Epsilon) {
-                Debug.Log("turn right");
-                rg2d.AddTorque(rotationConst * Time.deltaTime);
-            }
-
-            rg2d.AddForce(inputDir);
-        }
-	}
+    }
 
     void OnTriggerEnter2D (Collider2D other) {
         Artifact art = other.GetComponent<Artifact>();
@@ -65,14 +87,39 @@ public class Player : MonoBehaviour {
     void OnCollisionEnter2D(Collision2D coll) {
         // if planet
         // play destroy animation
-        foreach (var art in inventory) {
+        /*foreach (var art in inventory) {
             art.transform.position = transform.position;
             art.transform.localScale = Vector3.one;
             art.GetComponent<Rigidbody2D>().isKinematic = false;
             art.GetComponent<Rigidbody2D>().AddForce(new Vector2(1,1), ForceMode2D.Impulse);
         }
-        inventory.Clear();
+        */
+        //coll.gameObject; // what do i want it to do? i wanted it to destruct and spin the ship
+        //inventory.Clear();
+        OnHit();
         // end game
         //GameManager.instance.EndGame();
+    }
+
+    void OnHit() {
+        health -= damagePerHit;
+        Spin();
+        StartCoroutine(ShowHealthBar());
+        currentState = State.Hit;
+        spinUntil = Time.time + spinDuration;
+    }
+
+    void Spin() {
+        rg2d.AddTorque(
+                Random.Range(spinTorque.minimum, spinTorque.maximum),
+                ForceMode2D.Impulse);
+    }
+
+    IEnumerator ShowHealthBar() {
+        // set health
+        // fade in healthbar
+        yield return new WaitForSeconds(2);
+        // fade out healthbar
+        yield return null;
     }
 }
