@@ -75,6 +75,7 @@ public class BoardManager : MonoBehaviour {
             // create planets
             var numPlanets = Random.Range(planetsPerSector.minimum, planetsPerSector.maximum+1);
             var numArtifacts = Random.Range(artifactsPerSector.minimum, artifactsPerSector.maximum+1);
+numArtifacts = 0;
             for (int i = 0; i < numPlanets; i++) {
                 InstantiateWithoutOverlap(planetPrefabs[Random.Range(0, planetPrefabs.Length)], sector);
             }
