@@ -55,6 +55,10 @@ public class Player : MonoBehaviour {
                     xdir = Mathf.Sign(xdir);
                     if ((xdir > 0 & rg2d.velocity.x < xdir * maxXSpeed) ||
                         (xdir < 0 & rg2d.velocity.x > xdir * maxXSpeed)) {
+                        // if different direction then reset x velocity
+                        if (xdir != Mathf.Sign(rg2d.velocity.x)) {
+                            rg2d.velocity = new Vector2(0, rg2d.velocity.y);
+                        }
                         rg2d.AddForce(new Vector2(xdir*xSpeed, 0));
                     }
                 }
