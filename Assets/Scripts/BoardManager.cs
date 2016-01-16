@@ -27,12 +27,13 @@ public class BoardManager : MonoBehaviour {
         prevSector = CurrentSector();
 
         // create planets and artifacts
-        RenderAdjacentSectors(prevSector);
+        //RenderAdjacentSectors(prevSector);
     }
 
     // MONOBEHAVIOUR
     void FixedUpdate() {
         if (!GameManager.instance.journeying) return;
+        return;
 
         var currSector = CurrentSector();
         if (currSector != prevSector) {

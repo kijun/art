@@ -3,20 +3,30 @@ using System.Collections;
 
 public class CameraFollow : MonoBehaviour {
 
+    public static CameraFollow instance;
+
     public float xMargin = 0f;		// Distance in the x axis the player can move before the camera follows.
 	public float yMargin = 0f;		// Distance in the y axis the player can move before the camera follows.
 	public float xSmooth = 1f;		// How smoothly the camera catches up with it's target movement in the x axis.
 	public float ySmooth = 1f;		// How smoothly the camera catches up with it's target movement in the y axis.
 
     private Transform player;
+    private bool shaking;
 
 	// Use this for initialization
 	void Start () {
-
+        shaking = false;
 	}
 
     void Awake () {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        // Assign static instance
+        if (instance == null) {
+            instance = this;
+        } else if (instance != this) {
+            Destroy(gameObject);
+        }
+        DontDestroyOnLoad(gameObject);
     }
 
 	bool CheckXMargin() {
@@ -32,7 +42,9 @@ public class CameraFollow : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
-        TrackPlayer();
+        if (!shaking) {
+            TrackPlayer();
+        }
 	}
 
     void TrackPlayer() {
@@ -49,11 +61,36 @@ public class CameraFollow : MonoBehaviour {
 		// If the player has moved beyond the y margin...
 		if(CheckYMargin())
 			// ... the target y coordinate should be a Lerp between the camera's current y position and the player's current y position.
-            targetY = player.position.y;
+            targetY = player.position.y - yMargin;
 			//targetY = Mathf.Lerp(transform.position.y, player.position.y, ySmooth * Time.deltaTime);
 
 
 		// Set the camera's position to the target position with the same z component.
 		transform.position = new Vector3(targetX, targetY, transform.position.z);
+    }
+
+    public void ScreenShake() {
+        shaking = true;
+        InvokeRepeating("CameraShake", 0, .01f);
+        Invoke("StopShaking", 0.3f);
+    }
+
+    //void OnCollisionEnter2D(Collision2D coll)
+    //{
+
+    //    shakeAmt = coll.relativeVelocity.magnitude * .0025f;
+
+    //}
+
+    void CameraShake() {
+        float quakeAmt = Random.value*0.01f*2 - 0.01f;
+        Vector3 pp = transform.position;
+        pp.y+= quakeAmt; // can also add to x and/or z
+        transform.position = pp;
+    }
+
+    void StopShaking() {
+        shaking = false;
+        CancelInvoke("CameraShake");
     }
 }

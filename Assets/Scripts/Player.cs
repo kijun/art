@@ -17,6 +17,8 @@ public class Player : MonoBehaviour {
     public int damagePerHit = 30;
     public Count spinTorque = new Count(30, 100);
     public float spinDuration = 2f;
+    public AudioSource soundSource;
+    public AudioClip hitSound;
 
     public enum State {
         Start,
@@ -76,12 +78,16 @@ public class Player : MonoBehaviour {
     }
 
     void OnTriggerEnter2D (Collider2D other) {
+        /*
         Artifact art = other.GetComponent<Artifact>();
         if (art != null) {
             art.ShrinkAndHide();
             UIManager.instance.ShowText(art.poetry);
             inventory.Add(art);
         }
+        */
+        Destroy(other.gameObject);
+        OnHit();
     }
 
     void OnCollisionEnter2D(Collision2D coll) {
@@ -107,6 +113,8 @@ public class Player : MonoBehaviour {
         StartCoroutine(ShowHealthBar());
         currentState = State.Hit;
         spinUntil = Time.time + spinDuration;
+        CameraFollow.instance.ScreenShake();
+        soundSource.PlayOneShot(hitSound);
     }
 
     void Spin() {
