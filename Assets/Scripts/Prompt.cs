@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Prompt : MonoBehaviour {
 
@@ -8,6 +9,7 @@ public class Prompt : MonoBehaviour {
     public TextAsset promptText;
     public bool finished = false;
 
+    private Queue<string> paragraphs = new Queue<string>();
     private Text textArea;
 
 	// Use this for initialization
@@ -17,20 +19,29 @@ public class Prompt : MonoBehaviour {
 
     void Awake () {
         textArea = GetComponent<Text>();
-        StartCoroutine(RunPrompt());
-    }
-
-    IEnumerator RunPrompt() {
+        string pg = "";
         foreach (var line in promptText.text.Split('\n')) {
-            textArea.text += "\n" + line;
-            // TODO play sound
-            yield return new WaitForSeconds(timeBetweenLine);
+            if (line.Equals("")) {
+                if (pg.Length > 0) {
+                    paragraphs.Enqueue(pg);
+                    pg = "";
+                }
+            } else {
+                pg += line + "\n";
+            }
         }
-        finished = true;
+        //StartCoroutine(RunPrompt());
+        DisplayNextParagraph();
     }
 
 	// Update is called once per frame
 	void Update () {
-
+        if (Input.GetKeyDown("space") && paragraphs.Count > 0) {
+            DisplayNextParagraph();
+        }
 	}
+
+    void DisplayNextParagraph() {
+        textArea.text = paragraphs.Dequeue() + "\n";
+    }
 }
