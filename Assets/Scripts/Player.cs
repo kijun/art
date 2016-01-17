@@ -12,6 +12,7 @@ public class Player : MonoBehaviour {
     public float xSpeed = 1f;
     public float ySpeed = 1f;
     public float thrust = 4f;
+    public float maxAltitude = 15f;
 
     public int maxHealth = 100;
     public int damagePerHit = 30;
@@ -24,7 +25,8 @@ public class Player : MonoBehaviour {
         Start,
         Normal,
         Hit,
-        Destroyed
+        Destroyed,
+        Won
     }
 
     private float spinUntil;
@@ -61,6 +63,8 @@ public class Player : MonoBehaviour {
                         }
                         rg2d.AddForce(new Vector2(xdir*xSpeed, 0));
                     }
+                } else {
+                    rg2d.velocity = new Vector2(0, rg2d.velocity.y);
                 }
 
                 // up
@@ -70,6 +74,12 @@ public class Player : MonoBehaviour {
                     }
                     // animate
                 }
+
+                if (maxAltitude < altitude) {
+                    Debug.Log("You win");
+                    currentState = State.Won;
+                }
+
                 break;
             case State.Hit:
                 if (Time.time > spinUntil) {
@@ -77,6 +87,9 @@ public class Player : MonoBehaviour {
                 }
                 break;
             case State.Destroyed:
+                break;
+            case State.Won:
+                Debug.Log("you won!");
                 break;
         }
     }
@@ -115,7 +128,11 @@ public class Player : MonoBehaviour {
         health -= damagePerHit;
         Spin();
         StartCoroutine(ShowHealthBar());
-        currentState = State.Hit;
+        if (health < 0)  {
+            currentState = State.Destroyed;
+        } else {
+            currentState = State.Hit;
+        }
         spinUntil = Time.time + spinDuration;
         CameraFollow.instance.ScreenShake();
         soundSource.PlayOneShot(hitSound);
@@ -125,6 +142,12 @@ public class Player : MonoBehaviour {
         rg2d.AddTorque(
                 Random.Range(spinTorque.minimum, spinTorque.maximum),
                 ForceMode2D.Impulse);
+    }
+
+    float altitude {
+        get {
+            return transform.position.y;
+        }
     }
 
     IEnumerator ShowHealthBar() {
