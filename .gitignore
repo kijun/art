@@ -25,3 +25,4 @@ sysinfo.txt
 .DS_Store
 *.swo
 *.swp
+/Assets/SPA/

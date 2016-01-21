@@ -103,8 +103,15 @@ public class Player : MonoBehaviour {
             inventory.Add(art);
         }
         */
-        Destroy(other.gameObject);
-        OnHit();
+        Artifact art = other.GetComponent<Artifact>();
+        if (art != null) {
+            Debug.Log("triggered");
+            art.BlazeAndFade();
+            UIManager.instance.ShowText(art);
+        } else {
+            Destroy(other.gameObject);
+            OnHit();
+        }
     }
 
     void OnCollisionEnter2D(Collision2D coll) {

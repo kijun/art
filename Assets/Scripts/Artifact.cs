@@ -18,4 +18,8 @@ public class Artifact : MonoBehaviour {
             yield return new WaitForSeconds(0.1f);
         }
     }
+
+    public void BlazeAndFade() {
+        // do nothing
+    }
 }
