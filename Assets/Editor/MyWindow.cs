@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using UnityEditor;
 public class MyWindow : EditorWindow {
 	string myString = "Hello World";
@@ -13,7 +13,6 @@ public class MyWindow : EditorWindow {
 		MyWindow window = (MyWindow)EditorWindow.GetWindow (typeof (MyWindow));
 		window.Show();
 	}
-
 	void OnGUI () {
 		GUILayout.Label ("Base Settings", EditorStyles.boldLabel);
 			myString = EditorGUILayout.TextField ("Text Field", myString);
@@ -24,3 +23,4 @@ public class MyWindow : EditorWindow {
 		EditorGUILayout.EndToggleGroup ();
 	}
 }
+*/

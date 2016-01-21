@@ -4,6 +4,11 @@ using System.Collections.Generic;
 
 public class GameState {
 
+    public bool running;
+    public float altitude;
+    public int destroyedComets;
+    public float gameTime;
+
     private static GameState inst;
 
     private GameState() {
@@ -59,11 +64,21 @@ public class DialogueManager {
     }
 }
 
+public class DialogueHolder : ScriptableObject {
+    public List<Dialogue> dialogues = new List<Dialogue>();
+
+    /*public DialogueHolder (Dialogue d) {
+        dialogue = d;
+    }*/
+}
+
+
+[System.Serializable]
 public class Dialogue {
     public int priority = 0;
     public int id {
         get;
-        private set;
+        set;
     }
     private List<Condition> conditions = new List<Condition>();
     public string lines;
@@ -86,10 +101,30 @@ public abstract class Condition {
     public abstract bool Check(GameState states, Dictionary<int, Dialogue> completed);
 }
 
-public class StateCondition : Condition {
+public class AltitudeStateCondition : Condition {
+    public float value;
+
     public override bool Check(GameState states, Dictionary<int, Dialogue> completed) {
         // TODO: how?
-        return false;
+        return value > states.altitude;
+    }
+}
+
+public class TimeStateCondition : Condition {
+    public float value;
+
+    public override bool Check(GameState states, Dictionary<int, Dialogue> completed) {
+        // TODO: how?
+        return value > states.gameTime;
+    }
+}
+
+public class CometStateCondition : Condition {
+    public float value;
+
+    public override bool Check(GameState states, Dictionary<int, Dialogue> completed) {
+        // TODO: how?
+        return value > states.destroyedComets;
     }
 }
 

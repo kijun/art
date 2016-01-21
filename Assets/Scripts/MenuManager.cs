@@ -39,7 +39,7 @@ public class MenuManager : MonoBehaviour {
     }
 
     public void MusicOnPressed() {
-        //Application.OpenURL("http://listenonrepeat.com/watch/?v=6liAgg4SN88");
+        Application.OpenURL("http://listenonrepeat.com/watch/?v=6liAgg4SN88");
         ActivateButton(playButton);
     }
 
