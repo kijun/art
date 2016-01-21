@@ -62,7 +62,7 @@ public class DialogueSystemWindow: EditorWindow {
         foreach (Dialogue d in dialogueHolder.dialogues) {
             GUILayout.BeginHorizontal();
             GUILayout.Label(d.id + ": " + d.lines.Substring(0, Mathf.Min(20, d.lines.Length)));
-            if (GUILayout.Button("open")) {
+            if (GUILayout.Button("edit")) {
                 DialogueWindow.Open(d, this);
             }
             if (GUILayout.Button("del")) {
@@ -80,7 +80,9 @@ public class DialogueSystemWindow: EditorWindow {
     }
 
     public void AddDialogue(Dialogue d) {
-        dialogueHolder.dialogues.Add(d);
+        if (!dialogueHolder.dialogues.Contains(d)) {
+            dialogueHolder.dialogues.Add(d);
+        }
         Save();
         Repaint();
     }

@@ -31,6 +31,13 @@ public class DialogueManager {
     private Dictionary<int, Dialogue> completedDialogues = new Dictionary<int, Dialogue>();
     //private Dialogue currentDialogue;
 
+    public DialogueManager(List<Dialogue> dg) {
+        dialogues = dg;
+        foreach (var d in dg) {
+            remainingDialogues.Add(d.id, d);
+        }
+    }
+
     public Dialogue NextDialogue() {
         Dialogue nextDialogue = null;
         foreach (var d in remainingDialogues.Values) {
@@ -47,6 +54,10 @@ public class DialogueManager {
             }
         }
         return nextDialogue;
+    }
+
+    public bool HasDialogue() {
+        return remainingDialogues.Count > 0;
     }
 
     public void DialogueCompleted(Dialogue d) {
@@ -80,17 +91,22 @@ public class Dialogue {
         get;
         set;
     }
-    private List<Condition> conditions = new List<Condition>();
+    private List<Condition> conditions;
+
+    [TextArea(3,10)]
     public string lines;
 
 
     public Dialogue(int id) {
         this.id = id;
+        conditions = new List<Condition>();
     }
 
     public bool Ready(GameState states, Dictionary<int, Dialogue> completed) {
-        foreach (var cond in conditions) {
-            if (!cond.Check(states, completed)) return false;
+        if (conditions != null) {
+            foreach (var cond in conditions) {
+                if (!cond.Check(states, completed)) return false;
+            }
         }
 
         return true;
