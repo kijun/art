@@ -50,8 +50,8 @@ public class Player : MonoBehaviour {
                 }
                 break;
             case State.Normal:
-                float xdir = Input.GetAxis("Horizontal");
-                float ydir = Input.GetAxis("Vertical");
+                float xdir = Input.GetAxisRaw("Horizontal");
+                float ydir = Input.GetAxisRaw("Vertical");
                 // left, right
                 if (Mathf.Abs(xdir) > float.Epsilon) {
                     xdir = Mathf.Sign(xdir);
@@ -68,10 +68,20 @@ public class Player : MonoBehaviour {
                 }
 
                 // up
-                if (ydir > float.Epsilon) {
-                    if (Mathf.Abs(rg2d.velocity.y) < maxYSpeed) {
+                if (Mathf.Abs(ydir) > float.Epsilon) {
+                    ydir = Mathf.Sign(ydir);
+                    if ((ydir > 0 & rg2d.velocity.y < ydir * maxYSpeed) ||
+                        (ydir < 0 & rg2d.velocity.y > ydir * maxYSpeed)) {
+                        // if different direction then reset x velocity
+                        if (ydir != Mathf.Sign(rg2d.velocity.y)) {
+                            rg2d.velocity = new Vector2(rg2d.velocity.x, 0);
+                        }
+                        rg2d.AddForce(new Vector2(0, ydir*ySpeed));
+                    }
+                    /*if (Mathf.Abs(rg2d.velocity.y) < maxYSpeed) {
                         rg2d.AddForce(new Vector2(0, ySpeed));
                     }
+                    */
                     // animate
                 }
 

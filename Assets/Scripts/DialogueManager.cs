@@ -79,10 +79,7 @@ public class DialogueManager {
 [System.Serializable]
 public class Dialogue {
     public int priority = 0;
-    public int id {
-        get;
-        set;
-    }
+    public int id;
     private List<Condition> conditions;
 
     [TextArea(3,10)]
