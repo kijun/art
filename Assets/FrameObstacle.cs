@@ -42,7 +42,6 @@ public class FrameObstacle : MonoBehaviour {
         while (true) {
             var startTime = Time.time;
             while (Time.time < startTime + shrinkDuration) {
-                Debug.Log("A");
                 top.transform.position = Vector2.Lerp(topOrigPos, topTargetPos, (Time.time - startTime)/shrinkDuration);
                 left.transform.position = Vector2.Lerp(leftOrigPos, leftTargetPos, (Time.time - startTime)/shrinkDuration);
                 right.transform.position = Vector2.Lerp(rightOrigPos, rightTargetPos, (Time.time - startTime)/shrinkDuration);
