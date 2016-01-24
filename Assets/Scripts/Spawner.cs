@@ -6,6 +6,7 @@ public class Spawner : MonoBehaviour {
     public GameObject artifact;
     public GameObject planet;
     public GameObject astroid;
+    public SnowFlake snowFlake;
     public float rateOfComet = 5f;
 
 	// Use this for initialization
@@ -21,6 +22,7 @@ public class Spawner : MonoBehaviour {
 
     void Start() {
         StartCoroutine(SpawnComet());
+        StartCoroutine(SpawnSnowFlake());
     }
 
 	// Update is called once per frame
@@ -43,7 +45,6 @@ public class Spawner : MonoBehaviour {
             if (Random.value < (1f/rateOfComet)*0.1f) {
                 var a = Instantiate(astroid);
                 a.transform.position = spawnBox.bounds.RandomPoint();
-                Debug.Log(a.transform.position);
                     //new Vector2(
                         //Random.Range(-1*halfScreenWidth, halfScreenWidth), CameraHelper.Height);
                 var rg = a.GetComponent<Rigidbody2D>();
@@ -53,5 +54,23 @@ public class Spawner : MonoBehaviour {
 
             yield return new WaitForSeconds(0.1f);
         }
+    }
+
+    IEnumerator SpawnSnowFlake() {
+        while (GameManager.instance.journeying) {
+            if (Random.value < (1f/rateOfComet)*0.1f) {
+                var a = Instantiate<SnowFlake>(snowFlake);
+                a.transform.position = RandomStartPoint();
+                a.FallDown(Random.Range(-160, 160),
+                        new Vector2(Random.Range(-2, 2), Random.Range(-2, -7)));
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+    }
+
+    Vector2 RandomStartPoint() {
+        return spawnBox.bounds.RandomPoint();
     }
 }

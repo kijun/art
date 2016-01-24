@@ -11,3 +11,15 @@ public class Count {
         maximum = max;
     }
 }
+
+[Serializable]
+public class Range {
+    public float minimum;
+    public float maximum;
+
+    //Assignment constructor.
+    public Range (float min, float max) {
+        minimum = min;
+        maximum = max;
+    }
+}
