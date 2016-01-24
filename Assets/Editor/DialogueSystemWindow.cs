@@ -9,11 +9,13 @@ public class DialogueSystemWindow: EditorWindow {
 	bool myBool = true;
 	float myFloat = 1.23f;
 
-    private DialogueHolder dialogueHolder;
+    //private DialogueHolder dialogueHolder;
+    private DialogueHolder dh;
 
 	// Add menu named "My Window" to the Window menu
 	[MenuItem ("Window/Dialogue System")]
 	static void Init () {
+        Debug.Log("init");
 		// Get existing open window or if none, make a new one:
 		DialogueSystemWindow window = (DialogueSystemWindow)EditorWindow.GetWindow(
                 typeof (DialogueSystemWindow));
@@ -22,18 +24,30 @@ public class DialogueSystemWindow: EditorWindow {
 	}
 
     void Initialize() {
-        dialogueHolder = AssetDatabase.LoadAssetAtPath<DialogueHolder>("Assets/Dialogue.asset");
-        if (dialogueHolder == null)  {
-            dialogueHolder = ScriptableObject.CreateInstance<DialogueHolder>();
-        }
+        Debug.Log("this init");
     }
 
     void Save() {
-        if (dialogueHolder != null) {
-            if (!AssetDatabase.Contains(dialogueHolder)) {
-                AssetDatabase.CreateAsset(dialogueHolder, "Assets/Dialogue.asset");
+        Debug.LogError("SAVE");
+        if (!AssetDatabase.Contains(dialogueHolder)) {
+            AssetDatabase.CreateAsset(dialogueHolder, "Assets/dialogue.asset");
+        }
+        AssetDatabase.SaveAssets();
+    }
+
+    DialogueHolder dialogueHolder {
+        get {
+            Debug.Log("dialogue holder");
+            if (dh == null) {
+                Debug.Log("trying to load");
+                dh = AssetDatabase.LoadAssetAtPath<DialogueHolder>("Assets/dialogue.asset");
+                Debug.Log(dh);
+                if (dh == null) {
+                    Debug.Log("dh is null");
+                    dh = ScriptableObject.CreateInstance<DialogueHolder>();
+                }
             }
-            AssetDatabase.SaveAssets();
+            return dh;
         }
     }
 
@@ -83,6 +97,7 @@ public class DialogueSystemWindow: EditorWindow {
         if (!dialogueHolder.dialogues.Contains(d)) {
             dialogueHolder.dialogues.Add(d);
         }
+        EditorUtility.SetDirty(dialogueHolder);
         Save();
         Repaint();
     }
@@ -90,10 +105,6 @@ public class DialogueSystemWindow: EditorWindow {
 
 
 public class DialogueWindow : EditorWindow {
-	string myString = "Hello World";
-	bool groupEnabled;
-	bool myBool = true;
-	float myFloat = 1.23f;
 
     private Dialogue dialogue;
 

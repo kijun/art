@@ -75,14 +75,6 @@ public class DialogueManager {
     }
 }
 
-public class DialogueHolder : ScriptableObject {
-    public List<Dialogue> dialogues = new List<Dialogue>();
-
-    /*public DialogueHolder (Dialogue d) {
-        dialogue = d;
-    }*/
-}
-
 
 [System.Serializable]
 public class Dialogue {
