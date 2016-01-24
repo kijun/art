@@ -6,12 +6,8 @@ using System.Collections.Generic;
 
 public class Player : MonoBehaviour {
 
-    public float rotationConst = 5f;
-    public float maxYSpeed = 4f;
-    public float maxXSpeed = 2f;
     public float xSpeed = 1f;
     public float ySpeed = 1f;
-    public float thrust = 4f;
     public float maxAltitude = 15f;
 
     public int maxHealth = 100;
@@ -20,6 +16,10 @@ public class Player : MonoBehaviour {
     public float spinDuration = 2f;
     public AudioSource soundSource;
     public AudioClip hitSound;
+    public BoxCollider2D localPositionConstraint;
+
+    public float altitude = 0f;
+    public float fixedYSpeed = 0f;
 
     public enum State {
         Start,
@@ -52,43 +52,21 @@ public class Player : MonoBehaviour {
             case State.Normal:
                 float xdir = Input.GetAxisRaw("Horizontal");
                 float ydir = Input.GetAxisRaw("Vertical");
-                // left, right
-                if (Mathf.Abs(xdir) > float.Epsilon) {
-                    xdir = Mathf.Sign(xdir);
-                    if ((xdir > 0 & rg2d.velocity.x < xdir * maxXSpeed) ||
-                        (xdir < 0 & rg2d.velocity.x > xdir * maxXSpeed)) {
-                        // if different direction then reset x velocity
-                        if (xdir != Mathf.Sign(rg2d.velocity.x)) {
-                            rg2d.velocity = new Vector2(0, rg2d.velocity.y);
-                        }
-                        rg2d.AddForce(new Vector2(xdir*xSpeed, 0));
-                    }
-                } else {
-                    rg2d.velocity = new Vector2(0, rg2d.velocity.y);
-                }
+                Vector2 newPos = transform.position;
 
-                // up
-                if (Mathf.Abs(ydir) > float.Epsilon) {
-                    ydir = Mathf.Sign(ydir);
-                    if ((ydir > 0 & rg2d.velocity.y < ydir * maxYSpeed) ||
-                        (ydir < 0 & rg2d.velocity.y > ydir * maxYSpeed)) {
-                        // if different direction then reset x velocity
-                        if (ydir != Mathf.Sign(rg2d.velocity.y)) {
-                            rg2d.velocity = new Vector2(rg2d.velocity.x, 0);
-                        }
-                        rg2d.AddForce(new Vector2(0, ydir*ySpeed));
-                    }
-                    /*if (Mathf.Abs(rg2d.velocity.y) < maxYSpeed) {
-                        rg2d.AddForce(new Vector2(0, ySpeed));
-                    }
-                    */
-                    // animate
-                }
+                newPos.x += xdir * xSpeed * Time.deltaTime;
+                newPos.y += ydir * ySpeed * Time.deltaTime;
 
+                newPos = ConstrainPoint(newPos);
+
+                transform.position = newPos;
+
+                /*
                 if (maxAltitude < altitude) {
                     Debug.Log("You win");
                     currentState = State.Won;
                 }
+                */
 
                 break;
             case State.Hit:
@@ -104,6 +82,17 @@ public class Player : MonoBehaviour {
         }
     }
 
+    Vector2 ConstrainPoint(Vector2 point) {
+        Debug.Log(localPositionConstraint.bounds + ":" + point);
+        if (!localPositionConstraint.bounds.Contains(point)) {
+            point = localPositionConstraint.bounds.ClosestPoint(point);
+            Debug.Log("constrained at " + point);
+        } else {
+            Debug.Log("good");
+        }
+        return point;
+    }
+
     void OnTriggerEnter2D (Collider2D other) {
         /*
         Artifact art = other.GetComponent<Artifact>();
@@ -113,6 +102,7 @@ public class Player : MonoBehaviour {
             inventory.Add(art);
         }
         */
+        return;
         Artifact art = other.GetComponent<Artifact>();
         if (art != null) {
             Debug.Log("triggered");
@@ -125,6 +115,7 @@ public class Player : MonoBehaviour {
     }
 
     void OnCollisionEnter2D(Collision2D coll) {
+        return;
         // if planet
         // play destroy animation
         /*foreach (var art in inventory) {
@@ -143,7 +134,7 @@ public class Player : MonoBehaviour {
 
     void OnHit() {
         health -= damagePerHit;
-        Spin();
+        //Spin();
         StartCoroutine(ShowHealthBar());
         if (health < 0)  {
             currentState = State.Destroyed;
@@ -159,12 +150,6 @@ public class Player : MonoBehaviour {
         rg2d.AddTorque(
                 Random.Range(spinTorque.minimum, spinTorque.maximum),
                 ForceMode2D.Impulse);
-    }
-
-    float altitude {
-        get {
-            return transform.position.y;
-        }
     }
 
     IEnumerator ShowHealthBar() {
