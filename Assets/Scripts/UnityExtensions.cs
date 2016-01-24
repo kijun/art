@@ -30,4 +30,11 @@ public static class UnityExtensions {
         v.z += val;
         return v;
     }
+
+    public static Vector2 RandomPoint(this Bounds b) {
+        var center = b.center;
+        var extents = b.extents;
+        return new Vector2(Random.Range(center.x - extents.x, center.x + extents.x),
+                           Random.Range(center.y - extents.y, center.y + extents.y));
+    }
 }

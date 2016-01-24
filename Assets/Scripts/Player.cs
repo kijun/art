@@ -83,12 +83,8 @@ public class Player : MonoBehaviour {
     }
 
     Vector2 ConstrainPoint(Vector2 point) {
-        Debug.Log(localPositionConstraint.bounds + ":" + point);
         if (!localPositionConstraint.bounds.Contains(point)) {
             point = localPositionConstraint.bounds.ClosestPoint(point);
-            Debug.Log("constrained at " + point);
-        } else {
-            Debug.Log("good");
         }
         return point;
     }
