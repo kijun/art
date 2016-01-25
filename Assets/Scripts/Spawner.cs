@@ -28,8 +28,6 @@ public class Spawner : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
         if (!GameManager.instance.journeying) return;
-
-
         /*
         if (!madeOne) {
             var a = Instantiate(artifact);
@@ -62,7 +60,7 @@ public class Spawner : MonoBehaviour {
                 var a = Instantiate<SnowFlake>(snowFlake);
                 a.transform.position = RandomStartPoint();
                 a.FallDown(Random.Range(-160, 160),
-                        new Vector2(Random.Range(-2, 2), Random.Range(-2, -3)));
+                        new Vector2(Random.Range(-2, 2), Random.Range(0, 0)));
             }
 
             yield return new WaitForSeconds(0.1f);
