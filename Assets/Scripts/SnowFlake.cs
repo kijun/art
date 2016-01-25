@@ -21,7 +21,6 @@ public class SnowFlake : MonoBehaviour {
 	}
 
     public void FallDown(float aV, Vector2 v) {
-        Debug.Log("falling");
         rg2d.angularVelocity = aV;
         rg2d.velocity = v;
         StartCoroutine(Detach(Random.Range(ejectAt.minimum, ejectAt.maximum)));
@@ -33,7 +32,6 @@ public class SnowFlake : MonoBehaviour {
         var currVel = rg2d.velocity;
         foreach (Rigidbody2D arm in arms) {
             var dir = arm.position - center.position;
-            Debug.Log(dir);
             arm.velocity = ejectionSpeed*Vector3.Normalize(dir);
         }
         center.velocity = currVel;

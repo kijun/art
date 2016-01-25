@@ -62,7 +62,7 @@ public class Spawner : MonoBehaviour {
                 var a = Instantiate<SnowFlake>(snowFlake);
                 a.transform.position = RandomStartPoint();
                 a.FallDown(Random.Range(-160, 160),
-                        new Vector2(Random.Range(-2, 2), Random.Range(-2, -7)));
+                        new Vector2(Random.Range(-2, 2), Random.Range(-2, -3)));
             }
 
             yield return new WaitForSeconds(0.1f);
