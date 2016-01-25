@@ -37,4 +37,8 @@ public static class UnityExtensions {
         return new Vector2(Random.Range(center.x - extents.x, center.x + extents.x),
                            Random.Range(center.y - extents.y, center.y + extents.y));
     }
+
+    public static float RandomValue(this Range r) {
+        return Random.Range(r.minimum, r.maximum);
+    }
 }
