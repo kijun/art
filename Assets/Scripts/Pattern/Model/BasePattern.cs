@@ -1,7 +1,8 @@
 using UnityEngine;
 using System;
 
-public abstract class BasePattern : ScriptableObject {
-    public Type controllerType;
+//public abstract class BasePattern : ScriptableObject {
+public abstract class BasePattern {//: ScriptableObject {
+    public abstract Type controllerType { get; }
 }
 

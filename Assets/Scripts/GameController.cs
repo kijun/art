@@ -16,7 +16,7 @@ public class GameController : MonoBehaviour {
         // 0:0
         var stage = new Stage(0, 0);
         stage.introduction = "As he left the familiar airspace, Quinti found himself tormented with the thoughts he'd left behind. \nHis first memory was of winter.";
-        stage.AddPattern(0, new MoonPattern());
+        stage.AddPattern(0, new MoonPattern{sweepDuration = 1f, sweepAngle = 90f});
 
         stages.Add(stage);
     }
