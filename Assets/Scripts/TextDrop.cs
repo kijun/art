@@ -29,6 +29,7 @@ public class TextDrop : MonoBehaviour {
             letters.Clear();
 
             var word = words[Random.Range(0, words.Count)];
+            word = word.ToUpper();
             float midpoint = word.Length/2.0f;
             for (int i = 0; i<word.Length; i++) {
                 string letter = word.Substring(i, 1);

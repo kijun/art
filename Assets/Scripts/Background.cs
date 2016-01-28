@@ -40,5 +40,6 @@ public class Background : MonoBehaviour {
         //Debug.Log(lerp);
         //bgRenderer.material.Lerp(bg1, bg2, lerp);
         //bgRenderer.material.SetFloat( "_Blend", lerp );
+        Debug.Log(offset.y);
 	}
 }
