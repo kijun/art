@@ -27,14 +27,10 @@ public class PatternControllerFactory : MonoBehaviour {
                 break;
         }
         */
-        Debug.Log(bparam);
-        Debug.Log("A" + bparam.controllerType);
         if (bparam.controllerType == typeof(MoonPatternController)) {
-            Debug.Log("B");
             bctrl = Instantiate(moonPrefab);
         }
 
-        Debug.Log("C " + bctrl);
         //
         if (bctrl) bctrl.Initialize(bparam);
         return bctrl;

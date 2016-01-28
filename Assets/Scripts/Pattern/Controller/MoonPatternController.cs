@@ -27,7 +27,7 @@ public class MoonPatternController : BasePatternController {
     }
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         GetComponent<Renderer>().sortingLayerName = "Midground";
         beamR = beam.GetComponent<Renderer>();
 	}
@@ -80,7 +80,6 @@ public class MoonPatternController : BasePatternController {
         float sweepStart = Time.time;
         while (param.sweepDuration + sweepStart > Time.time) {
             float targetAngle = Mathf.Lerp(startAngle, angle, (Time.time - sweepStart) / param.sweepDuration);
-            Debug.Log(targetAngle);
             SetBeamToAngle(targetAngle);
             yield return null;
         }

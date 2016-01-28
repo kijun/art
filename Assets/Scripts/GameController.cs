@@ -15,14 +15,29 @@ public class GameController : MonoBehaviour {
 
         // 0:0
         var stage = new Stage(0, 0);
-        stage.introduction = "As he left the familiar airspace, Quinti found himself tormented with the thoughts he'd left behind. \nHis first memory was of winter.";
-        stage.AddPattern(0, new MoonPattern{sweepDuration = 1f, sweepAngle = 90f});
+        stage.introduction = "As he left the familiar airspace, Quinti found himself tormented with the thoughts he'd left behind. \n\nHis first memory was of winter.";
+        stage.AddPattern(0, new MoonPattern());
+        stage.duration = 5f;
+        stages.Add(stage);
 
+        stage = new Stage(0, 1);
+        stage.introduction = "The moon is scarier";
+        stage.AddPattern(0, new MoonPattern{sweepDuration = 5f, sweepAngle = 45f});
+        stage.duration = 10f;
         stages.Add(stage);
     }
 
     public void Start() {
-        stageCtrl.RunStage(stages[0]);
+        StartCoroutine(RunStages());
+    }
+
+    IEnumerator RunStages() {
+        foreach (Stage s in stages) {
+            Debug.Log("AAA");
+            yield return StartCoroutine(stageCtrl.RunStage(s));
+            Debug.Log("BBB");
+            yield return new WaitForSeconds(s.duration);
+        }
     }
 }
 
