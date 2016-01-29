@@ -76,6 +76,10 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    public void ChangeState(State state) {
+        currentState = state;
+    }
+
     Vector2 ConstrainPoint(Vector2 point) {
         if (!localPositionConstraint.bounds.Contains(point)) {
             point = localPositionConstraint.bounds.ClosestPoint(point);

@@ -26,9 +26,12 @@ public class GameStatePlay : GameState {
         }
         DontDestroyOnLoad(gameObject);
 
+
         stages = new List<Stage>();
         stageCtrl = GetComponent<StageController>();
         TempSetupStages();
+
+SetCurrentStage(stages[0]);
 
         //playerCtrl = Instantiate<PlayerController>(playerPrefab);
         playerCtrl = playerPrefab;//Instantiate<PlayerController>(playerPrefab);
@@ -39,6 +42,7 @@ public class GameStatePlay : GameState {
     public override void Run(GameStateChangeRequestDelegate onChange) {
         Debug.Log("run");
         base.Run(onChange);
+        playerCtrl.ChangeState(PlayerController.State.Normal);
         StartCoroutine(RunStages());
     }
 
@@ -64,14 +68,32 @@ public class GameStatePlay : GameState {
 
     // Clean Up
     public override void CleanUp() {
+        stageCtrl.CleanUp();
     }
 
     // Game State Management
-    void OnHit() {
+    void Stop() {
+        StopAllCoroutines();
         stageCtrl.Stop();
+        playerCtrl.ChangeState(PlayerController.State.Destroyed);
+    }
+
+    void OnHit() {
+        // stop coroutines
+        Stop();
+
+        // effect
         CameraFollow.instance.ScreenShake();
-        // pause game - rewind?
-        outputText.text = "Your mind has been wandering...\n\nabout a glass tank high as a cathedral\na palm tree which plays the harp\na square with a horseshoe marble table\na marble tablecloth\nset with foods and beverages\nalso of marble\n\n\ntry again.";
+        outputText.text = "Your mind has been wandering...\n\nabout a glass tank high as a cathedral\na palm tree which plays the harp\na square with a horseshoe marble table\na marble tablecloth\nset with foods and beverages\nalso of marble\n\ntry again.";
+
+        StartCoroutine(Transition());
+    }
+
+    IEnumerator Transition() {
+        yield return new WaitForSeconds(3f);
+        while (!Input.anyKeyDown) {
+            yield return null;
+        }
         onChangeDelegate(GameStateDefeat.instance);
     }
 
