@@ -33,9 +33,7 @@ public class GameController : MonoBehaviour {
 
     IEnumerator RunStages() {
         foreach (Stage s in stages) {
-            Debug.Log("AAA");
             yield return StartCoroutine(stageCtrl.RunStage(s));
-            Debug.Log("BBB");
             yield return new WaitForSeconds(s.duration);
         }
     }

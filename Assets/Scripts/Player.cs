@@ -98,16 +98,20 @@ public class Player : MonoBehaviour {
             inventory.Add(art);
         }
         */
-        return;
+        if (!other.gameObject.tag.Equals(Tags.Bullet)) {
+            return;
+        }
+        /*
         Artifact art = other.GetComponent<Artifact>();
         if (art != null) {
             Debug.Log("triggered");
             art.BlazeAndFade();
             UIManager.instance.ShowText(art);
         } else {
-            Destroy(other.gameObject);
+        */
+            //Destroy(other.transform.root.gameObject);
             OnHit();
-        }
+        //}
     }
 
     void OnCollisionEnter2D(Collision2D coll) {
