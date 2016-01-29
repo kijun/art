@@ -10,6 +10,7 @@ public abstract class GameState : MonoBehaviour {
 
     protected GameStateChangeRequestDelegate onChangeDelegate;
 
+    /*
     protected virtual void Awake() {
         if (instance == null) {
             instance = this;
@@ -18,6 +19,7 @@ public abstract class GameState : MonoBehaviour {
         }
         DontDestroyOnLoad(gameObject);
     }
+    */
 
     public virtual void Run(GameStateChangeRequestDelegate onChange) {
         onChangeDelegate = onChange;

@@ -11,7 +11,6 @@ public class StageController : MonoBehaviour {
 
     void Awake() {
         patternFactory = GetComponent<PatternControllerFactory>();
-        Debug.Log(patternFactory);
     }
 
     public IEnumerator RunStage(Stage stage) {

@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour {
             currentState.CleanUp();
         }
         currentState = gameStateInstance;
+        Debug.Log(currentState);
         currentState.Run(ChangeState);
     }
 }

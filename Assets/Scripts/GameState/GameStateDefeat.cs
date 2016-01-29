@@ -4,7 +4,17 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GameStateDefeat : GameState {
+    public static GameState instance;
     private Text defeatTextUI;
+
+    protected void Awake() {
+        if (instance == null) {
+            instance = this;
+        } else if (instance != this) {
+            Destroy(gameObject);
+        }
+        DontDestroyOnLoad(gameObject);
+    }
 
     public IEnumerator Run() {
         // show text
@@ -17,5 +27,6 @@ public class GameStateDefeat : GameState {
 
     public override void CleanUp() {
     }
+
 }
 

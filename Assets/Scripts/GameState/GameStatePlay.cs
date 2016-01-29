@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GameStatePlay : GameState {
+    public static GameState instance;
     private const string PrefKeyStageLastPlayed = "StageLastPlayed";
 
     public PlayerController playerPrefab;
@@ -18,7 +19,13 @@ public class GameStatePlay : GameState {
     // Object Setup
 
     protected void Awake() {
-        base.Awake();
+        if (instance == null) {
+            instance = this;
+        } else if (instance != this) {
+            Destroy(gameObject);
+        }
+        DontDestroyOnLoad(gameObject);
+
         stages = new List<Stage>();
         stageCtrl = GetComponent<StageController>();
         TempSetupStages();
@@ -29,13 +36,15 @@ public class GameStatePlay : GameState {
     }
     // Main Script
 
-    public void Run(GameStateChangeRequestDelegate onChange) {
+    public override void Run(GameStateChangeRequestDelegate onChange) {
+        Debug.Log("run");
         base.Run(onChange);
         StartCoroutine(RunStages());
     }
 
     IEnumerator RunStages() {
         for (int i = LoadLastStageIndex(); i<stages.Count; i++) {
+            Debug.Log("Running stage " + i);
             Stage stage = stages[i];
             SetCurrentStage(stage);
             yield return StartCoroutine(stageCtrl.RunStage(stage));
