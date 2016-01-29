@@ -33,6 +33,11 @@ public class StageController : MonoBehaviour {
         BasePatternController bctrl = patternFactory.CreateController(bparam);
         yield return StartCoroutine(bctrl.Run());
     }
+
+    public void Stop() {
+        // will this care of future coroutines?
+        StopAllCoroutines();
+    }
 }
 
 

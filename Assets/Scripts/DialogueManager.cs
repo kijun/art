@@ -2,22 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameState {
+public class GameStats {
 
     public bool running;
     public float altitude;
     public int destroyedComets;
     public float gameTime;
 
-    private static GameState inst;
+    private static GameStats inst;
 
-    private GameState() {
+    private GameStats() {
     }
 
-    public static GameState Instance {
+    public static GameStats Instance {
         get {
             if (inst == null) {
-                inst = new GameState();
+                inst = new GameStats();
             }
 
             return inst;
@@ -43,13 +43,13 @@ public class DialogueManager {
         foreach (var d in remainingDialogues.Values) {
 
             if (nextDialogue == null) {
-                if (d.Ready(GameState.Instance, completedDialogues)) {
+                if (d.Ready(GameStats.Instance, completedDialogues)) {
                     nextDialogue = d;
                 }
             }
 
             else if (d.priority < nextDialogue.priority &&
-                     d.Ready(GameState.Instance, completedDialogues)) {
+                     d.Ready(GameStats.Instance, completedDialogues)) {
                 nextDialogue = d;
             }
         }
@@ -91,7 +91,7 @@ public class Dialogue {
         conditions = new List<Condition>();
     }
 
-    public bool Ready(GameState states, Dictionary<int, Dialogue> completed) {
+    public bool Ready(GameStats states, Dictionary<int, Dialogue> completed) {
         if (conditions != null) {
             foreach (var cond in conditions) {
                 if (!cond.Check(states, completed)) return false;
@@ -103,13 +103,13 @@ public class Dialogue {
 }
 
 public abstract class Condition {
-    public abstract bool Check(GameState states, Dictionary<int, Dialogue> completed);
+    public abstract bool Check(GameStats states, Dictionary<int, Dialogue> completed);
 }
 
 public class AltitudeStateCondition : Condition {
     public float value;
 
-    public override bool Check(GameState states, Dictionary<int, Dialogue> completed) {
+    public override bool Check(GameStats states, Dictionary<int, Dialogue> completed) {
         // TODO: how?
         return value > states.altitude;
     }
@@ -118,7 +118,7 @@ public class AltitudeStateCondition : Condition {
 public class TimeStateCondition : Condition {
     public float value;
 
-    public override bool Check(GameState states, Dictionary<int, Dialogue> completed) {
+    public override bool Check(GameStats states, Dictionary<int, Dialogue> completed) {
         // TODO: how?
         return value > states.gameTime;
     }
@@ -127,7 +127,7 @@ public class TimeStateCondition : Condition {
 public class CometStateCondition : Condition {
     public float value;
 
-    public override bool Check(GameState states, Dictionary<int, Dialogue> completed) {
+    public override bool Check(GameStats states, Dictionary<int, Dialogue> completed) {
         // TODO: how?
         return value > states.destroyedComets;
     }
@@ -136,7 +136,7 @@ public class CometStateCondition : Condition {
 public class DependencyCondition : Condition {
     public int dependentDialogueID;
 
-    public override bool Check(GameState states, Dictionary<int, Dialogue> completed) {
+    public override bool Check(GameStats states, Dictionary<int, Dialogue> completed) {
         return completed.ContainsKey(dependentDialogueID);
     }
 }

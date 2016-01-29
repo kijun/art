@@ -1,25 +1,18 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
+public delegate void OnHitDelegate();
 
-public class Player : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
 
     public float xSpeed = 1f;
     public float ySpeed = 1f;
-    public float maxAltitude = 15f;
 
-    public int maxHealth = 100;
-    public int damagePerHit = 30;
-    public Count spinTorque = new Count(30, 100);
-    public float spinDuration = 2f;
     public AudioSource soundSource;
     public AudioClip hitSound;
     public BoxCollider2D localPositionConstraint;
-
-    public float altitude = 0f;
-    public float fixedYSpeed = 0f;
 
     public enum State {
         Start,
@@ -29,27 +22,24 @@ public class Player : MonoBehaviour {
         Won
     }
 
-    public delegate void OnHitDelegate();
+    public OnHitDelegate OnHit;
 
-    private float spinUntil;
+
     private State currentState = State.Start;
-    private int health;
     private Rigidbody2D rg2d;
-    private List<Artifact> inventory = new List<Artifact>();
 
 	// Use this for initialization
 	void Awake () {
         rg2d = GetComponent<Rigidbody2D>();
-        health = maxHealth;
 	}
 
 	// Update is called once per frame
 	void FixedUpdate () {
         switch (currentState) {
             case State.Start:
-                if (GameManager.instance.journeying) {
+                //if (GameManager.instance.journeying) {
                     currentState = State.Normal;
-                }
+                //}
                 break;
             case State.Normal:
                 float xdir = Input.GetAxisRaw("Horizontal");
@@ -72,9 +62,11 @@ public class Player : MonoBehaviour {
 
                 break;
             case State.Hit:
+                /*
                 if (Time.time > spinUntil) {
                     currentState = State.Normal;
                 }
+                */
                 break;
             case State.Destroyed:
                 break;
@@ -95,39 +87,8 @@ public class Player : MonoBehaviour {
         if (!other.gameObject.tag.Equals(Tags.Bullet)) {
             return;
         }
-        OnHit();
-    }
-
-    void OnCollisionEnter2D(Collision2D coll) {
-        return;
-        OnHit();
-    }
-
-    void OnHit() {
-        health -= damagePerHit;
-        //Spin();
-        StartCoroutine(ShowHealthBar());
-        if (health < 0)  {
-            currentState = State.Destroyed;
-        } else {
-            currentState = State.Hit;
-        }
-        spinUntil = Time.time + spinDuration;
-        CameraFollow.instance.ScreenShake();
+        //OnHit();
         soundSource.PlayOneShot(hitSound);
-    }
-
-    void Spin() {
-        rg2d.AddTorque(
-                UnityEngine.Random.Range(spinTorque.minimum, spinTorque.maximum),
-                ForceMode2D.Impulse);
-    }
-
-    IEnumerator ShowHealthBar() {
-        // set health
-        // fade in healthbar
-        yield return new WaitForSeconds(2);
-        // fade out healthbar
-        yield return null;
+        OnHit();
     }
 }
