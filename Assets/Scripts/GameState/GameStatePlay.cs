@@ -41,6 +41,7 @@ SetCurrentStage(stages[0]);
 
     public override void Run(GameStateChangeRequestDelegate onChange) {
         Debug.Log("run");
+        playerCtrl.Reset();
         base.Run(onChange);
         playerCtrl.ChangeState(PlayerController.State.Normal);
         StartCoroutine(RunStages());
@@ -54,6 +55,7 @@ SetCurrentStage(stages[0]);
             yield return StartCoroutine(stageCtrl.RunStage(stage));
             yield return new WaitForSeconds(stage.duration);
         }
+        OnWin();
     }
 
     // Stage Accesors
@@ -97,6 +99,13 @@ SetCurrentStage(stages[0]);
         onChangeDelegate(GameStateDefeat.instance);
     }
 
+    void OnWin() {
+        Stop();
+        outputText.text = "You won.\n\nPlay from the beginning.";
+        SetCurrentStage(stages[0]);
+        StartCoroutine(Transition());
+    }
+
     // TODO: load from UnityAsset
     void TempSetupStages() {
         // 0:0
@@ -110,7 +119,7 @@ SetCurrentStage(stages[0]);
         stage = new Stage(0, 1);
         stage.introduction = "The moon is scarier";
         stage.AddPattern(0, new MoonPattern{sweepDuration = 5f, sweepAngle = 45f});
-        stage.duration = 10f;
+        stage.duration = 3f;
         stages.Add(stage);
     }
 

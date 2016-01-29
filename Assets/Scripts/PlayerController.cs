@@ -25,12 +25,14 @@ public class PlayerController : MonoBehaviour {
     public OnHitDelegate OnHit;
 
 
+    private Vector2 originalPosition;
     private State currentState = State.Start;
     private Rigidbody2D rg2d;
 
 	// Use this for initialization
 	void Awake () {
         rg2d = GetComponent<Rigidbody2D>();
+        originalPosition = transform.position;
 	}
 
 	// Update is called once per frame
@@ -78,6 +80,10 @@ public class PlayerController : MonoBehaviour {
 
     public void ChangeState(State state) {
         currentState = state;
+    }
+
+    public void Reset() {
+        transform.position = originalPosition;
     }
 
     Vector2 ConstrainPoint(Vector2 point) {
