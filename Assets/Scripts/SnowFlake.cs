@@ -40,9 +40,13 @@ public class SnowFlake : MonoBehaviour {
             armRB.velocity = ejectionSpeed*Vector3.Normalize(dir);
         }
         // eject center
+        /*
         Rigidbody2D centerRB = center.AddComponent<Rigidbody2D>();
         centerRB.gravityScale = 0;
         centerRB.velocity = currVel;
+        Destroy(centerRB);
+        */
+        Destroy(center);
         Destroy(this.gameObject);
     }
 }

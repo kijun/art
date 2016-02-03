@@ -78,6 +78,11 @@ SetCurrentStage(stages[0]);
         StopAllCoroutines();
         stageCtrl.Stop();
         playerCtrl.ChangeState(PlayerController.State.Destroyed);
+
+        // stop all activators
+        foreach (Activator a in FindObjectsOfType<Activator>()) {
+            a.Reset();
+        }
     }
 
     void OnHit() {

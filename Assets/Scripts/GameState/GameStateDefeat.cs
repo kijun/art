@@ -18,6 +18,10 @@ public class GameStateDefeat : GameState {
 
     public override void Run(GameStateChangeRequestDelegate onChange) {
         base.Run(onChange);
+
+        foreach (Activator a in FindObjectsOfType<Activator>()) {
+            a.Run();
+        }
         onChangeDelegate(GameStatePlay.instance);
         //StartCoroutine(WaitForInput());
     }
