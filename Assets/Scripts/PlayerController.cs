@@ -8,7 +8,8 @@ public delegate void OnHitDelegate();
 public class PlayerController : MonoBehaviour {
 
     public float xSpeed = 1f;
-    public float ySpeed = 1f;
+    public float yDeltaSpeed = 1f;
+    public float yBaseSpeed = 5f;
 
     public AudioSource soundSource;
     public AudioClip hitSound;
@@ -36,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
         switch (currentState) {
             case State.Start:
                 //if (GameManager.instance.journeying) {
@@ -49,7 +50,7 @@ public class PlayerController : MonoBehaviour {
                 Vector2 newPos = transform.position;
 
                 newPos.x += xdir * xSpeed * Time.deltaTime;
-                newPos.y += ydir * ySpeed * Time.deltaTime;
+                newPos.y += (ydir * yDeltaSpeed + yBaseSpeed) * Time.deltaTime;
 
                 newPos = ConstrainPoint(newPos);
 

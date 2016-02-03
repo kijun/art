@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class SnowFlake : MonoBehaviour {
 
-    public Rigidbody2D center;
-    public List<Rigidbody2D> arms;
+    public GameObject center;
+    public List<GameObject> arms;
     public Range ejectAt = new Range(1.5f, 3f);
     public float ejectionSpeed = 4;
 
@@ -18,6 +18,7 @@ public class SnowFlake : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        //FallDown(50, new Vector2(-2, -4));
 	}
 
     public void FallDown(float aV, Vector2 v) {
@@ -30,11 +31,18 @@ public class SnowFlake : MonoBehaviour {
         yield return new WaitForSeconds(waitTime);
         transform.DetachChildren();
         var currVel = rg2d.velocity;
-        foreach (Rigidbody2D arm in arms) {
-            var dir = arm.position - center.position;
-            arm.velocity = ejectionSpeed*Vector3.Normalize(dir);
+        // eject arms
+        foreach (GameObject armGO in arms) {
+            Rigidbody2D armRB = armGO.AddComponent<Rigidbody2D>();
+            armRB.gravityScale = 0;
+
+            var dir = armRB.position - (Vector2)center.transform.position;
+            armRB.velocity = ejectionSpeed*Vector3.Normalize(dir);
         }
-        center.velocity = currVel;
+        // eject center
+        Rigidbody2D centerRB = center.AddComponent<Rigidbody2D>();
+        centerRB.gravityScale = 0;
+        centerRB.velocity = currVel;
         Destroy(this.gameObject);
     }
 }

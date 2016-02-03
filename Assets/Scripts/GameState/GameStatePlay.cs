@@ -85,17 +85,22 @@ SetCurrentStage(stages[0]);
         Stop();
 
         // effect
-        CameraFollow.instance.ScreenShake();
+        //CameraFollow.instance.ScreenShake();
         outputText.text = "Your mind has been wandering...\n\nabout a glass tank high as a cathedral\na palm tree which plays the harp\na square with a horseshoe marble table\na marble tablecloth\nset with foods and beverages\nalso of marble\n\ntry again.";
 
         StartCoroutine(Transition());
     }
 
     IEnumerator Transition() {
-        yield return new WaitForSeconds(3f);
+        Time.timeScale = 0;
+        Debug.Log("waiting");
+        //yield return new WaitForSeconds(3f);
         while (!Input.anyKeyDown) {
             yield return null;
         }
+        playerCtrl.transform.position = new Vector2(0, -2);
+        Camera.main.transform.position = new Vector3(0, 0, -10);
+        Time.timeScale = 1;
         onChangeDelegate(GameStateDefeat.instance);
     }
 
@@ -111,8 +116,8 @@ SetCurrentStage(stages[0]);
         // 0:0
         var stage = new Stage(0, 0);
         stage.introduction = "As he left the familiar airspace, Quinti found himself tormented with the thoughts he'd left behind. \n\nHis first memory was of winter.";
-        stage.AddPattern(0, new MoonPattern());
-        stage.duration = 5f;
+        //stage.AddPattern(0, new MoonPattern());
+        stage.duration = 100f;
         stages.Add(stage);
 
         // 0:1
