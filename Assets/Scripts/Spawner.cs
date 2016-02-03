@@ -63,13 +63,15 @@ public class Spawner : MonoBehaviour {
             //if (Random.value < (1f/rateOfComet)*0.1f) {
         while (true) {
             if (enabled) {
-                var a = Instantiate<SnowFlake>(snowFlake);
-                a.transform.position = RandomStartPoint();
-                a.FallDown(Random.Range(-160, 160), new Vector2(Random.Range(-2, 2), Random.Range(0, 0)));
+                if (Random.value < (1f/rateOfComet)*0.1f) {
+                    var a = Instantiate<SnowFlake>(snowFlake);
+                    a.transform.position = RandomStartPoint();
+                    a.FallDown(Random.Range(-160, 160), new Vector2(Random.Range(-2, 2), Random.Range(0, 0)));
+                }
             }
         //}
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 

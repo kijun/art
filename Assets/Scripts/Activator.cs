@@ -6,6 +6,8 @@ public class Activator : MonoBehaviour {
     public float distanceToActivate = 5;
     public float distanceToDeactivate = 0;
     public MonoBehaviour toActivate;
+    public BoxCollider2D activationZone;
+    public BoxCollider2D endZone;
 
     private PlayerController playerCtrl;
 
@@ -36,12 +38,12 @@ public class Activator : MonoBehaviour {
 	}
 
     IEnumerator RunActivator() {
-        while (transform.position.y > playerCtrl.transform.position.y + distanceToActivate) {
+        while (!activationZone.bounds.Contains(playerCtrl.transform.position)) {
             yield return null;
         }
         toActivate.enabled = true;
 
-        while (transform.position.y > playerCtrl.transform.position.y + distanceToDeactivate) {
+        while (!endZone.bounds.Contains(playerCtrl.transform.position)) {
             yield return null;
         }
         toActivate.enabled = false;
