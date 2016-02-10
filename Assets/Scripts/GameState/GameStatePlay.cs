@@ -55,7 +55,7 @@ SetCurrentStage(stages[0]);
             yield return StartCoroutine(stageCtrl.RunStage(stage));
             yield return new WaitForSeconds(stage.duration);
         }
-        OnWin();
+        //OnWin();
     }
 
     // Stage Accesors

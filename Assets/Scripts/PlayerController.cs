@@ -98,11 +98,14 @@ public class PlayerController : MonoBehaviour {
     }
 
     void OnTriggerEnter2D (Collider2D other) {
+        Debug.Log("hit by" + other + other.gameObject.name);
         if (!other.gameObject.tag.Equals(Tags.Bullet)) {
             return;
         }
+
+        //Debug.Log("hit by" + other + other.gameObject.name);
         //OnHit();
         soundSource.PlayOneShot(hitSound);
-        OnHit();
+        //OnHit();
     }
 }
