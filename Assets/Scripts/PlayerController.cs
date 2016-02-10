@@ -45,6 +45,9 @@ public class PlayerController : MonoBehaviour {
                 //}
                 break;
             case State.Normal:
+                if (Input.GetKeyDown("up")) {
+                    yBaseSpeed = 0.5f;
+                }
                 float xdir = Input.GetAxisRaw("Horizontal");
                 float ydir = Input.GetAxisRaw("Vertical");
                 Vector2 newPos = transform.position;

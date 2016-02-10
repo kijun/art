@@ -5,7 +5,6 @@ public class CameraController : MonoBehaviour {
 
     public static CameraController instance;
 
-
     private PlayerController player;
     private bool shaking;
 

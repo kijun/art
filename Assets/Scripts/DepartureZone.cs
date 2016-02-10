@@ -7,6 +7,7 @@ public class DepartureZone : MonoBehaviour {
     public ShadowShipController shipPrefab;
     public float secondsBetweenShips;
     public int startingShipCount = 30;
+    public Range speedRange = new Range(0.3f, 0.7f);
     //public Vector2[] initialSpawnLocation;
     //public BoxCollider2D departureZone;
 
@@ -26,22 +27,27 @@ public class DepartureZone : MonoBehaviour {
     IEnumerator SpawnShadowShip() {
         // first spawn some
         for (int i = 0; i<startingShipCount; i++) {
-            Instantiate(shipPrefab,
-                        RandomShipPosition(initialSpawnZone.bounds),
-                        Quaternion.identity);
+            InstantiateShip(initialSpawnZone.bounds);
         }
 
         while (spawnShip)  {
             yield return new WaitForSeconds(secondsBetweenShips);
-            Instantiate(shipPrefab,
-                        RandomShipPosition(departureZone),
-                        Quaternion.identity);
+            InstantiateShip(departureZone);
         }
     }
 
     Vector2 RandomShipPosition(Bounds bounds) {
         return bounds.RandomPoint();
     }
+
+    void InstantiateShip(Bounds bounds) {
+        var ship = (ShadowShipController)Instantiate(shipPrefab,
+                                                     RandomShipPosition(bounds),
+                                                     Quaternion.identity);
+
+        ship.GetComponent<Rigidbody2D>().velocity = new Vector2(0, speedRange.RandomValue());
+    }
+
 
 	// Update is called once per frame
 	void Update () {

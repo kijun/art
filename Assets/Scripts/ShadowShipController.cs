@@ -19,7 +19,7 @@ public class ShadowShipController : MonoBehaviour {
         material.color = c;
 
         rgbd = GetComponent<Rigidbody2D>();
-        rgbd.velocity = new Vector2(0, speed);
+//        rgbd.velocity = new Vector2(0, speed);
 	}
 
     void OnTriggerEnter2D(Collider2D other) {
