@@ -98,7 +98,7 @@ SetCurrentStage(stages[0]);
 
     IEnumerator Transition() {
         Time.timeScale = 0;
-        Debug.Log("waiting");
+        Debug.Log("You've been hit");
         //yield return new WaitForSeconds(3f);
         while (!Input.anyKeyDown) {
             yield return null;
