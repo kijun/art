@@ -44,6 +44,10 @@ public class CameraController : MonoBehaviour {
         }
 	}
 
+    public void ResetPosition() {
+        transform.position = transform.position.SwapY(player.transform.position.y + 3.5f);
+    }
+
     void TrackPlayer() {
 		// By default the target x and y coordinates of the camera are it's current x and y coordinates.
 		float targetX = transform.position.x;
@@ -71,13 +75,6 @@ public class CameraController : MonoBehaviour {
         InvokeRepeating("CameraShake", 0, .01f);
         Invoke("StopShaking", 0.3f);
     }
-
-    //void OnCollisionEnter2D(Collision2D coll)
-    //{
-
-    //    shakeAmt = coll.relativeVelocity.magnitude * .0025f;
-
-    //}
 
     void CameraShake() {
         float quakeAmt = Random.value*0.01f*2 - 0.01f;

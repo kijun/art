@@ -42,6 +42,7 @@ SetCurrentStage(stages[0]);
     public override void Run(GameStateChangeRequestDelegate onChange) {
         Debug.Log("run");
         playerCtrl.Reset();
+        Camera.main.GetComponent<CameraController>().ResetPosition();
         base.Run(onChange);
         playerCtrl.ChangeState(PlayerController.State.Normal);
         StartCoroutine(RunStages());
@@ -103,8 +104,10 @@ SetCurrentStage(stages[0]);
         while (!Input.anyKeyDown) {
             yield return null;
         }
+        // TODO get nearest spawn point
         playerCtrl.transform.position = new Vector2(0, -2);
-        Camera.main.transform.position = new Vector3(0, 0, -10);
+        Camera.main.GetComponent<CameraController>().ResetPosition();
+        //Camera.main.transform.position = new Vector3(0, 0, -10);
         Time.timeScale = 1;
         onChangeDelegate(GameStateDefeat.instance);
     }

@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour {
     private Vector2 originalPosition;
     private State currentState = State.Start;
     private Rigidbody2D rg2d;
+    //TODO remove
+    private bool upOnce = true;
 
 	// Use this for initialization
 	void Awake () {
@@ -45,8 +47,11 @@ public class PlayerController : MonoBehaviour {
                 //}
                 break;
             case State.Normal:
-                if (Input.GetKeyDown("up")) {
-                    yBaseSpeed = 0.5f;
+                if (upOnce) {
+                    if (Input.GetKeyDown("up")) {
+                        yBaseSpeed = 0.5f;
+                        upOnce = false;
+                    }
                 }
                 float xdir = Input.GetAxisRaw("Horizontal");
                 float ydir = Input.GetAxisRaw("Vertical");
@@ -87,7 +92,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void Reset() {
-        transform.position = originalPosition;
+        //transform.position = originalPosition;
     }
 
     Vector2 ConstrainPoint(Vector2 point) {

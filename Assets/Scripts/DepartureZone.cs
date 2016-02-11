@@ -14,9 +14,11 @@ public class DepartureZone : MonoBehaviour {
     private BoxCollider2D initialSpawnZone;
     private bool spawnShip = true;
     private Bounds departureZone;
+    private PlayerController playerController;
 
 	// Use this for initialization
 	void Start () {
+        playerController = GameObject.FindObjectOfType<PlayerController>();
         initialSpawnZone = GetComponent<BoxCollider2D>();
         departureZone = initialSpawnZone.bounds;
         departureZone.center = departureZone.center.SwapY(departureZone.min.y);
@@ -51,7 +53,11 @@ public class DepartureZone : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-
+        if (!spawnShip) return;
+        if (!initialSpawnZone.bounds.Contains(playerController.transform.position)) return;
+        if (Input.GetKeyDown("up")) {
+            playerController.yBaseSpeed = 0.5f;
+        }
 	}
 
     void OnTriggerExit2D(Collider2D other) {
