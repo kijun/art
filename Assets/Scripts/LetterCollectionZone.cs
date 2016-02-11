@@ -14,7 +14,7 @@ public class LetterCollectionZone : MonoBehaviour {
     private BoxCollider2D fixCameraZone;
     private PlayerController player;
     private bool solved = false;
-    private float baseSpeedCache;
+    private float baseSpeedCache = 0.5f;
 	// Use this for initialization
 	void Start () {
         fixCameraZone = GetComponent<BoxCollider2D>();
@@ -30,7 +30,7 @@ public class LetterCollectionZone : MonoBehaviour {
         if (solved) return;
         if (other.gameObject.tag == "Player") {
             player = other.GetComponent<PlayerController>();
-            baseSpeedCache = player.yBaseSpeed;
+//            baseSpeedCache = player.yBaseSpeed;
             player.yBaseSpeed = 0;
         }
     }
