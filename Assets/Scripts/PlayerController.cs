@@ -5,11 +5,20 @@ using System.Collections.Generic;
 
 public delegate void OnHitDelegate();
 
+[System.Serializable]
+public class ShipStats {
+    public float maxXSpeed = 1.05f;
+    public float maxYSpeed = 1.05f;
+    public float baseYSpeed = 0.5f;
+}
+
 public class PlayerController : MonoBehaviour {
 
-    public float xSpeed = 1f;
-    public float yDeltaSpeed = 1f;
-    public float yBaseSpeed = 5f;
+    //public float xSpeed { get; private set;}
+    public float yDeltaSpeed {get; private set;}
+    public float yBaseSpeed {get; private set;}
+
+    public ShipStats stats;
 
     public AudioSource soundSource;
     public AudioClip hitSound;
@@ -32,6 +41,17 @@ public class PlayerController : MonoBehaviour {
     //TODO remove
     private bool upOnce = true;
 
+    // Stats
+    public void LockCurrentRegion() {
+        yDeltaSpeed = stats.maxYSpeed;
+        yBaseSpeed = 0;
+    }
+
+    public void UnlockCurrentRegion() {
+        yDeltaSpeed = stats.maxYSpeed - stats.baseYSpeed;
+        yBaseSpeed = stats.baseYSpeed;
+    }
+
 	// Use this for initialization
 	void Awake () {
         rg2d = GetComponent<Rigidbody2D>();
@@ -49,7 +69,7 @@ public class PlayerController : MonoBehaviour {
             case State.Normal:
                 if (upOnce) {
                     if (Input.GetKeyDown("up")) {
-                        yBaseSpeed = 0.5f;
+                        UnlockCurrentRegion();
                         upOnce = false;
                     }
                 }
@@ -57,7 +77,7 @@ public class PlayerController : MonoBehaviour {
                 float ydir = Input.GetAxisRaw("Vertical");
                 Vector2 newPos = transform.position;
 
-                newPos.x += xdir * xSpeed * Time.deltaTime;
+                newPos.x += xdir * stats.maxXSpeed * Time.deltaTime;
                 newPos.y += (ydir * yDeltaSpeed + yBaseSpeed) * Time.deltaTime;
 
                 newPos = ConstrainPoint(newPos);

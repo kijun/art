@@ -56,7 +56,7 @@ public class DepartureZone : MonoBehaviour {
         if (!spawnShip) return;
         if (!initialSpawnZone.bounds.Contains(playerController.transform.position)) return;
         if (Input.GetKeyDown("up")) {
-            playerController.yBaseSpeed = 0.5f;
+            playerController.UnlockCurrentRegion();
         }
 	}
 
