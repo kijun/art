@@ -8,7 +8,8 @@ public class LetterCollectionZone : MonoBehaviour {
     public string wordToCollect = "wonder";
     public TextMesh banner;
     // right now can't have same letters
-    public HashSet<char> collected = new HashSet<char>();
+    public List<char> collected = new List<char>();
+    //public HashSet<char> collected = new HashSet<char>();
     public float fadeTime = 2f;
     public Color32 colorOnPickup;
 
@@ -18,7 +19,7 @@ public class LetterCollectionZone : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         fixCameraZone = GetComponent<BoxCollider2D>();
-        banner.text = wordToCollect;
+        banner.text = BuildColoredString();
 	}
 
 	// Update is called once per frame
@@ -37,20 +38,36 @@ public class LetterCollectionZone : MonoBehaviour {
 
     public void LetterCollected(char letter) {
         collected.Add(letter);
-
-        string coloredLetter = string.Format("<color={0}{1}{2}{3}>{4}</color>",
-                // todo extension
-                                             colorOnPickup.r.ToString("X2"),
-                                             colorOnPickup.g.ToString("X2"),
-                                             colorOnPickup.b.ToString("X2"),
-                                             colorOnPickup.a.ToString("X2"),
-                                             letter);
-
-        banner.text = banner.text.Replace(letter.ToString(), coloredLetter);
+        banner.text = BuildColoredString();
         if (collected.Count == wordToCollect.Length) {
             solved = true;
             StartCoroutine(ToNextPuzzle());
         }
+    }
+
+    string BuildColoredString() {
+        string text = "";
+        List<char> unusedChars = new List<char>(collected);
+
+        foreach (char l in wordToCollect) {
+            if (unusedChars.Contains(l)) {
+                unusedChars.Remove(l);
+
+                string coloredLetter = string.Format("<color=#{0}{1}{2}{3}>{4}</color>",
+                        // todo extension
+                                                     colorOnPickup.r.ToString("X2"),
+                                                     colorOnPickup.g.ToString("X2"),
+                                                     colorOnPickup.b.ToString("X2"),
+                                                     colorOnPickup.a.ToString("X2"),
+                                                     l);
+                Debug.Log(coloredLetter.Substring(1));
+
+                text += coloredLetter;
+            } else {
+                text += l;
+            }
+        }
+        return text;
     }
 
     IEnumerator ToNextPuzzle() {
