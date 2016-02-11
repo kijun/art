@@ -4,13 +4,17 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 
     public static CameraController instance;
+    public float trackingDuration = 1.3f;
 
     private PlayerController player;
     private bool shaking;
+    private bool locked;
 
+    // INIT
 	// Use this for initialization
 	void Start () {
         shaking = false;
+        locked = false;
 	}
 
     void Awake () {
@@ -24,56 +28,58 @@ public class CameraController : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
     }
 
-    /*
-	bool CheckXMargin() {
-		// Returns true if the distance between the camera and the player in the x axis is greater than the x margin.
-		//return Mathf.Abs(transform.position.x - player.position.x) > xMargin;
-	}
 
-
-	bool CheckYMargin() {
-		// Returns true if the distance between the camera and the player in the y axis is greater than the y margin.
-		//return Mathf.Abs(transform.position.y - player.position.y) > yMargin;
-	}
-    */
-
-	// Update is called once per frame
-	void Update () {
-        if (!shaking) {
-            TrackPlayer();
-        }
-	}
-
+    // API
     public void ResetPosition() {
-        transform.position = transform.position.SwapY(player.transform.position.y + 3.5f);
-    }
-
-    void TrackPlayer() {
-		// By default the target x and y coordinates of the camera are it's current x and y coordinates.
-		float targetX = transform.position.x;
-		float targetY = transform.position.y + Time.deltaTime * player.yBaseSpeed;
-
-		// If the player has moved beyond the x margin...
-		//if(CheckXMargin())
-			// ... the target x coordinate should be a Lerp between the camera's current x position and the player's current x position.
-        //    targetX = player.position.x;
-			//targetX = Mathf.Lerp(transform.position.x, player.position.x, xSmooth * Time.deltaTime);
-
-		// If the player has moved beyond the y margin...
-		//if(CheckYMargin())
-			// ... the target y coordinate should be a Lerp between the camera's current y position and the player's current y position.
-//            targetY = player.position.y - yMargin;
-			//targetY = Mathf.Lerp(transform.position.y, player.position.y, ySmooth * Time.deltaTime);
-
-
-		// Set the camera's position to the target position with the same z component.
-		transform.position = new Vector3(targetX, targetY, transform.position.z);
+        transform.position = DefaultPosition();
     }
 
     public void ScreenShake() {
         shaking = true;
         InvokeRepeating("CameraShake", 0, .01f);
         Invoke("StopShaking", 0.3f);
+    }
+
+    public void LockCamera(Vector2 position) {
+        locked = true;
+        StartCoroutine(TrackToPosition(position));
+    }
+
+    public void UnlockCamera() {
+        StartCoroutine(TrackToPosition(DefaultPosition(), true));
+    }
+
+    IEnumerator TrackToPosition(Vector2 position, bool unlock = false) {
+        float elapsedTime = 0.0f;
+        Vector3 startPos = transform.position;
+        Vector3 endPos = new Vector3(position.x, position.y, startPos.z);
+        while (elapsedTime < trackingDuration) {
+            yield return null;
+            elapsedTime += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, endPos, elapsedTime/trackingDuration);
+        }
+        if (unlock) locked = false;
+    }
+
+
+    Vector3 DefaultPosition() {
+        return transform.position.SwapY(player.transform.position.y + 3.5f);
+    }
+
+    // PRIVATE
+	void Update () {
+        if (!shaking) {
+            TrackPlayer();
+        }
+	}
+
+    void TrackPlayer() {
+        if (locked) return;
+
+		float targetX = transform.position.x;
+		float targetY = transform.position.y + Time.deltaTime * player.yBaseSpeed;
+
+		transform.position = new Vector3(targetX, targetY, transform.position.z);
     }
 
     void CameraShake() {

@@ -7,12 +7,11 @@ public class LetterCollectionZone : MonoBehaviour {
 
     public string wordToCollect = "wonder";
     public TextMesh banner;
-    // right now can't have same letters
-    public List<char> collected = new List<char>();
-    //public HashSet<char> collected = new HashSet<char>();
     public float fadeTime = 2f;
     public Color32 colorOnPickup;
+    public Transform cameraLockPosition;
 
+    private List<char> collected = new List<char>();
     private BoxCollider2D fixCameraZone;
     private PlayerController player;
     private bool solved = false;
@@ -31,8 +30,7 @@ public class LetterCollectionZone : MonoBehaviour {
         if (solved) return;
         if (other.gameObject.tag == "Player") {
             player = other.GetComponent<PlayerController>();
-//            baseSpeedCache = player.yBaseSpeed;
-            player.LockCurrentRegion();
+            Lock();
         }
     }
 
@@ -45,9 +43,19 @@ public class LetterCollectionZone : MonoBehaviour {
         }
     }
 
+    void Lock() {
+        player.LockCurrentRegion();
+        Camera.main.GetComponent<CameraController>().LockCamera(cameraLockPosition.position);
+    }
+
+    void Unlock() {
+        player.UnlockCurrentRegion();
+        Camera.main.GetComponent<CameraController>().UnlockCamera();
+    }
+
     string BuildColoredString() {
         string text = "";
-        List<char> unusedChars = new List<char>(collected);
+        var unusedChars = new List<char>(collected);
 
         foreach (char l in wordToCollect) {
             if (unusedChars.Contains(l)) {
@@ -76,6 +84,6 @@ public class LetterCollectionZone : MonoBehaviour {
             fader.FadeAndDestroy(fadeTime);
         }
         yield return new WaitForSeconds(fadeTime);
-        player.UnlockCurrentRegion();
+        Unlock();
     }
 }
