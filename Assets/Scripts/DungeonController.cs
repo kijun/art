@@ -6,10 +6,12 @@ using System.Collections;
 public class DungeonController : MonoBehaviour {
 
     public GameObject wallPrefab;
+    public Frame framePrefab;
     public Transform cameraLockPosition;
     public float wallWidth = 0.3f;
     public float wallMovementDuration = 5f;
     public float exitWidth = 0.5f;
+    public Collider2D frameSpawnLocation;
 
     private CameraController cameraCtrl;
     private PlayerController player;
@@ -34,10 +36,19 @@ public class DungeonController : MonoBehaviour {
             Camera cam = Camera.main;
             cameraCtrl = cam.GetComponent<CameraController>();
             // TODO add post locking delegate and move walls there
-            cameraCtrl.LockCamera(cameraLockPosition.position,
-                                  delegate() { CreateEnclosure(); });
+            cameraCtrl.LockCamera(
+                    cameraLockPosition.position,
+                    delegate {
+                        CreateEnclosure();
+                        StartCoroutine(CoroutineWithWait(SpawnFrame(), wallMovementDuration));
+                    });
             locked = true;
         }
+    }
+
+    IEnumerator CoroutineWithWait(IEnumerator coroutine, float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        yield return StartCoroutine(coroutine);
     }
 
     void CreateEnclosure() {
@@ -72,18 +83,25 @@ public class DungeonController : MonoBehaviour {
         MoveWall(wall, initPos, endPos);
     }
 
-    void MoveWall(GameObject wall, Vector3 initPosLocal, Vector3 endPosLocal) {
-        var center = cameraLockPosition.position;
-        StartCoroutine(wall.transform.Glide(initPosLocal+center, endPosLocal+center, wallMovementDuration));
-    }
-
     GameObject CreateWall(float width, float height) {
         var w = Instantiate<GameObject>(wallPrefab);
         w.transform.localScale = new Vector2(width, height);
         return w;
     }
 
-    IEnumerator MoveWall(GameObject wall, Vector2 initPos, Vector2 endPos) {
-        yield return StartCoroutine(wall.transform.Glide(initPos, endPos, wallMovementDuration));
+    void MoveWall(GameObject wall, Vector3 initPosLocal, Vector3 endPosLocal) {
+        var center = cameraLockPosition.position;
+        StartCoroutine(wall.transform.Glide(initPosLocal+center, endPosLocal+center, wallMovementDuration));
+    }
+
+    IEnumerator SpawnFrame() {
+        while (true) {
+            var frame = Instantiate<Frame>(framePrefab);
+            frame.transform.position = frameSpawnLocation.bounds.RandomPoint();
+            var rg2d = frame.GetComponent<Rigidbody2D>();
+            rg2d.angularVelocity = Random.Range(-160, 160);
+            rg2d.velocity = new Vector2(Random.Range(-0.5f, 0.5f), Random.Range(-1f, -0.2f) );
+            yield return new WaitForSeconds(Random.Range(1f, 2f));
+        }
     }
 }

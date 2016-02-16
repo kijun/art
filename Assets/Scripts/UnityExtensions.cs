@@ -32,6 +32,12 @@ public static class UnityExtensions {
         return v;
     }
 
+    public static void SetAlpha(this Material m, float val) {
+        var color = m.color;
+        color.a = val;
+        m.color = color;
+    }
+
     public static Vector2 RandomPoint(this Bounds b) {
         var center = b.center;
         var extents = b.extents;
@@ -51,5 +57,10 @@ public static class UnityExtensions {
             trans.position = Vector3.Lerp(startPos, endPos, elapsedTime/duration);
         }
         yield return null;
+    }
+
+    public static IEnumerator CoroutineWithWait(this MonoBehaviour script, IEnumerator coroutine, float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        yield return script.StartCoroutine(coroutine);
     }
 }
