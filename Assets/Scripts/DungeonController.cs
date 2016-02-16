@@ -99,9 +99,9 @@ public class DungeonController : MonoBehaviour {
             var frame = Instantiate<Frame>(framePrefab);
             frame.transform.position = frameSpawnLocation.bounds.RandomPoint();
             var rg2d = frame.GetComponent<Rigidbody2D>();
-            rg2d.angularVelocity = Random.Range(-160, 160);
-            rg2d.velocity = new Vector2(Random.Range(-0.5f, 0.5f), Random.Range(-1f, -0.2f) );
-            yield return new WaitForSeconds(Random.Range(1f, 2f));
+            rg2d.angularVelocity = Random.Range(-1.60f, 1.60f);
+            rg2d.velocity = new Vector2(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, -0.2f) );
+            yield return new WaitForSeconds(Random.Range(5f, 7f));
         }
     }
 }
