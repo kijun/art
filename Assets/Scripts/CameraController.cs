@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class CameraController : MonoBehaviour {
+    public delegate void PostLockDelegate();
 
     public static CameraController instance;
     public float trackingDuration = 1.3f;
@@ -11,13 +12,10 @@ public class CameraController : MonoBehaviour {
     private bool locked;
 
     // INIT
-	// Use this for initialization
-	void Start () {
-        shaking = false;
-        locked = false;
-	}
-
     void Awake () {
+        Screen.fullScreen = false;
+        Screen.SetResolution(375,667,false);
+
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         // Assign static instance
         if (instance == null) {
@@ -28,6 +26,10 @@ public class CameraController : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
     }
 
+	void Start () {
+        shaking = false;
+        locked = false;
+	}
 
     // API
     public void ResetPosition() {
@@ -40,16 +42,16 @@ public class CameraController : MonoBehaviour {
         Invoke("StopShaking", 0.3f);
     }
 
-    public void LockCamera(Vector2 position) {
+    public void LockCamera(Vector2 position, PostLockDelegate postLock = null ) {
         locked = true;
-        StartCoroutine(TrackToPosition(position));
+        StartCoroutine(TrackToPosition(position, false, postLock));
     }
 
-    public void UnlockCamera() {
-        StartCoroutine(TrackToPosition(DefaultPosition(), true));
+    public void UnlockCamera(PostLockDelegate postLock = null) {
+        StartCoroutine(TrackToPosition(DefaultPosition(), true, postLock));
     }
 
-    IEnumerator TrackToPosition(Vector2 position, bool unlock = false) {
+    IEnumerator TrackToPosition(Vector2 position, bool unlock = false, PostLockDelegate postLock = null) {
         float elapsedTime = 0.0f;
         Vector3 startPos = transform.position;
         Vector3 endPos = new Vector3(position.x, position.y, startPos.z);
@@ -59,6 +61,9 @@ public class CameraController : MonoBehaviour {
             transform.position = Vector3.Lerp(startPos, endPos, elapsedTime/trackingDuration);
         }
         if (unlock) locked = false;
+        if (postLock != null) {
+            postLock();
+        }
     }
 
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public static class UnityExtensions {
     public static Vector3 SwapX(this Vector3 v, float val) {
@@ -40,5 +41,15 @@ public static class UnityExtensions {
 
     public static float RandomValue(this Range r) {
         return Random.Range(r.minimum, r.maximum);
+    }
+
+    public static IEnumerator Glide(this Transform trans, Vector3 startPos, Vector3 endPos, float duration) {
+        float elapsedTime = 0.0f;
+        while (elapsedTime < duration) {
+            yield return null;
+            elapsedTime += Time.deltaTime;
+            trans.position = Vector3.Lerp(startPos, endPos, elapsedTime/duration);
+        }
+        yield return null;
     }
 }

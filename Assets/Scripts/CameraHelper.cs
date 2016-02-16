@@ -1,17 +1,27 @@
 using UnityEngine;
-using System.Collections;
 
-class CameraHelper {
+static class CameraHelper {
+    public static float HalfWidth {
+        get {
+            return Camera.main.orthographicSize / Screen.height * Screen.width;
+        }
+    }
+
     public static float Width {
         get {
-            var halfScreenWidth = Camera.main.orthographicSize / Screen.height * Screen.width;
-            return 2*halfScreenWidth;
+            return 2*HalfWidth;
+        }
+    }
+
+    public static float HalfHeight {
+        get {
+            return Camera.main.orthographicSize;
         }
     }
 
     public static float Height {
         get {
-            return 2 * Camera.main.orthographicSize;
+            return 2 * HalfHeight;
         }
     }
 }
