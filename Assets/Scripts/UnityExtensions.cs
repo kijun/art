@@ -63,4 +63,25 @@ public static class UnityExtensions {
         yield return new WaitForSeconds(waitTime);
         yield return script.StartCoroutine(coroutine);
     }
+
+    // Game Object
+    public static bool IsPlayer(this GameObject obj) {
+        if (obj.tag == "Player") return true;
+        return false;
+    }
+
+    public static void SetAlpha(this GameObject obj, float alpha) {
+        var rend = obj.GetComponent<Renderer>();
+        if (rend != null) {
+            rend.material.SetAlpha(alpha);
+        }
+    }
+
+    public static float GetAlpha(this GameObject obj) {
+        var rend = obj.GetComponent<Renderer>();
+        if (rend != null) {
+            return rend.material.color.a;
+        }
+        return 1;
+    }
 }
