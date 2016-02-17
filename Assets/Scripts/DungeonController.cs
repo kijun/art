@@ -31,7 +31,6 @@ public class DungeonController : MonoBehaviour {
     }
 
     void Lock() {
-        Debug.Log("Locking");
         if (!locked) {
             Camera cam = Camera.main;
             cameraCtrl = cam.GetComponent<CameraController>();
