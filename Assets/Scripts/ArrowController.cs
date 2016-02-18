@@ -30,8 +30,6 @@ public class ArrowController : MonoBehaviour {
             rgbd.velocity = direction.normalized * baseSpeed;
             //rgbd.rotation = 180f - Mathf.Atan2(-2, 2) / (2 * Mathf.PI) * 360f;
             rgbd.rotation = -90f + Mathf.Atan2(direction.y, direction.x) / (2 * Mathf.PI) * 360f;
-            Debug.Log("y"+ direction.y +"x"+ direction.x);
-            Debug.Log(Mathf.Atan2(direction.y, direction.x));
             yield return null;
         }
     }

@@ -20,7 +20,6 @@ public class Frame : MonoBehaviour {
     }
 
     void OnTriggerEnter2D(Collider2D other) {
-        Debug.Log(other);
         if (other.gameObject.tag == "Player") {
             StartCoroutine(LockAndUnlock());
         }
@@ -45,7 +44,8 @@ public class Frame : MonoBehaviour {
 
     void SetAlpha(float alpha) {
         foreach (Transform c in transform) {
-            c.GetComponent<Renderer>().material.SetAlpha(alpha);
+            c.gameObject.SetAlpha(alpha);
+            //c.GetComponent<Renderer>().material.SetAlpha(alpha);
         }
     }
 }
