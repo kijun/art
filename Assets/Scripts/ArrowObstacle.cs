@@ -21,10 +21,12 @@ public class ArrowObstacle : MonoBehaviour {
 
     IEnumerator SpawnArrow() {
         while (true) {
-            var arrow = Instantiate<ArrowController>(arrowPrefab);
+            var arrow = (ArrowController)Instantiate(arrowPrefab,
+                    transform.position, Quaternion.identity);
             arrow.ChasePlayer(playerCtrl.transform);
             yield return new WaitForSeconds(secondsToSpawn);
         }
+        yield return null;
     }
 }
 

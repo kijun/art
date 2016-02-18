@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent (typeof (BoxCollider2D), typeof (Rigidbody2D))]
+[RequireComponent (typeof (BoxCollider2D))]
 
 public class Frame : MonoBehaviour {
 
