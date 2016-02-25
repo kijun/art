@@ -17,7 +17,7 @@ public class PatternGenerator : MonoBehaviour {
 	// Add menu named "My Window" to the Window menu
 	[MenuItem ("Patterns/Create New Pattern %&n")]
 	public static void CreatePattern () {
-        DeactivateObject();
+        CancelImmediateActivation();
         // count the number of patterns in folder
         var dir = new DirectoryInfo(patternDirPath);
         FileInfo[] info = dir.GetFiles("*.prefab");
@@ -54,7 +54,7 @@ public class PatternGenerator : MonoBehaviour {
 
     [MenuItem ("Patterns/Play Pattern %&p")]
     public static void PlayPattern() {
-        DeactivateObject();
+        CancelImmediateActivation();
         var pattern = Selection.activeGameObject;
         var startPos = pattern.transform.position;
         SetupPlayerAndCamera(startPos);
@@ -62,15 +62,15 @@ public class PatternGenerator : MonoBehaviour {
     }
 
     [MenuItem ("Patterns/Activate Object %&o")]
-    public static void ActivateObject() {
+    public static void ActivateObjects() {
         var pl = GameObject.FindObjectOfType<PatternLauncher>();
-        pl.toActivateInPlayMode = Selection.activeGameObject;
+        pl.toActivateInPlayMode = Selection.gameObjects;
         EditorApplication.isPlaying = true;
     }
 
-    public static void DeactivateObject() {
+    public static void CancelImmediateActivation() {
         var pl = GameObject.FindObjectOfType<PatternLauncher>();
-        pl.toActivateInPlayMode = null;
+        pl.toActivateInPlayMode = new GameObject[0];
     }
 
     public static void SetupPlayerAndCamera(Vector3 startPos) {

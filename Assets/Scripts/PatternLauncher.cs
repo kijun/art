@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PatternLauncher : MonoBehaviour {
 
-    public GameObject toActivateInPlayMode;
+    public GameObject[] toActivateInPlayMode;
     bool launched = false;
 
 	// Use this for initialization
@@ -14,8 +14,8 @@ public class PatternLauncher : MonoBehaviour {
 	void Update () {
         // we put this after the start function as Activator might reawake and reinitialize
         if (!launched) {
-            if (toActivateInPlayMode != null) {
-                var activator = toActivateInPlayMode.GetComponent<TimeActivator>();
+            foreach (var go in toActivateInPlayMode) {
+                var activator = go.GetComponent<TimeActivator>();
                 activator.ActivateNow();
             }
             launched = true;
