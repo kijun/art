@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-public static class PatternGenerator {
+public class PatternGenerator : MonoBehaviour {
 
     const float cameraWidth = 5.63f;
     const float cameraHeight = 10f;
@@ -12,10 +12,12 @@ public static class PatternGenerator {
     const string patternDirPath = "Assets/Patterns";
     const string patternBackgroundPath = "Assets/Prefabs/PatternBackground.prefab";
     const string playerPrefabPath = "Assets/Prefabs/Player.prefab";
+    // activated by monobehaviour
 
 	// Add menu named "My Window" to the Window menu
-	[MenuItem ("GameObject/Create New Pattern %&n")]
+	[MenuItem ("Patterns/Create New Pattern %&n")]
 	public static void CreatePattern () {
+        DeactivateObject();
         // count the number of patterns in folder
         var dir = new DirectoryInfo(patternDirPath);
         FileInfo[] info = dir.GetFiles("*.prefab");
@@ -50,11 +52,28 @@ public static class PatternGenerator {
         */
 	}
 
-    [MenuItem ("Assets/Play Pattern %&p")]
+    [MenuItem ("Patterns/Play Pattern %&p")]
     public static void PlayPattern() {
-        EditorApplication.isPlaying = true;
+        DeactivateObject();
         var pattern = Selection.activeGameObject;
         var startPos = pattern.transform.position;
+        SetupPlayerAndCamera(startPos);
+        EditorApplication.isPlaying = true;
+    }
+
+    [MenuItem ("Patterns/Activate Object %&o")]
+    public static void ActivateObject() {
+        var pl = GameObject.FindObjectOfType<PatternLauncher>();
+        pl.toActivateInPlayMode = Selection.activeGameObject;
+        EditorApplication.isPlaying = true;
+    }
+
+    public static void DeactivateObject() {
+        var pl = GameObject.FindObjectOfType<PatternLauncher>();
+        pl.toActivateInPlayMode = null;
+    }
+
+    public static void SetupPlayerAndCamera(Vector3 startPos) {
         Camera.main.transform.position = new Vector3(startPos.x, cameraHeight/2, -10);
         var player = GameObject.FindWithTag("Player");
         player.transform.position = startPos.IncrY(0.5f);
