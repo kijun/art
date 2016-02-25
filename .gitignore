@@ -25,5 +25,8 @@ sysinfo.txt
 .DS_Store
 *.swo
 *.swp
+
+# Licensed
 /Assets/SPA/
 /Assets/Music/
+/Assets/SVG Importer/

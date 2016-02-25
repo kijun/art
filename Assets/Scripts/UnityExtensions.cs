@@ -70,6 +70,11 @@ public static class UnityExtensions {
         return false;
     }
 
+    public static bool IsCamera(this GameObject obj) {
+        if (obj.tag == "MainCamera") return true;
+        return false;
+    }
+
     public static void SetAlpha(this GameObject obj, float alpha) {
         var rend = obj.GetComponent<Renderer>();
         if (rend != null) {
