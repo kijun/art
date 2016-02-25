@@ -52,12 +52,12 @@ public static class PatternGenerator {
 
     [MenuItem ("Assets/Play Pattern %&p")]
     public static void PlayPattern() {
+        EditorApplication.isPlaying = true;
         var pattern = Selection.activeGameObject;
         var startPos = pattern.transform.position;
         Camera.main.transform.position = new Vector3(startPos.x, cameraHeight/2, -10);
         var player = GameObject.FindWithTag("Player");
         player.transform.position = startPos.IncrY(0.5f);
-        EditorApplication.isPlaying = true;
     }
 
     public static float CenterX(int patNum) {
@@ -70,4 +70,7 @@ public static class PatternGenerator {
 }
 
 public class PatternController : MonoBehaviour {
+
+    void Start() {
+    }
 }
