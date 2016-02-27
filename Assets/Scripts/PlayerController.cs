@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour {
     public AudioSource soundSource;
     public AudioClip hitSound;
     public BoxCollider2D localPositionConstraint;
+    public ScreenFader fader;
 
     public enum State {
         Start,
@@ -123,14 +124,37 @@ public class PlayerController : MonoBehaviour {
     }
 
     void OnTriggerEnter2D (Collider2D other) {
-        Debug.Log("hit by" + other + other.gameObject.name);
         if (!other.gameObject.tag.Equals(Tags.Bullet)) {
             return;
         }
+        Respawn();
 
         //Debug.Log("hit by" + other + other.gameObject.name);
         //OnHit();
-        soundSource.PlayOneShot(hitSound);
+        //soundSource.PlayOneShot(hitSound);
         //OnHit();
+    }
+
+    void Respawn() {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, new Vector3(0, 0, 1), out hit, 500, Consts.patternBackgroundLayerMask)) {
+            ChangeState(State.Hit);
+            var go = hit.collider.gameObject;
+            StartCoroutine(FadeInOut(go));
+        } else {
+            Debug.LogError("raycast result null", this);
+        }
+    }
+
+    IEnumerator FadeInOut(GameObject go) {
+        fader.fadeIn = false;
+        yield return new WaitForSeconds(2f);
+        var pattern = go.transform.parent;
+        transform.position = pattern.position;
+        LockCurrentRegion();
+        upOnce = true;
+        CameraController.instance.ResetPosition();
+        fader.fadeIn = true;
+        ChangeState(State.Normal);
     }
 }

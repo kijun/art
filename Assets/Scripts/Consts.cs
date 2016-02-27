@@ -6,6 +6,7 @@ public static class Consts {
     public static int sectorDensity = 2;
     public static float planetMinRadius = 0.1f;
     public static float planetMaxRadius = 0.3f;
+    public static int patternBackgroundLayerMask = 1<<8;
 }
 
 
