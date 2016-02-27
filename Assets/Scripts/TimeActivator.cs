@@ -26,7 +26,6 @@ public class TimeActivator : MonoBehaviour {
 
 
     public void ActivateNow() {
-        Debug.Log("activating!!!!!!!");
         if (!activated) {
             toActivate.enabled = true;
             activated = true;
