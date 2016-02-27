@@ -50,13 +50,51 @@ public class PatternGenerator : MonoBehaviour {
         window.Initialize();
 		window.Show();
         */
+        // if
+        var transforms = Selection.transforms;
+        if (transforms.Length > 0 && EditorUtility.DisplayDialog("Move " +transforms.Length+" object(s)?", "", "Move", "Cancel")) {
+            float minY = float.PositiveInfinity;
+            float minX = float.PositiveInfinity;
+            float maxX = float.NegativeInfinity;
+            foreach (var t in transforms) {
+                t.SetParent(go.transform);
+                var bounds = GetBoundsOfTransform(t);
+                //t.GetComponent<Renderer>().bounds;
+                minY = Mathf.Min(bounds.min.y, minY);
+                minX = Mathf.Min(bounds.min.x, minX);
+                maxX = Mathf.Max(bounds.max.x, maxX);
+            }
+            // we center X for now
+            Debug.Log(minY + "/" + minX + "/" + maxX);
+            float midX = (minX+maxX)/2f;
+
+            foreach (var t in transforms) {
+                t.localPosition = new Vector2(t.position.x-midX, t.position.y-minY);
+            }
+        };
 	}
+
+    static Bounds GetBoundsOfTransform(Transform t) {
+        var renderer = t.GetComponent<Renderer>();
+        var bounds = new Bounds(t.position, Vector3.zero);
+        if (renderer != null) {
+            bounds.Encapsulate(renderer.bounds);
+        }
+        foreach (Transform child in t) {
+            renderer = child.GetComponent<Renderer>();
+            if (renderer != null) {
+                bounds.Encapsulate(renderer.bounds);
+            }
+        }
+        return bounds;
+    }
 
     [MenuItem ("Patterns/Play Pattern %&p")]
     public static void PlayPattern() {
+        Debug.Log("AAA");
         CancelImmediateActivation();
         var pattern = Selection.activeGameObject;
-        var startPos = pattern.transform.position;
+        var startPos = pattern.transform.position - new Vector3(0, 1, 0);
         SetupPlayerAndCamera(startPos);
         EditorApplication.isPlaying = true;
     }
@@ -74,7 +112,7 @@ public class PatternGenerator : MonoBehaviour {
     }
 
     public static void SetupPlayerAndCamera(Vector3 startPos) {
-        Camera.main.transform.position = new Vector3(startPos.x, cameraHeight/2, -10);
+        Camera.main.transform.position = new Vector3(startPos.x, cameraHeight/2+startPos.y, -10);
         var player = GameObject.FindWithTag("Player");
         player.transform.position = startPos.IncrY(0.5f);
     }

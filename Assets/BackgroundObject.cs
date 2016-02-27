@@ -19,7 +19,6 @@ public class BackgroundObject : MonoBehaviour {
 	}
 
     void OnBecameInvisible() {
-        Debug.Log("AAA INVIS");
         onBecameInvisibleDelegate(gameObject);
     }
 }
