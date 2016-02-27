@@ -15,12 +15,13 @@ public class BackgroundController : MonoBehaviour {
     public Range largePlanetSpeedRange = new Range(0.5f, 1f);
 
     public BoxCollider2D visibleArea;
+    public PlayerController playerCtrl;
 
     private List<GameObject> backgroundObjects = new List<GameObject>();
 
 	// Use this for initialization
 	void Start () {
-
+        playerCtrl = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
 	}
 
 	// Update is called once per frame
@@ -86,9 +87,15 @@ public class BackgroundController : MonoBehaviour {
         newObject.transform.position = spawnPoint;
 
         var rgbd = newObject.GetComponent<Rigidbody2D>();
-        rgbd.velocity = (exitPoint-spawnPoint).normalized * speed;
+        var baseVelocity = (exitPoint-spawnPoint).normalized * speed;
+        rgbd.velocity = baseVelocity + playerCtrl.yBaseSpeed * Vector2.up;
 
         // add it to list
+        newObject.GetComponent<BackgroundObject>().onBecameInvisibleDelegate = delegate (GameObject go) {
+            // TODO object pool
+            backgroundObjects.Remove(go);
+            Destroy(go);
+        };
         backgroundObjects.Add(newObject.gameObject);
         Debug.Log("new object created");
     }
