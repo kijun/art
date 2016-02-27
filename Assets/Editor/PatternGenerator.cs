@@ -12,6 +12,7 @@ public class PatternGenerator : MonoBehaviour {
     const string patternDirPath = "Assets/Patterns";
     const string patternBackgroundPath = "Assets/Prefabs/PatternBackground.prefab";
     const string playerPrefabPath = "Assets/Prefabs/Player.prefab";
+    const string levelDirPath = "Assets/Levels";
     // activated by monobehaviour
 
 	// Add menu named "My Window" to the Window menu
@@ -19,13 +20,7 @@ public class PatternGenerator : MonoBehaviour {
 	public static void CreatePattern () {
         CancelImmediateActivation();
         // count the number of patterns in folder
-        var dir = new DirectoryInfo(patternDirPath);
-        FileInfo[] info = dir.GetFiles("*.prefab");
-        foreach (FileInfo f in info) {
-            Debug.Log(f);
-        }
-
-        int patNum = info.Length + 1;
+        int patNum = CountFilesInPathWithExt(patternDirPath, "prefab");
         var go = new GameObject("Pattern"+ patNum);
         go.transform.position = new Vector3(CenterX(patNum), 0, 0);
 
@@ -36,21 +31,8 @@ public class PatternGenerator : MonoBehaviour {
         background.transform.SetParent(go.transform);
         background.transform.localPosition = new Vector3(0, cameraHeight, 100); // clip
 
-        /*
-        var bounds = new Bounds(
-                       new Vector2(cameraWidth/2, cameraHeight),
-                       new Vector2(cameraWidth, cameraHeight*2));
-        border.bounds = bounds;
-        */
-
-        /*
-		// Get existing open window or if none, make a new one:
-		DialogueSystemWindow window = (DialogueSystemWindow)EditorWindow.GetWindow(
-                typeof (DialogueSystemWindow));
-        window.Initialize();
-		window.Show();
-        */
-        // if
+        // if transforms are selected, give option to set them as
+        // children of the new pattern
         var transforms = Selection.transforms;
         if (transforms.Length > 0 && EditorUtility.DisplayDialog("Move " +transforms.Length+" object(s)?", "", "Move", "Cancel")) {
             float minY = float.PositiveInfinity;
@@ -74,21 +56,6 @@ public class PatternGenerator : MonoBehaviour {
         };
 	}
 
-    static Bounds GetBoundsOfTransform(Transform t) {
-        var renderer = t.GetComponent<Renderer>();
-        var bounds = new Bounds(t.position, Vector3.zero);
-        if (renderer != null) {
-            bounds.Encapsulate(renderer.bounds);
-        }
-        foreach (Transform child in t) {
-            renderer = child.GetComponent<Renderer>();
-            if (renderer != null) {
-                bounds.Encapsulate(renderer.bounds);
-            }
-        }
-        return bounds;
-    }
-
     [MenuItem ("Patterns/Play Pattern %&p")]
     public static void PlayPattern() {
         Debug.Log("AAA");
@@ -106,22 +73,80 @@ public class PatternGenerator : MonoBehaviour {
         EditorApplication.isPlaying = true;
     }
 
-    public static void CancelImmediateActivation() {
+    [MenuItem ("Patterns/Create Level Asset")]
+    public static void CreateLevelAsset() {
+        int nextLevel = CountFilesInPathWithExt(levelDirPath, "asset") + 1;
+        LevelHolder lh = ScriptableObject.CreateInstance<LevelHolder>();
+        AssetDatabase.CreateAsset(lh, levelDirPath + "/Level"+nextLevel+".asset");
+        AssetDatabase.SaveAssets();
+    }
+
+    [MenuItem ("Patterns/Load Level")]
+    public static void LoadLevel() {
+        var ld = Selection.activeObject as LevelHolder;
+        var go = new GameObject(ld.name);
+
+        if (ld != null) {
+            float nextY = 0;
+            foreach (var pattern in ld.patterns) {
+                var newPat = Instantiate(pattern,
+                        new Vector3(0, nextY, 0),
+                        Quaternion.identity) as GameObject;
+                foreach (Transform child in newPat.transform) {
+                    if (child.tag == "PatternBounds") {
+                        nextY = child.GetComponent<Renderer>().bounds.max.y;
+                    }
+                }
+
+                newPat.transform.SetParent(go.transform);
+            }
+        }
+
+        /*
+        if (Selection.activeObject is LevelHolder) {
+        }
+        */
+    }
+
+
+    static int CountFilesInPathWithExt(string path, string extension) {
+        var dir = new DirectoryInfo(path);
+        FileInfo[] info = dir.GetFiles("*."+extension);
+        return info.Length;
+    }
+
+    static Bounds GetBoundsOfTransform(Transform t) {
+        var renderer = t.GetComponent<Renderer>();
+        var bounds = new Bounds(t.position, Vector3.zero);
+        if (renderer != null) {
+            bounds.Encapsulate(renderer.bounds);
+        }
+        foreach (Transform child in t) {
+            renderer = child.GetComponent<Renderer>();
+            if (renderer != null) {
+                bounds.Encapsulate(renderer.bounds);
+            }
+        }
+        return bounds;
+    }
+
+
+    static void CancelImmediateActivation() {
         var pl = GameObject.FindObjectOfType<PatternLauncher>();
         pl.toActivateInPlayMode = new GameObject[0];
     }
 
-    public static void SetupPlayerAndCamera(Vector3 startPos) {
+    static void SetupPlayerAndCamera(Vector3 startPos) {
         Camera.main.transform.position = new Vector3(startPos.x, cameraHeight/2+startPos.y, -10);
         var player = GameObject.FindWithTag("Player");
         player.transform.position = startPos.IncrY(0.5f);
     }
 
-    public static float CenterX(int patNum) {
+    static float CenterX(int patNum) {
         return (cameraWidth + gapBetweenPatterns) * patNum;
     }
 
-    public static GameObject InstantiateFromPath(string path) {
+    static GameObject InstantiateFromPath(string path) {
         return (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
     }
 }
