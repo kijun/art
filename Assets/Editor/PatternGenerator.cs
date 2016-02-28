@@ -20,7 +20,7 @@ public class PatternGenerator : MonoBehaviour {
 	public static void CreatePattern () {
         CancelImmediateActivation();
         // count the number of patterns in folder
-        int patNum = CountFilesInPathWithExt(patternDirPath, "prefab");
+        int patNum = CountFilesInPathWithExt(patternDirPath, "prefab")+1;
         var go = new GameObject("Pattern"+ patNum);
         go.transform.position = new Vector3(CenterX(patNum), 0, 0);
 
@@ -148,11 +148,5 @@ public class PatternGenerator : MonoBehaviour {
 
     static GameObject InstantiateFromPath(string path) {
         return (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
-    }
-}
-
-public class PatternController : MonoBehaviour {
-
-    void Start() {
     }
 }
