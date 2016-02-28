@@ -58,14 +58,21 @@ public class InputBoxWindow: EditorWindow {
         window.floatDelegate = del;
         window.inputValue = defaultValue;
         window.ShowPopup();
+        window.Focus();
     }
 
 
     void OnGUI() {
         EditorGUILayout.LabelField(message, EditorStyles.wordWrappedLabel);
         GUILayout.Space(70);
+        GUI.SetNextControlName("inputField");
         inputValue = GUILayout.TextField(inputValue);
-        if (GUILayout.Button("Submit")) {
+        if (GUI.GetNameOfFocusedControl() == string.Empty) {
+            GUI.FocusControl("inputField");
+            EditorGUI.FocusTextInControl("inputField");
+        }
+
+        if (GUILayout.Button("Submit") || Event.current.keyCode == KeyCode.Return) {
             if (floatDelegate != null) {
                 floatDelegate(float.Parse(inputValue));
             }
