@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 4dd2249238980485997a85ff324f7977
+timeCreated: 1456711266
+licenseType: Free
+NativeFormatImporter:
+  userData: "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg width=\"374px\"
+    height=\"604px\" viewBox=\"0 0 374 604\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"
+    xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:sketch=\"http://www.bohemiancoding.com/sketch/ns\">\n
+    \   <!-- Generator: Sketch 3.5.2 (25235) - http://www.bohemiancoding.com/sketch
+    -->\n    <title>Path 256</title>\n    <desc>Created with Sketch.</desc>\n    <defs></defs>\n
+    \   <g id=\"Iter4\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\"
+    sketch:type=\"MSPage\">\n        <g id=\"Dungeon-2-Copy-4\" sketch:type=\"MSArtboardGroup\"
+    transform=\"translate(0.000000, -100.000000)\" fill=\"#000000\">\n            <path
+    d=\"M-39,199.442454 C-39,199.442454 13.5835544,434.034909 101.222812,458.095673
+    C152.710875,726.373198 369.618037,703.515472 369.618037,703.515472 L372.904509,615.693681
+    C372.904509,615.693681 238.159151,579.602534 222.822281,538.699235 C261.164456,566.369114
+    374,566.369114 374,566.369114 L370.713528,470.126056 C370.713528,470.126056 296.220159,490.577705
+    179.002653,405.161991 C210.771883,181.396882 372.904509,195.83334 372.904509,195.83334
+    L372.904509,109.214587 C372.904509,109.214587 231.586207,32.2201408 106.700265,323.355392
+    L38.7798408,115.229779 L-36.8090186,109.214587 L-39,199.442454 Z\" id=\"Path-256\"
+    sketch:type=\"MSShapeGroup\"></path>\n        </g>\n    </g>\n</svg>"
+  assetBundleName: 
+  assetBundleVariant: 

@@ -15,6 +15,8 @@ public class Movement : MonoBehaviour {
         var rg = GetComponent<Rigidbody2D>();
         rg.velocity = velocity;
         rg.angularVelocity = angularVelocity;
+        rg.gravityScale = 0;
+        rg.angularDrag = 0;
 	}
 
     void Update() {
@@ -22,11 +24,9 @@ public class Movement : MonoBehaviour {
             if (anchor.transform.position.y > topLimit.position.y)  {
                 var rg = GetComponent<Rigidbody2D>();
                 rg.velocity = new Vector2(velocity.x, -Mathf.Abs(velocity.y));
-                Debug.Log("down");
             } else if (anchor.transform.position.y < bottomLimit.position.y) {
                 var rg = GetComponent<Rigidbody2D>();
                 rg.velocity = new Vector2(velocity.x, Mathf.Abs(velocity.y));
-                Debug.Log("up");
             }
         }
 
