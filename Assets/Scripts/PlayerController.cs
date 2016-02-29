@@ -17,6 +17,12 @@ public class PlayerController : MonoBehaviour {
     //public float xSpeed { get; private set;}
     public float yDeltaSpeed {get; private set;}
     public float yBaseSpeed {get; private set;}
+    public float stroke1BaseAngularVelocity;
+    public float stroke1MaxAngularVelocity;
+    public float stroke2BaseAngularVelocity;
+    public float stroke2MaxAngularVelocity;
+    public Rigidbody2D stroke1;
+    public Rigidbody2D stroke2;
 
     public ShipStats stats;
 
@@ -78,8 +84,19 @@ public class PlayerController : MonoBehaviour {
                 float ydir = Input.GetAxisRaw("Vertical");
                 Vector2 newPos = transform.position;
 
-                newPos.x += xdir * stats.maxXSpeed * Time.deltaTime;
-                newPos.y += (ydir * yDeltaSpeed + yBaseSpeed) * Time.deltaTime;
+                float dx = xdir * stats.maxXSpeed * Time.deltaTime;
+                float dy = (ydir * yDeltaSpeed + yBaseSpeed) * Time.deltaTime;
+
+                newPos.x += dx;
+                newPos.y += dy;
+
+                if (dx*dx + dy*dy > (yBaseSpeed * yBaseSpeed * Time.deltaTime * Time.deltaTime)) {
+                    stroke1.angularVelocity = stroke1MaxAngularVelocity;
+                    stroke2.angularVelocity = stroke2MaxAngularVelocity;
+                } else {
+                    stroke1.angularVelocity = stroke1BaseAngularVelocity;
+                    stroke2.angularVelocity = stroke2BaseAngularVelocity;
+                }
 
                 newPos = ConstrainPoint(newPos);
 
