@@ -8,9 +8,8 @@ public class PathComponent : MonoBehaviour {
         var bubble = other.GetComponent<Bubble>();
         if (bubble != null)  {
             var brgbd = bubble.GetComponent<Rigidbody2D>();
-            Debug.Log(transform.rotation);
             brgbd.velocity = (transform.rotation * Vector3.up).normalized * pathController.speed;
-            Debug.Log(brgbd.velocity);
+            Debug.Log(gameObject.name + "/" +  transform.rotation.eulerAngles + "/"+ brgbd.velocity);
             brgbd.angularVelocity = pathController.angularVelocity;
         }
     }
