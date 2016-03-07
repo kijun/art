@@ -16,6 +16,11 @@ public class Bubble : MonoBehaviour {
 
 	}
 
+    public void UpdatePlayerVelocity() {
+        PlayerController.instance.zoneVelocity = GetComponent<Rigidbody2D>().velocity;
+    }
+
+    /*
     void OnTriggerEnter2D(Collider2D other) {
         if (other.gameObject.IsPlayer()) {
             PlayerController.instance.zoneVelocity = GetComponent<Rigidbody2D>().velocity;
@@ -24,6 +29,11 @@ public class Bubble : MonoBehaviour {
 
     void OnTriggerExit2D(Collider2D other) {
         if (other.gameObject.IsPlayer()) {
+            // what happens when there's another object?
+            var bubbles = PlayerController.instance.FindOverlappingBubbles();
+            if (bubbles.Count > 1) {
+                // then... what?
+            }
             PlayerController.instance.SetZoneVelocityAndMaxRelativeSpeedToDefault();
         }
     }
@@ -33,6 +43,7 @@ public class Bubble : MonoBehaviour {
             PlayerController.instance.zoneVelocity = GetComponent<Rigidbody2D>().velocity;
         }
     }
+    */
 
     /* public methods */
 }

@@ -150,21 +150,42 @@ public class PlayerController : MonoBehaviour {
         return point;
     }
 
-    /** respawn **/
+    /** respawn && bubble entrance **/
+    List<Bubble> bubbles = new List<Bubble>();
 
-    void OnTriggerEnter2D (Collider2D other) {
-        if (!other.gameObject.tag.Equals(Tags.Bullet)) {
-            return;
+    void OnTriggerExit2D (Collider2D other) {
+        var bubble = other.GetComponent<Bubble>();
+        if (bubble != null) {
+            bubbles.Remove(bubble);
+            if (bubbles.Count == 0) Respawn();
         }
-        Debug.Log("hit by" + other + other.gameObject.name);
-        Respawn();
-
-        //OnHit();
-        //soundSource.PlayOneShot(hitSound);
-        //OnHit();
     }
 
-    void Respawn() {
+    void OnTriggerStay2D (Collider2D other) {
+        var bubble = other.GetComponent<Bubble>();
+        if (bubble != null) {
+            if (bubbles[0] == bubble) {
+                bubble.UpdatePlayerVelocity();
+            }
+        }
+    }
+
+    void OnTriggerEnter2D (Collider2D other) {
+        if (other.gameObject.tag.Equals(Tags.Bullet)) {
+            Debug.Log("hit by" + other + other.gameObject.name);
+            Respawn();
+            //OnHit();
+            //soundSource.PlayOneShot(hitSound);
+            //OnHit();
+        } else {
+            var bubble = other.GetComponent<Bubble>();
+            if (bubble != null && !bubbles.Contains(bubble)) {
+                    bubbles.Add(bubble);
+            }
+        }
+    }
+
+    public void Respawn() {
         ZoneController zone = ZoneController.ZoneForPosition(transform.position);
         if (zone != null) {
             StartCoroutine(FadeInOut(zone));
