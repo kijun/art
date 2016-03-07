@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour {
     private State currentState = State.Start;
     private Rigidbody2D rg2d;
     //TODO remove
-    private bool upOnce = true;
+    private bool frozen = true;
 
 	// Use this for initialization
 	void Awake () {
@@ -64,11 +64,11 @@ public class PlayerController : MonoBehaviour {
                 //}
                 break;
             case State.Normal:
-                if (upOnce) {
+                if (frozen) {
                     if (Input.GetKeyDown("up")) {
                         // idea of current zone
                         SetZoneVelocityAndMaxRelativeSpeedToDefault();
-                        upOnce = false;
+                        frozen = false;
                     }
                 }
                 float xdir = Input.GetAxisRaw("Horizontal");
@@ -124,6 +124,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void SetZoneVelocityAndMaxRelativeSpeedToDefault() {
+        Debug.Log("AAA");
         var z = ZoneController.ZoneForPosition(transform.position);
         zoneVelocity = z.zoneBaseVelocity;
         maxRelativeSpeed = z.maxRelativeSpeed;
@@ -165,7 +166,7 @@ public class PlayerController : MonoBehaviour {
         var bubble = other.GetComponent<Bubble>();
         if (bubble != null) {
             if (bubbles[0] == bubble) {
-                bubble.UpdatePlayerVelocity();
+                if (!frozen) bubble.UpdatePlayerVelocity();
             }
         }
     }
@@ -201,7 +202,7 @@ public class PlayerController : MonoBehaviour {
 
         yield return new WaitForSeconds(2f);
         transform.position = zone.transform.position;
-        upOnce = true;
+        frozen = true;
         CameraController.instance.ResetPosition();
         fader.fadeIn = true;
         ChangeState(State.Normal);

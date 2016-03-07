@@ -17,7 +17,13 @@ public class Bubble : MonoBehaviour {
 	}
 
     public void UpdatePlayerVelocity() {
-        PlayerController.instance.zoneVelocity = GetComponent<Rigidbody2D>().velocity;
+        //PlayerController.instance.SetZoneVelocityAndMaxRelativeSpeed(
+        var vel = GetComponent<Rigidbody2D>().velocity;
+        if (vel == Vector2.zero) {
+            PlayerController.instance.SetZoneVelocityAndMaxRelativeSpeedToDefault();
+        } else {
+            PlayerController.instance.zoneVelocity = GetComponent<Rigidbody2D>().velocity;
+        }
     }
 
     /*
