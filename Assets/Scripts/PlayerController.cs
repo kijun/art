@@ -5,18 +5,15 @@ using System.Collections.Generic;
 
 public delegate void OnHitDelegate();
 
-[System.Serializable]
-public class ShipStats {
-    public float maxXSpeed = 1.05f;
-    public float maxYSpeed = 1.05f;
-    public float baseYSpeed = 0.5f;
-}
-
 public class PlayerController : MonoBehaviour {
 
-    //public float xSpeed { get; private set;}
-    public float yDeltaSpeed {get; private set;}
-    public float yBaseSpeed {get; private set;}
+    public static PlayerController instance;
+
+    /* basic stats */
+    public Vector2 zoneVelocity = Consts.defaultZoneBaseVelocity;
+    public Vector2 maxRelativeSpeed = Consts.defaultZoneMaxRelativeSpeed;
+
+    /* stroke movement - only visual */
     public float stroke1BaseAngularVelocity;
     public float stroke1MaxAngularVelocity;
     public float stroke2BaseAngularVelocity;
@@ -24,12 +21,12 @@ public class PlayerController : MonoBehaviour {
     public Rigidbody2D stroke1;
     public Rigidbody2D stroke2;
 
-    public ShipStats stats;
-
+    /* random components */
     public AudioSource soundSource;
     public AudioClip hitSound;
     public BoxCollider2D localPositionConstraint;
     public ScreenFader fader;
+    public OnHitDelegate OnHit;
 
     public enum State {
         Start,
@@ -39,30 +36,22 @@ public class PlayerController : MonoBehaviour {
         Won
     }
 
-    public OnHitDelegate OnHit;
-
-
-    private Vector2 originalPosition;
+    /* private states and references */
     private State currentState = State.Start;
     private Rigidbody2D rg2d;
     //TODO remove
     private bool upOnce = true;
 
-    // Stats
-    public void LockCurrentRegion() {
-        yDeltaSpeed = stats.maxYSpeed;
-        yBaseSpeed = 0;
-    }
-
-    public void UnlockCurrentRegion() {
-        yDeltaSpeed = stats.maxYSpeed - stats.baseYSpeed;
-        yBaseSpeed = stats.baseYSpeed;
-    }
-
 	// Use this for initialization
 	void Awake () {
         rg2d = GetComponent<Rigidbody2D>();
-        originalPosition = transform.position;
+        // Assign static instance
+        if (instance == null) {
+            instance = this;
+        } else if (instance != this) {
+            Destroy(gameObject);
+        }
+        DontDestroyOnLoad(gameObject);
 	}
 
 	// Update is called once per frame
@@ -76,7 +65,8 @@ public class PlayerController : MonoBehaviour {
             case State.Normal:
                 if (upOnce) {
                     if (Input.GetKeyDown("up")) {
-                        UnlockCurrentRegion();
+                        // idea of current zone
+                        ResetShipMovement();
                         upOnce = false;
                     }
                 }
@@ -84,13 +74,13 @@ public class PlayerController : MonoBehaviour {
                 float ydir = Input.GetAxisRaw("Vertical");
                 Vector2 newPos = transform.position;
 
-                float dx = xdir * stats.maxXSpeed * Time.deltaTime;
-                float dy = (ydir * yDeltaSpeed + yBaseSpeed) * Time.deltaTime;
+                float dx = (xdir * maxRelativeSpeed.x + zoneVelocity.x) * Time.deltaTime;
+                float dy = (ydir * maxRelativeSpeed.y + zoneVelocity.y) * Time.deltaTime;
 
                 newPos.x += dx;
                 newPos.y += dy;
 
-                if (dx*dx + dy*dy > (yBaseSpeed * yBaseSpeed * Time.deltaTime * Time.deltaTime)) {
+                if (Mathf.Abs(xdir) + Mathf.Abs(ydir) > float.Epsilon) {
                     stroke1.angularVelocity = stroke1MaxAngularVelocity;
                     stroke2.angularVelocity = stroke2MaxAngularVelocity;
                 } else {
@@ -125,12 +115,36 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public void ChangeState(State state) {
-        currentState = state;
+    /** velocity and speed setters **/
+
+    public void SetZoneVelocityAndMaxRelativeSpeed(Vector2 zv, Vector2 rs) {
+        zoneVelocity = zv;
+        maxRelativeSpeed = rs;
     }
 
-    public void Reset() {
-        //transform.position = originalPosition;
+    public void ResetShipMovement() {
+        var z = ZoneController.ZoneForPosition(transform.position);
+        zoneVelocity = z.zoneBaseVelocity;
+        maxRelativeSpeed = z.maxRelativeSpeed;
+    }
+
+    public void SetZoneVelocityAndMaxRelativeSpeedToDefault() {
+        zoneVelocity = Consts.defaultZoneBaseVelocity;
+        maxRelativeSpeed = Consts.defaultZoneMaxRelativeSpeed;
+    }
+
+    public void Freeze() {
+        SetZoneVelocityAndMaxRelativeSpeed(Vector2.zero, Vector2.zero);
+    }
+
+    public void Freeze(out Vector2 currentZoneVelocity, out Vector2 currentMaxRelativeSpeed) {
+        currentZoneVelocity = zoneVelocity;
+        currentMaxRelativeSpeed = maxRelativeSpeed;
+        Freeze();
+    }
+
+    public void ChangeState(State state) {
+        currentState = state;
     }
 
     Vector2 ConstrainPoint(Vector2 point) {
@@ -139,6 +153,8 @@ public class PlayerController : MonoBehaviour {
         }
         return point;
     }
+
+    /** respawn **/
 
     void OnTriggerEnter2D (Collider2D other) {
         if (!other.gameObject.tag.Equals(Tags.Bullet)) {
@@ -153,25 +169,24 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Respawn() {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, new Vector3(0, 0, 1), out hit, 500, Consts.patternBackgroundLayerMask)) {
-            ChangeState(State.Hit);
-            var go = hit.collider.gameObject;
-            StartCoroutine(FadeInOut(go));
+        ZoneController zone = ZoneController.ZoneForPosition(transform.position);
+        if (zone != null) {
+            StartCoroutine(FadeInOut(zone));
         } else {
             Debug.LogError("raycast result null", this);
         }
     }
 
-    IEnumerator FadeInOut(GameObject go) {
+    IEnumerator FadeInOut(ZoneController zone) {
         fader.fadeIn = false;
         yield return new WaitForSeconds(2f);
-        var pattern = go.transform.parent;
-        transform.position = pattern.position;
-        LockCurrentRegion();
+        transform.position = zone.transform.position;
+        Vector2 zoneVCache, relSpeedCache;
+        Freeze(out zoneVCache, out relSpeedCache);
         upOnce = true;
         CameraController.instance.ResetPosition();
         fader.fadeIn = true;
+        SetZoneVelocityAndMaxRelativeSpeed(zoneVCache, relSpeedCache);
         ChangeState(State.Normal);
     }
 }

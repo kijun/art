@@ -44,12 +44,12 @@ public class LetterCollectionZone : MonoBehaviour {
     }
 
     void Lock() {
-        player.LockCurrentRegion();
+        //player.LockCurrentRegion();
         Camera.main.GetComponent<CameraController>().LockCamera(cameraLockPosition.position);
     }
 
     void Unlock() {
-        player.UnlockCurrentRegion();
+        //player.UnlockCurrentRegion();
         Camera.main.GetComponent<CameraController>().UnlockCamera();
     }
 

@@ -22,6 +22,7 @@ public class PatternGenerator : MonoBehaviour {
         // count the number of patterns in folder
         int patNum = CountFilesInPathWithExt(patternDirPath, "prefab")+1;
         var go = new GameObject("Pattern"+ patNum);
+        go.AddComponent<ZoneController>();
         go.transform.position = new Vector3(CenterX(patNum), 0, 0);
 
         var background = InstantiateFromPath(patternBackgroundPath);

@@ -82,7 +82,7 @@ public class CameraController : MonoBehaviour {
         if (locked) return;
 
 		float targetX = transform.position.x;
-		float targetY = transform.position.y + Time.deltaTime * player.yBaseSpeed;
+		float targetY = transform.position.y + Time.deltaTime * player.zoneVelocity.y;
 
 		transform.position = new Vector3(targetX, targetY, transform.position.z);
     }

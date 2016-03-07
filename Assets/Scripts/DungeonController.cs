@@ -25,7 +25,7 @@ public class DungeonController : MonoBehaviour {
         Debug.Log(other);
         if (other.gameObject.tag == "Player") {
             player = other.gameObject.GetComponent<PlayerController>();
-            player.LockCurrentRegion();
+            //player.LockCurrentRegion();
             Lock();
         }
     }

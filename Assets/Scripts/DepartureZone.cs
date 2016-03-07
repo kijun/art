@@ -55,9 +55,11 @@ public class DepartureZone : MonoBehaviour {
 	void Update () {
         if (!spawnShip) return;
         if (!initialSpawnZone.bounds.Contains(playerController.transform.position)) return;
+        /*
         if (Input.GetKeyDown("up")) {
             playerController.UnlockCurrentRegion();
         }
+        */
 	}
 
     void OnTriggerExit2D(Collider2D other) {

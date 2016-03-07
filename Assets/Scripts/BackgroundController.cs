@@ -88,7 +88,7 @@ public class BackgroundController : MonoBehaviour {
 
         var rgbd = newObject.GetComponent<Rigidbody2D>();
         var baseVelocity = (exitPoint-spawnPoint).normalized * speed;
-        rgbd.velocity = baseVelocity + playerCtrl.yBaseSpeed * Vector2.up;
+        //rgbd.velocity = baseVelocity + playerCtrl.yBaseSpeed * Vector2.up;
 
         // add it to list
         newObject.GetComponent<BackgroundObject>().onBecameInvisibleDelegate = delegate (GameObject go) {

@@ -41,7 +41,7 @@ SetCurrentStage(stages[0]);
 
     public override void Run(GameStateChangeRequestDelegate onChange) {
         Debug.Log("run");
-        playerCtrl.Reset();
+        //playerCtrl.Reset();
         Camera.main.GetComponent<CameraController>().ResetPosition();
         base.Run(onChange);
         playerCtrl.ChangeState(PlayerController.State.Normal);
