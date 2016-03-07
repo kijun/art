@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour {
             Destroy(gameObject);
         }
         DontDestroyOnLoad(gameObject);
+        Freeze();
 	}
 
 	// Update is called once per frame
@@ -160,9 +161,9 @@ public class PlayerController : MonoBehaviour {
         if (!other.gameObject.tag.Equals(Tags.Bullet)) {
             return;
         }
+        Debug.Log("hit by" + other + other.gameObject.name);
         Respawn();
 
-        //Debug.Log("hit by" + other + other.gameObject.name);
         //OnHit();
         //soundSource.PlayOneShot(hitSound);
         //OnHit();
@@ -179,14 +180,14 @@ public class PlayerController : MonoBehaviour {
 
     IEnumerator FadeInOut(ZoneController zone) {
         fader.fadeIn = false;
-        yield return new WaitForSeconds(2f);
-        transform.position = zone.transform.position;
         Vector2 zoneVCache, relSpeedCache;
         Freeze(out zoneVCache, out relSpeedCache);
+
+        yield return new WaitForSeconds(2f);
+        transform.position = zone.transform.position;
         upOnce = true;
         CameraController.instance.ResetPosition();
         fader.fadeIn = true;
-        SetZoneVelocityAndMaxRelativeSpeed(zoneVCache, relSpeedCache);
         ChangeState(State.Normal);
     }
 }

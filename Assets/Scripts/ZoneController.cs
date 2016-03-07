@@ -9,7 +9,7 @@ public class ZoneController : MonoBehaviour {
     public static ZoneController ZoneForPosition(Vector2 pos) {
         RaycastHit hit;
         if (Physics.Raycast(pos, new Vector3(0, 0, 1), out hit, 500, Consts.patternBackgroundLayerMask)) {
-            return hit.collider.GetComponent<ZoneController>();
+            return hit.collider.GetComponentInParent<ZoneController>();
         }
         return null;
     }
