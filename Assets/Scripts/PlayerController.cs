@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour {
                 if (upOnce) {
                     if (Input.GetKeyDown("up")) {
                         // idea of current zone
-                        ResetShipMovement();
+                        SetZoneVelocityAndMaxRelativeSpeedToDefault();
                         upOnce = false;
                     }
                 }
@@ -123,15 +123,10 @@ public class PlayerController : MonoBehaviour {
         maxRelativeSpeed = rs;
     }
 
-    public void ResetShipMovement() {
+    public void SetZoneVelocityAndMaxRelativeSpeedToDefault() {
         var z = ZoneController.ZoneForPosition(transform.position);
         zoneVelocity = z.zoneBaseVelocity;
         maxRelativeSpeed = z.maxRelativeSpeed;
-    }
-
-    public void SetZoneVelocityAndMaxRelativeSpeedToDefault() {
-        zoneVelocity = Consts.defaultZoneBaseVelocity;
-        maxRelativeSpeed = Consts.defaultZoneMaxRelativeSpeed;
     }
 
     public void Freeze() {
