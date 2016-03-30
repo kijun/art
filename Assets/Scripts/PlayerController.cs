@@ -78,6 +78,12 @@ public class PlayerController : MonoBehaviour {
                 float dx = (xdir * maxRelativeSpeed.x + zoneVelocity.x) * Time.deltaTime;
                 float dy = (ydir * maxRelativeSpeed.y + zoneVelocity.y) * Time.deltaTime;
 
+                if (TopBubble() != null) {
+                    var tb = TopBubble();
+                    dx += tb.dPos.x;
+                    dy += tb.dPos.y;
+                }
+
                 newPos.x += dx;
                 newPos.y += dy;
 
@@ -186,6 +192,11 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    Bubble TopBubble() {
+        if (bubbles.Count > 0) return bubbles[0];
+        return null;
+    }
+
     public void Respawn() {
         ZoneController zone = ZoneController.ZoneForPosition(transform.position);
         if (zone != null) {
@@ -206,5 +217,18 @@ public class PlayerController : MonoBehaviour {
         CameraController.instance.ResetPosition();
         fader.fadeIn = true;
         ChangeState(State.Normal);
+    }
+
+    /* public helpers */
+    public float y {
+        get {
+            return transform.position.y;
+        }
+    }
+
+    public float x {
+        get {
+            return transform.position.x;
+        }
     }
 }

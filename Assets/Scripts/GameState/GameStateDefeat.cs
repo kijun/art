@@ -19,7 +19,7 @@ public class GameStateDefeat : GameState {
     public override void Run(GameStateChangeRequestDelegate onChange) {
         base.Run(onChange);
 
-        foreach (Activator a in FindObjectsOfType<Activator>()) {
+        foreach (AActivator a in FindObjectsOfType<AActivator>()) {
             a.Run();
         }
         onChangeDelegate(GameStatePlay.instance);

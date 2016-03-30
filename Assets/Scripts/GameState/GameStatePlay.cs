@@ -81,7 +81,7 @@ SetCurrentStage(stages[0]);
         playerCtrl.ChangeState(PlayerController.State.Destroyed);
 
         // stop all activators
-        foreach (Activator a in FindObjectsOfType<Activator>()) {
+        foreach (AActivator a in FindObjectsOfType<AActivator>()) {
             a.Reset();
         }
     }
