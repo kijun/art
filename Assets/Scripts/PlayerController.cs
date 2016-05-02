@@ -125,12 +125,13 @@ public class PlayerController : MonoBehaviour {
     /** velocity and speed setters **/
 
     public void SetZoneVelocityAndMaxRelativeSpeed(Vector2 zv, Vector2 rs) {
+        Debug.Log("Setting speed to: " + zv + " " + rs);
         zoneVelocity = zv;
         maxRelativeSpeed = rs;
     }
 
     public void SetZoneVelocityAndMaxRelativeSpeedToDefault() {
-        Debug.Log("AAA");
+        Debug.Log("Setting speed to: default ");
         var z = ZoneController.ZoneForPosition(transform.position);
         zoneVelocity = z.zoneBaseVelocity;
         maxRelativeSpeed = z.maxRelativeSpeed;

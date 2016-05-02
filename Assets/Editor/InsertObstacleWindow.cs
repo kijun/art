@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Asteroid : MonoBehaviour {
+public class InsertObstacleWindow : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
