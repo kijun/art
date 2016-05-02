@@ -8,6 +8,8 @@ public class LinePropertyInspector : Editor {
         LineProperty line = (LineProperty)target;
         Transform lineTransform = line.transform;
 
+        EditorGUI.BeginChangeCheck();
+
         // Width, Length in pixels
         Vector3 newScale = lineTransform.localScale;
         newScale = new Vector3(
@@ -28,11 +30,17 @@ public class LinePropertyInspector : Editor {
         line.
         */
 
+        // Line Style
         line._style = (BorderStyle)EditorGUILayout.EnumPopup("Style", line._style);
 
         if (line._style == BorderStyle.Dash) {
             line._dashLength = EditorGUILayout.FloatField("Dash Length", line._dashLength);
             line._gapLength = EditorGUILayout.FloatField("Gap Length", line._gapLength);
+        }
+
+        // Render
+        if (EditorGUI.EndChangeCheck()) {
+            line.OnPropertyChange();
         }
     }
 }
