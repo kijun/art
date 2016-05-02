@@ -25,10 +25,7 @@ public class LinePropertyInspector : Editor {
         lineTransform.eulerAngles = eulerRot;
 
         // Color
-        /*
-        line.color = EditorGUILayout.ColorField("Color", line.color);
-        line.
-        */
+        line._color = EditorGUILayout.ColorField("Color", line._color);
 
         // Line Style
         line._style = (BorderStyle)EditorGUILayout.EnumPopup("Style", line._style);

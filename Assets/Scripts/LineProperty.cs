@@ -66,6 +66,7 @@ public class LineProperty : MonoBehaviour {
         }
         */
         GetComponent<MeshFilter>().mesh = line;
+        GetComponent<MeshRenderer>().material.color = _color;
     }
 
     public void OnPropertyChange() {
