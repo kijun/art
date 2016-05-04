@@ -1,23 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum BorderStyle {
-    Solid, Dash
-}
-
-/*
-
-public class RectProperty : MonoBehaviour {
-}
-
-public class CircleProperty : MonoBehaviour {
-}
-
-public class TriangleProperty : MonoBehaviour {
-
-}
-*/
-
 // execute in edit mode
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
