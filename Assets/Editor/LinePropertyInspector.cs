@@ -25,14 +25,14 @@ public class LinePropertyInspector : Editor {
         lineTransform.eulerAngles = eulerRot;
 
         // Color
-        line._color = EditorGUILayout.ColorField("Color", line._color);
+        line.color = EditorGUILayout.ColorField("Color", line.color);
 
         // Line Style
-        line._style = (BorderStyle)EditorGUILayout.EnumPopup("Style", line._style);
+        line.style = (BorderStyle)EditorGUILayout.EnumPopup("Style", line.style);
 
-        if (line._style == BorderStyle.Dash) {
-            line._dashLength = EditorGUILayout.FloatField("Dash Length", line._dashLength);
-            line._gapLength = EditorGUILayout.FloatField("Gap Length", line._gapLength);
+        if (line.style == BorderStyle.Dash) {
+            line.dashLength = EditorGUILayout.FloatField("Dash Length", line.dashLength);
+            line.gapLength = EditorGUILayout.FloatField("Gap Length", line.gapLength);
         }
 
         // Render
