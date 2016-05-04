@@ -48,7 +48,7 @@ public class CircleProperty : MonoBehaviour {
                 }
                 break;
         }
-        GetComponent<MeshRenderer>().sharedMaterial.color = color;
+        //GetComponent<MeshRenderer>().sharedMaterial.color = color;
     }
 
     void RenderBorderless() {
@@ -85,7 +85,7 @@ public class CircleProperty : MonoBehaviour {
     }
 
     void RenderBorderSolid() {
-        int numTris = 40;
+        int numTris = 200;
         float centerAngle = 2*Mathf.PI/numTris;
 
         var line = new Mesh();
@@ -112,24 +112,25 @@ public class CircleProperty : MonoBehaviour {
             verts[outerIdx] = new Vector3(x, y, 0);
 
             // TODO adjust this after generating a new texture
-            uvs[innerIdx] = Vector2.zero;
-            uvs[outerIdx] = Vector2.one;
+            uvs[innerIdx] = new Vector2(0.5f, 0);
+            uvs[outerIdx] = new Vector2(1.5f, 0);
 
-            // 3 4
-            // 1 2
             // We need to define 3 triangles, one for the inner circle, two for the outer rim
             // Triangle 1, 0, i, i+1
             tris[9*i] = 0;
             tris[9*i+1] = innerIdx+2;
             tris[9*i+2] = innerIdx;
+
             tris[9*i+3] = innerIdx+2;
             tris[9*i+4] = outerIdx+2;
             tris[9*i+5] = outerIdx;
+
             tris[9*i+6] = innerIdx;
             tris[9*i+7] = innerIdx+2;
             tris[9*i+8] = outerIdx;
         }
 
+        // TODO this code....
         tris[tris.Length-8] = 1;
         tris[tris.Length-6] = 1;
         tris[tris.Length-5] = 2;
@@ -140,6 +141,14 @@ public class CircleProperty : MonoBehaviour {
         line.triangles = tris;
 
         GetComponent<MeshFilter>().mesh = line;
+
+        var tex = new Texture2D(2,1, TextureFormat.ARGB32, false);
+        tex.SetPixel(0, 0, color);
+        tex.SetPixel(1, 0, borderColor);
+        tex.Apply();
+        tex.filterMode = FilterMode.Point;
+        tex.wrapMode = TextureWrapMode.Clamp;
+        GetComponent<Renderer>().sharedMaterial.mainTexture = tex;
     }
 
     void RenderBorderDash() {
