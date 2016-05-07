@@ -152,6 +152,7 @@ public class CircleProperty : MonoBehaviour {
     }
 
     void RenderBorderDash() {
+
     }
 
     /* RENDERING HELPER */
