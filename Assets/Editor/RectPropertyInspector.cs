@@ -14,6 +14,8 @@ public class RectPropertyInspector : Editor {
         rect.Height = EditorGUILayout.FloatField("Height", rect.Height * 100f) / 100f;
         rect.Width = EditorGUILayout.FloatField("Width", rect.Width * 100f) / 100f;
 
+        rect.Angle = EditorGUILayout.FloatField("Angle", rect.Angle);
+
         // Color
         rect.color = EditorGUILayout.ColorField("Color", rect.color);
 

@@ -76,25 +76,19 @@ public class RectProperty : MonoBehaviour {
             vh.AddVert(new Vector3(0.5f, 0.5f), color32, TextureMidPoint);
             vh.AddTriangle(0,1,2);
             vh.AddTriangle(2,1,3);
-            vh.FillMesh(innerMeshFilter.mesh);
+            UpdateMesh(innerMeshFilter, vh);
+            UpdateColor(innerMeshRenderer, color);
         }
-        innerMeshRenderer.material.color = color;
     }
 
     void RenderBorderSolid() {
         using (var vh = new VertexHelper()) {
             foreach (Bounds b in BorderSectionBounds()) {
-                Debug.Log(b);
                 AddRect(b, vh);
             }
 
-            Mesh newMesh = Mesh.Instantiate(borderMeshFilter.sharedMesh);
-            vh.FillMesh(newMesh);
-            borderMeshFilter.mesh = newMesh;
-
-            Material newMat = Material.Instantiate(borderMeshRenderer.sharedMaterial);
-            newMat.color = borderColor;
-            borderMeshRenderer.material = newMat;
+            UpdateMesh(borderMeshFilter, vh);
+            UpdateColor(borderMeshRenderer, borderColor);
         }
     }
 
@@ -105,6 +99,7 @@ public class RectProperty : MonoBehaviour {
             var right = sections[1];
             var bottom = sections[2];
             var left = sections[3];
+            var outerBounds = BorderOuterBounds;
 
             // Horizontal
             float scaledDashLength = dashLength / Width;
@@ -114,12 +109,16 @@ public class RectProperty : MonoBehaviour {
             for (int i = 0; i<numRects; i++) {
                 float displacement = (scaledDashLength + scaledGapLength) * i;
                 Vector2 anchor = top.TopLeft().Incr(displacement, 0);
-                var rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledDashLength, -scaledBorderHeight));
+                var rect = new Bounds().FromPoints(
+                        anchor,
+                        outerBounds.ClosestPoint(anchor.Incr(scaledDashLength, -scaledBorderHeight)));
                 AddRect(rect, vh);
 
                 // BOT
                 anchor = bottom.TopLeft().Incr(displacement, 0);
-                rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledDashLength, -scaledBorderHeight));
+                rect = new Bounds().FromPoints(
+                        anchor,
+                        outerBounds.ClosestPoint(anchor.Incr(scaledDashLength, -scaledBorderHeight)));
                 AddRect(rect, vh);
             }
 
@@ -131,41 +130,49 @@ public class RectProperty : MonoBehaviour {
             for (int i = 0; i<numRects; i++) {
                 float displacement = (scaledDashLength + scaledGapLength) * i;
                 Vector2 anchor = right.TopLeft().Incr(0, -displacement);
-                var rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledBorderWidth, -scaledDashLength));
+                var rect = new Bounds().FromPoints(
+                        anchor,
+                        outerBounds.ClosestPoint(anchor.Incr(scaledBorderWidth, -scaledDashLength)));
                 AddRect(rect, vh);
 
                 // BOT
                 anchor = left.TopLeft().Incr(0, -displacement);
-                rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledBorderWidth, -scaledDashLength));
+                rect = new Bounds().FromPoints(
+                        anchor,
+                        outerBounds.ClosestPoint(anchor.Incr(scaledBorderWidth, -scaledDashLength)));
                 AddRect(rect, vh);
             }
 
             // draw bot
-            vh.FillMesh(borderMeshFilter.mesh);
+            UpdateMesh(borderMeshFilter, vh);
+            UpdateColor(borderMeshRenderer, borderColor);
         }
-        borderMeshRenderer.material.color = borderColor;
+    }
+
+    Bounds BorderOuterBounds {
+        get {
+            var borderOuterBounds = new Bounds(Vector3.zero, new Vector3(1,1,0)); // Original bound
+            var borderFrame = new Vector2(scaledBorderWidth, scaledBorderHeight);
+
+
+            // adjust for border position
+            if (borderPosition == BorderPosition.Center) {
+                borderOuterBounds.Expand(borderFrame);
+            } else if (borderPosition == BorderPosition.Outside) {
+                borderOuterBounds.Expand(borderFrame*2f);
+            }
+
+            return borderOuterBounds;
+        }
     }
 
     Bounds[] BorderSectionBounds() {
-        var borderOuterBounds = new Bounds(Vector3.zero, new Vector3(1,1,0)); // Original bound
-        Debug.Log("1" + borderOuterBounds);
+        var borderOuterBounds = BorderOuterBounds;
         var borderFrame = new Vector2(scaledBorderWidth, scaledBorderHeight);
-
-        Debug.Log("2" + borderFrame);
-
-        // adjust for border position
-        if (borderPosition == BorderPosition.Center) {
-            borderOuterBounds.Expand(borderFrame);
-        } else if (borderPosition == BorderPosition.Outside) {
-            borderOuterBounds.Expand(borderFrame*2f);
-        }
-        Debug.Log("3" + borderOuterBounds);
 
         // calculate inner bounds from outer bounds
         var borderInnerBounds = borderOuterBounds;
         borderInnerBounds.Expand(-2f*borderFrame);
-
-        Debug.Log("inner bound= " + borderInnerBounds + "outer bounds= " + borderOuterBounds);
 
         // top
         var top = new Bounds().FromPoints(borderOuterBounds.TopLeft(),
@@ -178,6 +185,18 @@ public class RectProperty : MonoBehaviour {
                                            borderInnerBounds.TopLeft());
 
         return new []{top, right, bottom, left};
+    }
+
+    void UpdateMesh(MeshFilter filt, VertexHelper vh) {
+        Mesh newMesh = Mesh.Instantiate(filt.sharedMesh);
+        vh.FillMesh(newMesh);
+        filt.mesh = newMesh;
+    }
+
+    void UpdateColor(MeshRenderer rend, Color c) {
+        Material newMat = Material.Instantiate(rend.sharedMaterial);
+        newMat.color = c;
+        rend.material = newMat;
     }
 
     void AddRect(Bounds b, VertexHelper vh) {
@@ -236,6 +255,9 @@ public class RectProperty : MonoBehaviour {
     public float Angle {
         get {
             return transform.eulerAngles.z;
+        }
+        set {
+            transform.eulerAngles = transform.eulerAngles.SwapZ(value);
         }
     }
 
