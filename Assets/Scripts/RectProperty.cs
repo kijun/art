@@ -82,6 +82,70 @@ public class RectProperty : MonoBehaviour {
     }
 
     void RenderBorderSolid() {
+        using (var vh = new VertexHelper()) {
+            foreach (Bounds b in BorderSectionBounds()) {
+                AddRect(b, vh);
+            }
+
+            Mesh newMesh = Mesh.Instantiate(borderMeshFilter.sharedMesh);
+            vh.FillMesh(newMesh);
+            borderMeshFilter.mesh = newMesh;
+
+            Material newMat = Material.Instantiate(borderMeshRenderer.sharedMaterial);
+            newMat.color = borderColor;
+            borderMeshRenderer.material = newMat;
+        }
+    }
+
+    void RenderBorderDashed() {
+        using (var vh = new VertexHelper()) {
+            var sections = BorderSectionBounds();
+            var top = sections[0];
+            var right = sections[1];
+            var bottom = sections[2];
+            var left = sections[3];
+
+            // Horizontal
+            float scaledDashLength = dashLength / Width;
+            float scaledGapLength = gapLength / Width;
+            int numRects = Mathf.CeilToInt(top.size.x / (scaledDashLength + scaledGapLength));
+
+            for (int i = 0; i<numRects; i++) {
+                float displacement = (scaledDashLength + scaledGapLength) * i;
+                Vector2 anchor = top.TopLeft().Incr(displacement, 0);
+                var rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledDashLength, -scaledBorderHeight));
+                AddRect(rect, vh);
+
+                // BOT
+                anchor = bottom.TopLeft().Incr(displacement, 0);
+                rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledDashLength, -scaledBorderHeight));
+                AddRect(rect, vh);
+            }
+
+            // Vertical
+            scaledDashLength = dashLength / Height;
+            scaledGapLength = gapLength / Height;
+            numRects = Mathf.CeilToInt(right.size.y / (scaledDashLength + scaledGapLength));
+
+            for (int i = 0; i<numRects; i++) {
+                float displacement = (scaledDashLength + scaledGapLength) * i;
+                Vector2 anchor = right.TopLeft().Incr(0, -displacement);
+                var rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledBorderWidth, -scaledDashLength));
+                AddRect(rect, vh);
+
+                // BOT
+                anchor = left.TopLeft().Incr(0, -displacement);
+                rect = new Bounds().FromPoints(anchor, anchor.Incr(scaledBorderWidth, -scaledDashLength));
+                AddRect(rect, vh);
+            }
+
+            // draw bot
+            vh.FillMesh(borderMeshFilter.mesh);
+        }
+        borderMeshRenderer.material.color = borderColor;
+    }
+
+    Bounds[] BorderSectionBounds() {
         var borderOuterBounds = new Bounds(Vector3.zero, new Vector3(1,1,0)); // Original bound
         var borderFrame = new Vector2(scaledBorderWidth, scaledBorderHeight);
 
@@ -105,38 +169,8 @@ public class RectProperty : MonoBehaviour {
                                              borderInnerBounds.BottomLeft());
         var left = new Bounds().FromPoints(borderOuterBounds.BottomLeft(),
                                            borderInnerBounds.TopLeft());
-        using (var vh = new VertexHelper()) {
-            AddRect(top, vh);
-            AddRect(right, vh);
-            AddRect(bottom, vh);
-            AddRect(left, vh);
-            vh.FillMesh(borderMeshFilter.mesh);
-            borderMeshRenderer.material.color = borderColor;
-        }
-    }
 
-    void RenderBorderDashed() {
-        // TODO: SOLID BORDER
-        // scale?
-        // add top
-        //
-        using (var vh = new VertexHelper()) {
-            var bounds = Bounds;
-
-            // draw top border
-            int numRects = Mathf.CeilToInt(Width / (dashLength + gapLength));
-            Vector3 leftAnchor = new Vector2(-0.5f, 0.5f);
-
-            Debug.Log("Creating " + numRects + " for top");
-            for (int i = 0; i<numRects; i++) {
-                float displacement = ((dashLength + gapLength) * i) / Width;
-                AddRect(leftAnchor.IncrX(displacement), dashLength, borderThickness, vh);
-            }
-
-            // draw bot
-            vh.FillMesh(borderMeshFilter.mesh);
-        }
-        borderMeshRenderer.material.color = borderColor;
+        return new []{top, right, bottom, left};
     }
 
     void AddRect(Bounds b, VertexHelper vh) {
