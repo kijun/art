@@ -13,8 +13,17 @@ public class CameraController : MonoBehaviour {
 
     // INIT
     void Awake () {
+        /*
         Screen.fullScreen = false;
         Screen.SetResolution(375,667,false);
+        */
+        var resolutions = Screen.resolutions;
+        var maxResolution = resolutions[resolutions.Length-1];
+        Screen.SetResolution(maxResolution.width, maxResolution.height, true);
+
+        /*
+        Screen.SetResolution(375,667,true);
+        */
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         // Assign static instance

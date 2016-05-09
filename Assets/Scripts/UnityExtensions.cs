@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 public static class UnityExtensions {
+    /*
+     * VECTOR3
+     */
     public static Vector3 SwapX(this Vector3 v, float val) {
         v.x = val;
         return v;
@@ -32,6 +35,50 @@ public static class UnityExtensions {
         return v;
     }
 
+    /*
+     * VECTOR2
+     */
+
+    public static Vector2 Incr(this Vector2 v, float x, float y) {
+        v.x += x;
+        v.y += y;
+        return v;
+    }
+
+    /*
+     * BOUNDS
+     */
+    public static Bounds WithMinMax(this Bounds b, Vector3 min, Vector3 max) {
+        b.SetMinMax(min, max);
+        return b;
+    }
+
+    public static Bounds FromPoints(this Bounds b, Vector3 p1, Vector3 p2) {
+        var min = new Vector3(Mathf.Min(p1.x, p2.x), Mathf.Min(p1.y, p2.y), Mathf.Min(p1.z, p2.z));
+        var max = new Vector3(Mathf.Max(p1.x, p2.x), Mathf.Max(p1.y, p2.y), Mathf.Max(p1.z, p2.z));
+        b.SetMinMax(min, max);
+        return b;
+    }
+
+    public static Vector2 TopLeft(this Bounds b) {
+        return new Vector2(b.min.x, b.max.y);
+    }
+
+    public static Vector2 TopRight(this Bounds b) {
+        return new Vector2(b.max.x, b.max.y);
+    }
+
+    public static Vector2 BottomLeft(this Bounds b) {
+        return new Vector2(b.min.x, b.min.y);
+    }
+
+    public static Vector2 BottomRight(this Bounds b) {
+        return new Vector2(b.max.x, b.min.y);
+    }
+
+    /*
+     * DUNNO
+     */
     public static void SetAlpha(this Material m, float val) {
         var color = m.color;
         color.a = val;
