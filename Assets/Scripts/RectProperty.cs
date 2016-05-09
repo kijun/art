@@ -84,6 +84,7 @@ public class RectProperty : MonoBehaviour {
     void RenderBorderSolid() {
         using (var vh = new VertexHelper()) {
             foreach (Bounds b in BorderSectionBounds()) {
+                Debug.Log(b);
                 AddRect(b, vh);
             }
 
@@ -147,18 +148,24 @@ public class RectProperty : MonoBehaviour {
 
     Bounds[] BorderSectionBounds() {
         var borderOuterBounds = new Bounds(Vector3.zero, new Vector3(1,1,0)); // Original bound
+        Debug.Log("1" + borderOuterBounds);
         var borderFrame = new Vector2(scaledBorderWidth, scaledBorderHeight);
+
+        Debug.Log("2" + borderFrame);
 
         // adjust for border position
         if (borderPosition == BorderPosition.Center) {
-            borderOuterBounds.Expand(borderFrame/2f);
-        } else if (borderPosition == BorderPosition.Outside) {
             borderOuterBounds.Expand(borderFrame);
+        } else if (borderPosition == BorderPosition.Outside) {
+            borderOuterBounds.Expand(borderFrame*2f);
         }
+        Debug.Log("3" + borderOuterBounds);
 
         // calculate inner bounds from outer bounds
         var borderInnerBounds = borderOuterBounds;
-        borderInnerBounds.Expand(-borderFrame);
+        borderInnerBounds.Expand(-2f*borderFrame);
+
+        Debug.Log("inner bound= " + borderInnerBounds + "outer bounds= " + borderOuterBounds);
 
         // top
         var top = new Bounds().FromPoints(borderOuterBounds.TopLeft(),
