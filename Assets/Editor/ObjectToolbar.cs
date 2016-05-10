@@ -4,6 +4,8 @@ using System.Collections;
 
 public class ObjectToolbar : EditorWindow {
 
+    bool instantiating = false;
+
 	[MenuItem ("Window/Object Toolbar")]
 	static void Init () {
 		// Get existing open window or if none, make a new one:
@@ -37,5 +39,9 @@ public class ObjectToolbar : EditorWindow {
 
         if (GUILayout.Button("Box")) {
         }
+    }
+
+    void OnSceneGUI() {
+        if (!instantiating) return;
     }
 }

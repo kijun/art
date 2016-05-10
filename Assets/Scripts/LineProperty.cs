@@ -47,7 +47,6 @@ public class LineProperty : MonoBehaviour {
 
     void RenderSolid() {
         using (var vh = new VertexHelper()) {
-            Debug.Log("Unit Bounds" + BoundsUtil.UnitBounds);
             MeshUtil.AddRect(BoundsUtil.UnitBounds, vh);
             MeshUtil.UpdateMesh(GetComponent<MeshFilter>(), vh);
             MeshUtil.UpdateColor(GetComponent<MeshRenderer>(), color);
@@ -106,11 +105,63 @@ public class LineProperty : MonoBehaviour {
 
 
     public void OnPropertyChange() {
-        Debug.Log("on property change");
+        //Debug.Log("on property change");
         Render();
+        CacheEndPoints();
     }
 
     public void OnValidate() {
-        Debug.Log("property changed");
+//        Debug.Log("property changed");
+    }
+
+
+    void SetEndPoints(Vector2 p1, Vector2 p2) {
+        var z = transform.position.z;
+        var midpoint = (p1+p2)/2f;
+
+        Length = (p1-p2).magnitude;
+        Angle = Mathf.Atan2(p2.y-p1.y, p2.x-p1.x) * Mathf.Rad2Deg;
+        transform.position = new Vector3(midpoint.x, midpoint.y, z);
+
+        CacheEndPoints();
+    }
+
+    void CacheEndPoints() {
+        var directional = transform.rotation * new Vector2(Length/2, 0);
+        var p1 = directional + transform.position;
+        var p2 = -1*directional + transform.position;
+
+        if (Vector2.Distance(cachedEndPoint1, p1) < Vector2.Distance(cachedEndPoint2, p2)) {
+            cachedEndPoint1 = p1;
+            cachedEndPoint2 = p2;
+        } else {
+            cachedEndPoint1 = p2;
+            cachedEndPoint2 = p1;
+        }
+    }
+
+    Vector2 cachedEndPoint1;
+    Vector2 cachedEndPoint2;
+
+    public Vector2 EndPoint1 {
+        get {
+            return cachedEndPoint1;
+            //return transform.rotation * new Vector2(Length/2, 0) + transform.position;
+        }
+
+        set {
+            SetEndPoints(value, EndPoint2);
+        }
+    }
+
+    public Vector2 EndPoint2 {
+        get {
+            return cachedEndPoint2;
+            //return -1 * (transform.rotation * new Vector2(Length/2, 0)) + transform.position;
+        }
+
+        set {
+            SetEndPoints(EndPoint1, value);
+        }
     }
 }
