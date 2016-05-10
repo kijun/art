@@ -5,7 +5,6 @@ using System.Collections;
 // execute in edit mode
 [ExecuteInEditMode]
 [SelectionBase]
-//[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class RectProperty : MonoBehaviour {
     static Vector2 TextureMidPoint = TextureMidPoint;
 
@@ -20,35 +19,11 @@ public class RectProperty : MonoBehaviour {
     public float dashLength;
     public float gapLength;
 
-    // Assume that it is already filled by a prefab
+    // Prefab should assign these to child gameobjects
     public MeshFilter innerMeshFilter;
     public MeshRenderer innerMeshRenderer;
     public MeshFilter borderMeshFilter;
     public MeshRenderer borderMeshRenderer;
-
-    /*
-     * SETUP
-     */
-    /*
-    void Start() {
-        CreateChildObjects();
-    }
-
-    void CreateChildObjects() {
-        if (innerMeshFilter != null) return;
-
-        var inner = new GameObject();
-        innerMeshFilter = inner.AddComponent<MeshFilter>();
-        innerMeshRenderer = inner.AddComponent<MeshRenderer>();
-        innerMeshRenderer.material = Material.
-        inner.transform.parent = transform;
-
-        var border = new GameObject();
-        borderMeshFilter = border.AddComponent<MeshFilter>();
-        borderMeshRenderer = border.AddComponent<MeshRenderer>();
-        border.transform.parent = transform;
-    }
-    */
 
     /*
      * RENDERING
@@ -76,19 +51,19 @@ public class RectProperty : MonoBehaviour {
             vh.AddVert(new Vector3(0.5f, 0.5f), color32, TextureMidPoint);
             vh.AddTriangle(0,1,2);
             vh.AddTriangle(2,1,3);
-            UpdateMesh(innerMeshFilter, vh);
-            UpdateColor(innerMeshRenderer, color);
+            MeshUtil.UpdateMesh(innerMeshFilter, vh);
+            MeshUtil.UpdateColor(innerMeshRenderer, color);
         }
     }
 
     void RenderBorderSolid() {
         using (var vh = new VertexHelper()) {
             foreach (Bounds b in BorderSectionBounds()) {
-                AddRect(b, vh);
+                MeshUtil.AddRect(b, vh);
             }
 
-            UpdateMesh(borderMeshFilter, vh);
-            UpdateColor(borderMeshRenderer, borderColor);
+            MeshUtil.UpdateMesh(borderMeshFilter, vh);
+            MeshUtil.UpdateColor(borderMeshRenderer, borderColor);
         }
     }
 
@@ -112,14 +87,14 @@ public class RectProperty : MonoBehaviour {
                 var rect = new Bounds().FromPoints(
                         anchor,
                         outerBounds.ClosestPoint(anchor.Incr(scaledDashLength, -scaledBorderHeight)));
-                AddRect(rect, vh);
+                MeshUtil.AddRect(rect, vh);
 
                 // BOT
                 anchor = bottom.TopLeft().Incr(displacement, 0);
                 rect = new Bounds().FromPoints(
                         anchor,
                         outerBounds.ClosestPoint(anchor.Incr(scaledDashLength, -scaledBorderHeight)));
-                AddRect(rect, vh);
+                MeshUtil.AddRect(rect, vh);
             }
 
             // Vertical
@@ -133,19 +108,19 @@ public class RectProperty : MonoBehaviour {
                 var rect = new Bounds().FromPoints(
                         anchor,
                         outerBounds.ClosestPoint(anchor.Incr(scaledBorderWidth, -scaledDashLength)));
-                AddRect(rect, vh);
+                MeshUtil.AddRect(rect, vh);
 
                 // BOT
                 anchor = left.TopLeft().Incr(0, -displacement);
                 rect = new Bounds().FromPoints(
                         anchor,
                         outerBounds.ClosestPoint(anchor.Incr(scaledBorderWidth, -scaledDashLength)));
-                AddRect(rect, vh);
+                MeshUtil.AddRect(rect, vh);
             }
 
             // draw bot
-            UpdateMesh(borderMeshFilter, vh);
-            UpdateColor(borderMeshRenderer, borderColor);
+            MeshUtil.UpdateMesh(borderMeshFilter, vh);
+            MeshUtil.UpdateColor(borderMeshRenderer, borderColor);
         }
     }
 
@@ -187,43 +162,6 @@ public class RectProperty : MonoBehaviour {
         return new []{top, right, bottom, left};
     }
 
-    void UpdateMesh(MeshFilter filt, VertexHelper vh) {
-        Mesh newMesh = Mesh.Instantiate(filt.sharedMesh);
-        vh.FillMesh(newMesh);
-        filt.mesh = newMesh;
-    }
-
-    void UpdateColor(MeshRenderer rend, Color c) {
-        Material newMat = Material.Instantiate(rend.sharedMaterial);
-        newMat.color = c;
-        rend.material = newMat;
-    }
-
-    void AddRect(Bounds b, VertexHelper vh) {
-        int vertIdx = vh.currentVertCount;
-        vh.AddVert(b.BottomLeft(), Color.white, TextureMidPoint);
-        vh.AddVert(b.TopLeft(), Color.white, TextureMidPoint);
-        vh.AddVert(b.BottomRight(), Color.white, TextureMidPoint);
-        vh.AddVert(b.TopRight(), Color.white, TextureMidPoint);
-        vh.AddTriangle(vertIdx, vertIdx+1, vertIdx+2);
-        vh.AddTriangle(vertIdx+2, vertIdx+1, vertIdx+3);
-    }
-
-    // left = left middle
-    // TODO refactor
-    void AddRect(Vector2 leftAnchor, float rectWidth, float rectHeight, VertexHelper vh) {
-        int vertIdx = vh.currentVertCount;
-        float localWidth = rectWidth/Width;
-        float localHeight = rectHeight/Height;
-        vh.AddVert(new Vector3(leftAnchor.x, leftAnchor.y-localHeight/2, 0), Color.white, TextureMidPoint);
-        vh.AddVert(new Vector3(leftAnchor.x, leftAnchor.y+localHeight/2, 0), Color.white, TextureMidPoint);
-        vh.AddVert(new Vector3(leftAnchor.x+localWidth, leftAnchor.y-localHeight/2, 0), Color.white, TextureMidPoint);
-        vh.AddVert(new Vector3(leftAnchor.x+localWidth, leftAnchor.y+localHeight/2, 0), Color.white, TextureMidPoint);
-        vh.AddTriangle(vertIdx, vertIdx+1, vertIdx+2);
-        vh.AddTriangle(vertIdx+2, vertIdx+1, vertIdx+3);
-    }
-
-
     /*
      * PROPERTIES
      */
@@ -261,10 +199,6 @@ public class RectProperty : MonoBehaviour {
         }
     }
 
-
-    /*
-     * ETC
-     */
     float scaledBorderWidth {
         get  {
             return borderThickness/Width;
