@@ -24,6 +24,9 @@ public class ObjectToolbar : EditorWindow {
     void OnGUI () {
         if (GUILayout.Button("Line")) {
             Debug.Log("line");
+            var line = Resources.Load<GameObject>("Shapes/UnitLine");
+            Instantiate(line, Camera.main.transform.position.SwapZ(0), Quaternion.identity);
+            line.GetComponent<LineProperty>().OnPropertyChange();
         }
 
         if (GUILayout.Button("Circle")) {

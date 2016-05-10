@@ -6,10 +6,10 @@ public class MeshUtil {
     const string DEFAULT_MATERIAL_NAME = "material";
 
     public static void UpdateMesh(MeshFilter filt, VertexHelper vh, string meshName = DEFAULT_MESH_NAME) {
-        Mesh newMesh = Mesh.Instantiate(filt.sharedMesh);
-        vh.FillMesh(newMesh);
-        newMesh.name = filt.sharedMesh.name;
-        filt.mesh = newMesh;
+        var mesh = new Mesh();
+        vh.FillMesh(mesh);
+        mesh.name = meshName;
+        filt.mesh = mesh;
     }
 
     public static void UpdateColor(MeshRenderer rend, Color c, string matName = DEFAULT_MATERIAL_NAME) {
