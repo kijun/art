@@ -25,9 +25,9 @@ public class ObjectToolbar : EditorWindow {
 
     void OnGUI () {
         if (GUILayout.Button("Line")) {
-            Debug.Log("line");
-            var line = Resources.Load<GameObject>("Shapes/UnitLine");
-            Instantiate(line, Camera.main.transform.position.SwapZ(0), Quaternion.identity);
+            var linePrefab = Resources.Load<GameObject>("Shapes/UnitLine");
+            var line = Instantiate(linePrefab, Camera.main.transform.position.SwapZ(0), Quaternion.identity) as GameObject;
+            Debug.Log(line);
             line.GetComponent<LineProperty>().OnPropertyChange();
         }
 
