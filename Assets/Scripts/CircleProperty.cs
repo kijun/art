@@ -49,20 +49,27 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
                 RenderBorderSolid();
                 break;
             case BorderStyle.Dash:
+                RenderBorderSolid();
+                /* TODO
                 if (dashLength == 0) {
                     RenderBorderSolid();
                 } else {
                     RenderBorderDash();
                 }
+                */
+                break;
+            case BorderStyle.None:
+                RenderBorderNone();
                 break;
             default:
                 break;
-            /* case BorderStyle.None:
-                RenderBorderless();
-                break;
-                */
         }
-        //GetComponent<MeshRenderer>().sharedMaterial.color = color;
+    }
+
+    void RenderBorderNone() {
+        using (var vh = new VertexHelper()) {
+            MeshUtil.UpdateMesh(borderMeshFilter, vh);
+        }
     }
 
     void RenderBorderless() {

@@ -34,10 +34,11 @@ public class DefaultShapeStyle {
 
     public static void Apply(IObjectProperty p) {
         if (p.GetType() == typeof(LineProperty)) {
-            LineProperty lp = (LineProperty)p;
-            ApplyToLine(lp);
+            ApplyToLine((LineProperty)p);
         } else if (p.GetType() == typeof(RectProperty)) {
             ApplyToRect((RectProperty)p);
+        } else if (p.GetType() == typeof(CircleProperty)) {
+            ApplyToCircle((CircleProperty)p);
         }
     }
 
