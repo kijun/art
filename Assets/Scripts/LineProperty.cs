@@ -2,10 +2,15 @@
 using UnityEngine.UI;
 using System.Collections;
 
+
+public interface IObjectProperty {
+    void OnUpdate();
+}
+
 // execute in edit mode
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class LineProperty : MonoBehaviour {
+public class LineProperty : MonoBehaviour, IObjectProperty {
 
     const int MAX_FRAGMENTS = 10000;
 
@@ -26,7 +31,7 @@ public class LineProperty : MonoBehaviour {
         // TODO check if edit mode
         if (angleCache != transform.eulerAngles || scaleCache != transform.localScale) {
             CacheTransform();
-            OnPropertyChange();
+            OnUpdate();
         }
     }
 
@@ -104,7 +109,7 @@ public class LineProperty : MonoBehaviour {
     }
 
 
-    public void OnPropertyChange() {
+    public void OnUpdate() {
         //Debug.Log("on property change");
         Render();
         CacheEndPoints();

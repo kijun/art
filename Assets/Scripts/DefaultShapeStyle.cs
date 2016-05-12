@@ -52,4 +52,11 @@ public class DefaultShapeStyle {
         lineLength = line.Length;
         lineWidth = line.Width;
     }
+
+    public static void Apply(IObjectProperty p) {
+        if (p.GetType() == typeof(LineProperty)) {
+            LineProperty lp = (LineProperty)p;
+            ApplyToLine(lp);
+        }
+    }
 }

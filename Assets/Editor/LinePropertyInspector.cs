@@ -27,7 +27,7 @@ public class LinePropertyInspector : Editor {
 
         // Render
         if (EditorGUI.EndChangeCheck()) {
-            line.OnPropertyChange();
+            line.OnUpdate();
         }
     }
 
