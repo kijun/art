@@ -35,17 +35,21 @@ public class MeshUtil {
         vh.AddTriangle(vertIdx+2, vertIdx+1, vertIdx+3);
     }
 
-    /*
-    void AddRect(Vector2 leftAnchor, float rectWidth, float rectHeight, VertexHelper vh) {
+    public static void AddTriangle(
+        Vector2 p1,
+        Vector2 p2,
+        Vector3 p3,
+        VertexHelper vh,
+        Color vertexColor = default(Color),
+        Vector2 uv=default(Vector2))
+    {
+        uv = new Vector2(0.5f, 0.5f);
         int vertIdx = vh.currentVertCount;
-        float localWidth = rectWidth/Width;
-        float localHeight = rectHeight/Height;
-        vh.AddVert(new Vector3(leftAnchor.x, leftAnchor.y-localHeight/2, 0), Color.white, TextureMidPoint);
-        vh.AddVert(new Vector3(leftAnchor.x, leftAnchor.y+localHeight/2, 0), Color.white, TextureMidPoint);
-        vh.AddVert(new Vector3(leftAnchor.x+localWidth, leftAnchor.y-localHeight/2, 0), Color.white, TextureMidPoint);
-        vh.AddVert(new Vector3(leftAnchor.x+localWidth, leftAnchor.y+localHeight/2, 0), Color.white, TextureMidPoint);
+        vh.AddVert(p1, vertexColor, uv);
+        vh.AddVert(p2, vertexColor, uv);
+        vh.AddVert(p3, vertexColor, uv);
         vh.AddTriangle(vertIdx, vertIdx+1, vertIdx+2);
-        vh.AddTriangle(vertIdx+2, vertIdx+1, vertIdx+3);
     }
-    */
+
+    //public static void AddQuad(
 }

@@ -1,42 +1,50 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 [ExecuteInEditMode]
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class CircleProperty : MonoBehaviour {
+public class CircleProperty : MonoBehaviour, IObjectProperty {
+
+    const float MAX_FRAGMENT_LENGTH = 0.03f; // make it small enough to be invisible
 
     // basic circle property
     public Color color;
 
     // border
-    public BorderStyle style;
+    public BorderStyle borderStyle;
+    public BorderPosition borderPosition;
     public Color borderColor;
     public float borderWidth;
     public float dashLength;
     public float gapLength;
 
+    // Prefab should assign these to child gameobjects
+    public MeshFilter innerMeshFilter;
+    public MeshRenderer innerMeshRenderer;
+    public MeshFilter borderMeshFilter;
+    public MeshRenderer borderMeshRenderer;
+
     public float diameter {
         get {
-            return transform.localScale.x * 100f;
+            return transform.localScale.x;
         }
 
         set {
-            transform.localScale = new Vector3(value/100f, value/100f, 1);
+            transform.localScale = new Vector3(value, value, 1);
         }
     }
 
-    public void OnPropertyChange() {
+    public void OnUpdate() {
         Render();
+        DefaultShapeStyle.SetDefaultCircleStyle(this);
     }
-
 
     /* RENDERING */
 
     void Render() {
-        switch (style) {
-            case BorderStyle.None:
-                RenderBorderless();
-                break;
+        // inner
+        RenderBorderless();
+        switch (borderStyle) {
             case BorderStyle.Solid:
                 RenderBorderSolid();
                 break;
@@ -47,42 +55,46 @@ public class CircleProperty : MonoBehaviour {
                     RenderBorderDash();
                 }
                 break;
+            default:
+                break;
+            /* case BorderStyle.None:
+                RenderBorderless();
+                break;
+                */
         }
         //GetComponent<MeshRenderer>().sharedMaterial.color = color;
     }
 
     void RenderBorderless() {
-        int numTris = 40;
+        int numTris = Mathf.CeilToInt(diameter * Mathf.PI / MAX_FRAGMENT_LENGTH);
         float centerAngle = 2*Mathf.PI/numTris;
+        Color c = Color.white;
 
-        var line = new Mesh();
-        var verts = new Vector3[numTris+1]; // center + one for each
-        var uvs = new Vector2[verts.Length];
-        var tris = new int[numTris * 3];
+        using (var vh = new VertexHelper()) {
+            // create verticies
+            vh.AddVert(Vector3.zero, c, Vector2.zero); // midpoint
+            for (int i = 0; i < numTris; i++) {
+                float angle = centerAngle * i;
+                float x = Mathf.Cos(angle);
+                float y = Mathf.Sin(angle);
+                vh.AddVert(new Vector3(x, y, 0), c, Vector2.zero);
+            }
 
-        verts[0] = Vector3.zero;
-        uvs[0] = Vector2.zero;
-
-        for (int i = 1; i<verts.Length; i++) {
-            float angle = centerAngle * (i-1);
-            float x = Mathf.Cos(angle);
-            float y = Mathf.Sin(angle);
-            verts[i] = new Vector3(x, y, 0);
-            Debug.Log("vert " + i + " " + verts[i]);
-            uvs[i] = Vector2.zero;
-            tris[3*(i-1)] = 0;
-            tris[3*(i-1)+1] = i+1; // wrap around
-            tris[3*(i-1)+2] = i;
+            // create triangles
+            for (int i = 0; i < numTris-1; i++) {
+                vh.AddTriangle(0, i+2, i+1);
+            }
+            // come around
+            vh.AddTriangle(0, 1, numTris);
+            MeshUtil.UpdateMesh(innerMeshFilter, vh);
+            MeshUtil.UpdateColor(innerMeshRenderer, color);
         }
-
-        tris[tris.Length-2] = 1;
-
-        line.vertices = verts;
-        line.uv = uvs;
-        line.triangles = tris;
-
-        GetComponent<MeshFilter>().mesh = line;
     }
+
+    /*
+    void RenderBorderSolid() {
+    }
+    */
 
     void RenderBorderSolid() {
         int numTris = 200;
@@ -153,13 +165,6 @@ public class CircleProperty : MonoBehaviour {
 
     void RenderBorderDash() {
 
-    }
-
-    /* RENDERING HELPER */
-    void AddTriangle() {
-    }
-
-    void AddRectangle() {
     }
 
     /* */

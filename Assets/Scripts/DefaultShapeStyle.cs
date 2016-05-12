@@ -31,9 +31,23 @@ public class DefaultShapeStyle {
     public static float dashLength = 0.10f;
     public static float gapLength = 0.10f;
 
+
+    public static void Apply(IObjectProperty p) {
+        if (p.GetType() == typeof(LineProperty)) {
+            LineProperty lp = (LineProperty)p;
+            ApplyToLine(lp);
+        } else if (p.GetType() == typeof(RectProperty)) {
+            ApplyToRect((RectProperty)p);
+        }
+    }
+
+    /*
+     * LINE
+     */
+
     // TODO should probably return a line property struct,
     // and we should refactor rendering code
-    public static void ApplyToLine(LineProperty line) {
+    static void ApplyToLine(LineProperty line) {
         line.color = color;
         line.style = borderStyle;
         line.dashLength = dashLength;
@@ -53,7 +67,11 @@ public class DefaultShapeStyle {
         lineWidth = line.Width;
     }
 
-    public static void ApplyToRect(RectProperty obj) {
+    /*
+     * RECT
+     */
+
+    static void ApplyToRect(RectProperty obj) {
         obj.color = color;
         obj.Height = rectHeight;
         obj.Width = rectWidth;
@@ -77,12 +95,27 @@ public class DefaultShapeStyle {
         gapLength = obj.gapLength;
     }
 
-    public static void Apply(IObjectProperty p) {
-        if (p.GetType() == typeof(LineProperty)) {
-            LineProperty lp = (LineProperty)p;
-            ApplyToLine(lp);
-        } else if (p.GetType() == typeof(RectProperty)) {
-            ApplyToRect((RectProperty)p);
-        }
+    /*
+     * CIRCLE
+     */
+    static void ApplyToCircle(CircleProperty obj) {
+        obj.color = color;
+        obj.diameter = diameter;
+
+        obj.borderStyle = borderStyle;
+        obj.borderPosition = borderPosition;
+        obj.dashLength = dashLength;
+        obj.gapLength = gapLength;
     }
+
+    public static void SetDefaultCircleStyle(CircleProperty obj) {
+        color = obj.color;
+        diameter = obj.diameter;
+
+        borderStyle = obj.borderStyle;
+        borderPosition = obj.borderPosition;
+        dashLength = obj.dashLength;
+        gapLength = obj.gapLength;
+    }
+
 }

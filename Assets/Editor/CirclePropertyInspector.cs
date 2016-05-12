@@ -19,20 +19,43 @@ public class CirclePropertyInspector : Editor {
         circle.color = EditorGUILayout.ColorField("Color", circle.color);
 
         // Circle Style
-        circle.style = (BorderStyle)EditorGUILayout.EnumPopup("Style", circle.style);
+        circle.borderStyle = (BorderStyle)EditorGUILayout.EnumPopup("Style", circle.borderStyle);
 
-        if (circle.style != BorderStyle.None) {
+        if (circle.borderStyle != BorderStyle.None) {
             circle.borderColor = EditorGUILayout.ColorField("Border Color", circle.borderColor);
             circle.borderWidth = EditorGUILayout.FloatField("Border Width", circle.borderWidth);
-            if (circle.style == BorderStyle.Dash) {
+            if (circle.borderStyle == BorderStyle.Dash) {
                 circle.dashLength = EditorGUILayout.FloatField("Dash Length", circle.dashLength);
                 circle.gapLength = EditorGUILayout.FloatField("Gap Length", circle.gapLength);
             }
         }
 
+        // MeshFilter/Renderer
+        circle.innerMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
+                "Inner Mesh Renderer",
+                circle.innerMeshRenderer,
+                typeof(MeshRenderer),
+                true);
+        circle.innerMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
+                "Inner Mesh Filter",
+                circle.innerMeshFilter,
+                typeof(MeshFilter),
+                true);
+
+        circle.borderMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
+                "Border Mesh Renderer",
+                circle.borderMeshRenderer,
+                typeof(MeshRenderer),
+                true);
+        circle.borderMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
+                "Border Mesh Filter",
+                circle.borderMeshFilter,
+                typeof(MeshFilter),
+                true);
+
         // Render
         if (EditorGUI.EndChangeCheck()) {
-            circle.OnPropertyChange();
+            circle.OnUpdate();
         }
     }
 }
