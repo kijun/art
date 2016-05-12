@@ -5,7 +5,7 @@ using System.Collections;
 // execute in edit mode
 [ExecuteInEditMode]
 [SelectionBase]
-public class RectProperty : MonoBehaviour {
+public class RectProperty : MonoBehaviour, IObjectProperty {
     static Vector2 TextureMidPoint = TextureMidPoint;
 
     /*
@@ -43,6 +43,7 @@ public class RectProperty : MonoBehaviour {
                 break;
         }
         RenderInner();
+        DefaultShapeStyle.SetDefaultRectStyle(this);
     }
 
     void RenderInner() {
@@ -169,6 +170,10 @@ public class RectProperty : MonoBehaviour {
                                            borderInnerBounds.TopLeft());
 
         return new []{top, right, bottom, left};
+    }
+
+    public void OnUpdate() {
+        Render();
     }
 
     /*

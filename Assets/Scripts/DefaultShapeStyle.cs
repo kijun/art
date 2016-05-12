@@ -27,7 +27,7 @@ public class DefaultShapeStyle {
     // this is also shared by line shape as well
     public static float borderThickness = 0.05f;
     public static Color borderColor = Color.grey;
-    public BorderPosition borderPosition = BorderPosition.Outside;
+    public static BorderPosition borderPosition = BorderPosition.Outside;
     public static float dashLength = 0.10f;
     public static float gapLength = 0.10f;
 
@@ -53,10 +53,36 @@ public class DefaultShapeStyle {
         lineWidth = line.Width;
     }
 
+    public static void ApplyToRect(RectProperty obj) {
+        obj.color = color;
+        obj.Height = rectHeight;
+        obj.Width = rectWidth;
+        obj.Angle = angle;
+
+        obj.borderStyle = borderStyle;
+        obj.borderPosition = borderPosition;
+        obj.dashLength = dashLength;
+        obj.gapLength = gapLength;
+    }
+
+    public static void SetDefaultRectStyle(RectProperty obj) {
+        color = obj.color;
+        rectHeight = obj.Height;
+        rectWidth = obj.Width;
+        angle = obj.Angle;
+
+        borderStyle = obj.borderStyle;
+        borderPosition = obj.borderPosition;
+        dashLength = obj.dashLength;
+        gapLength = obj.gapLength;
+    }
+
     public static void Apply(IObjectProperty p) {
         if (p.GetType() == typeof(LineProperty)) {
             LineProperty lp = (LineProperty)p;
             ApplyToLine(lp);
+        } else if (p.GetType() == typeof(RectProperty)) {
+            ApplyToRect((RectProperty)p);
         }
     }
 }

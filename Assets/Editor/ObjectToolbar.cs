@@ -15,27 +15,9 @@ public class ObjectToolbar : EditorWindow {
                 typeof (ObjectToolbar));
 	}
 
-	// Use this for initialization
-	void Start () {
-
-	}
-
-	// Update is called once per frame
-	void Update () {
-
-	}
-
     [MenuItem ("GameObject/Line %&l")]
     static void CreateLine() {
         Create<LineProperty>();
-        /*
-        Resources.Load<GameObject>(LINE_PREFAB_PATH));
-        var line = Instantiate(linePrefab, Camera.main.transform.position.SwapZ(0), Quaternion.identity) as GameObject;
-        var lineProperty = line.GetComponent<LineProperty>();
-        DefaultShapeStyle.ApplyToLine(lineProperty);
-        lineProperty.OnPropertyChange();
-        Selection.activeGameObject = line;
-        */
     }
 
     [MenuItem ("GameObject/Circle %&c")]
