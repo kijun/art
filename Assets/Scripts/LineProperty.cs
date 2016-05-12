@@ -108,6 +108,7 @@ public class LineProperty : MonoBehaviour {
         //Debug.Log("on property change");
         Render();
         CacheEndPoints();
+        DefaultShapeStyle.SetDefaultLineStyle(this);
     }
 
     public void OnValidate() {

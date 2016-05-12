@@ -23,12 +23,16 @@ public class ObjectToolbar : EditorWindow {
 
 	}
 
+    // we need to get previous element's thickness, regardless of circle etc.
+    // notification? or editor cached property
     void OnGUI () {
         if (GUILayout.Button("Line")) {
             var linePrefab = Resources.Load<GameObject>("Shapes/UnitLine");
             var line = Instantiate(linePrefab, Camera.main.transform.position.SwapZ(0), Quaternion.identity) as GameObject;
-            Debug.Log(line);
+            var lineProperty = line.GetComponent<LineProperty>() as LineProperty;
+            DefaultShapeStyle.ApplyToLine(lineProperty);
             line.GetComponent<LineProperty>().OnPropertyChange();
+            // for line width and color, used previously changed value for consistency
         }
 
         if (GUILayout.Button("Circle")) {
@@ -39,9 +43,5 @@ public class ObjectToolbar : EditorWindow {
 
         if (GUILayout.Button("Box")) {
         }
-    }
-
-    void OnSceneGUI() {
-        if (!instantiating) return;
     }
 }

@@ -36,6 +36,9 @@ public class RectProperty : MonoBehaviour {
             case BorderStyle.Solid:
                 RenderBorderSolid();
                 break;
+            case BorderStyle.None:
+                RenderBorderNone();
+                break;
             default:
                 break;
         }
@@ -53,6 +56,12 @@ public class RectProperty : MonoBehaviour {
             vh.AddTriangle(2,1,3);
             MeshUtil.UpdateMesh(innerMeshFilter, vh);
             MeshUtil.UpdateColor(innerMeshRenderer, color);
+        }
+    }
+
+    void RenderBorderNone() {
+        using (var vh = new VertexHelper()) {
+            MeshUtil.UpdateMesh(borderMeshFilter, vh);
         }
     }
 
