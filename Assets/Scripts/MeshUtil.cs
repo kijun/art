@@ -38,7 +38,7 @@ public class MeshUtil {
     public static void AddTriangle(
         Vector2 p1,
         Vector2 p2,
-        Vector3 p3,
+        Vector2 p3,
         VertexHelper vh,
         Color vertexColor = default(Color),
         Vector2 uv=default(Vector2))
@@ -51,5 +51,22 @@ public class MeshUtil {
         vh.AddTriangle(vertIdx, vertIdx+1, vertIdx+2);
     }
 
-    //public static void AddQuad(
+    // two triangles: (1,2,3) (2,3,4)
+    public static void AddQuad(
+            Vector2 p1,
+            Vector2 p2,
+            Vector2 p3,
+            Vector2 p4,
+            VertexHelper vh,
+            Color vertexColor = default(Color),
+            Vector2 uv=default(Vector2))
+    {
+        int vertIdx = vh.currentVertCount;
+        vh.AddVert(p1, vertexColor, uv);
+        vh.AddVert(p2, vertexColor, uv);
+        vh.AddVert(p3, vertexColor, uv);
+        vh.AddVert(p4, vertexColor, uv);
+        vh.AddTriangle(vertIdx, vertIdx+1, vertIdx+2);
+        vh.AddTriangle(vertIdx+1, vertIdx+2, vertIdx+3);
+    }
 }

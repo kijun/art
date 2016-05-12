@@ -14,7 +14,7 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
     public BorderStyle borderStyle;
     public BorderPosition borderPosition;
     public Color borderColor;
-    public float borderWidth;
+    public float borderThickness;
     public float dashLength;
     public float gapLength;
 
@@ -91,11 +91,62 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
         }
     }
 
-    /*
     void RenderBorderSolid() {
-    }
-    */
+        int numQuads = Mathf.CeilToInt(diameter * Mathf.PI / MAX_FRAGMENT_LENGTH);
+        float centerAngle = 2*Mathf.PI/numQuads;
 
+        float scaledBorderThickness = borderThickness/diameter;
+        Color c = Color.white;
+
+        using (var vh = new VertexHelper()) {
+            for (int i = 0; i<numQuads; i++) {
+                float angle = centerAngle * i;
+                float x = Mathf.Cos(angle);
+                float y = Mathf.Sin(angle);
+
+                float scaledInnerRadius = 1; // default = outer
+
+                switch (borderPosition) {
+                    case BorderPosition.Center:
+                        scaledInnerRadius -= scaledBorderThickness/2;
+                        break;
+
+                    case BorderPosition.Inside:
+                        scaledInnerRadius -= scaledBorderThickness;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                float scaledOuterRadius = scaledInnerRadius + scaledBorderThickness;
+
+
+                vh.AddVert(new Vector3(x*scaledInnerRadius, y*scaledInnerRadius, 0),
+                           c, Vector2.zero);
+
+                vh.AddVert(new Vector3(x*scaledOuterRadius, y*scaledOuterRadius, 0),
+                           c, Vector2.zero);
+
+            }
+
+            for (int i = 0; i<numQuads-1; i++) {
+                int idxBase = 2*i; // two new vertices per quad
+                vh.AddTriangle(idxBase, idxBase+2, idxBase+1);
+                vh.AddTriangle(idxBase+1, idxBase+2, idxBase+3);
+            }
+
+            int finalIdxBase = 2*numQuads-2; // last two vertices
+            vh.AddTriangle(finalIdxBase, 0, finalIdxBase+1);
+            vh.AddTriangle(finalIdxBase+1, 0, 1);
+
+            MeshUtil.UpdateMesh(borderMeshFilter, vh);
+            MeshUtil.UpdateColor(borderMeshRenderer, borderColor);
+        }
+    }
+
+
+/*
     void RenderBorderSolid() {
         int numTris = 200;
         float centerAngle = 2*Mathf.PI/numTris;
@@ -108,7 +159,7 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
         verts[0] = Vector3.zero;
         uvs[0] = Vector2.zero;
 
-        float innerCircleRatio = 1 - borderWidth/diameter;
+        float innerCircleRatio = 1 - borderThickness/diameter;
 
         for (int i = 0; i<numTris; i++) {
             float angle = centerAngle * i;
@@ -162,6 +213,7 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
         tex.wrapMode = TextureWrapMode.Clamp;
         GetComponent<Renderer>().sharedMaterial.mainTexture = tex;
     }
+*/
 
     void RenderBorderDash() {
 

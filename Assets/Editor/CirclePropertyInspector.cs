@@ -23,7 +23,9 @@ public class CirclePropertyInspector : Editor {
 
         if (circle.borderStyle != BorderStyle.None) {
             circle.borderColor = EditorGUILayout.ColorField("Border Color", circle.borderColor);
-            circle.borderWidth = EditorGUILayout.FloatField("Border Width", circle.borderWidth);
+            circle.borderPosition = (BorderPosition)EditorGUILayout.EnumPopup("Border Position", circle.borderPosition);
+            circle.borderThickness = EditorGUILayout.FloatField("Border Thickness",
+                    circle.borderThickness);
             if (circle.borderStyle == BorderStyle.Dash) {
                 circle.dashLength = EditorGUILayout.FloatField("Dash Length", circle.dashLength);
                 circle.gapLength = EditorGUILayout.FloatField("Gap Length", circle.gapLength);
