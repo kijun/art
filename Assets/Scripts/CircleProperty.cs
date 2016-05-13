@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 [ExecuteInEditMode]
+[SelectionBase]
 public class CircleProperty : MonoBehaviour, IObjectProperty {
 
     const float MAX_FRAGMENT_LENGTH = 0.03f; // make it small enough to be invisible
@@ -23,6 +24,16 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
     public MeshRenderer innerMeshRenderer;
     public MeshFilter borderMeshFilter;
     public MeshRenderer borderMeshRenderer;
+
+    public Vector2 center {
+        get {
+            return transform.position;
+        }
+
+        set {
+            transform.position = new Vector3(value.x, value.y, transform.position.z);
+        }
+    }
 
     public float diameter {
         get {
@@ -82,8 +93,8 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
             vh.AddVert(Vector3.zero, c, Vector2.zero); // midpoint
             for (int i = 0; i < numTris; i++) {
                 float angle = centerAngle * i;
-                float x = Mathf.Cos(angle);
-                float y = Mathf.Sin(angle);
+                float x = Mathf.Cos(angle) * 0.5f;
+                float y = Mathf.Sin(angle) * 0.5f;
                 vh.AddVert(new Vector3(x, y, 0), c, Vector2.zero);
             }
 
@@ -108,8 +119,8 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
         using (var vh = new VertexHelper()) {
             for (int i = 0; i<numQuads; i++) {
                 float angle = centerAngle * i;
-                float x = Mathf.Cos(angle);
-                float y = Mathf.Sin(angle);
+                float x = Mathf.Cos(angle) * 0.5f;
+                float y = Mathf.Sin(angle) * 0.5f;
 
                 float scaledInnerRadius = 1; // default = outer
 
@@ -127,7 +138,6 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
                 }
 
                 float scaledOuterRadius = scaledInnerRadius + scaledBorderThickness;
-
 
                 vh.AddVert(new Vector3(x*scaledInnerRadius, y*scaledInnerRadius, 0),
                            c, Vector2.zero);
@@ -152,81 +162,8 @@ public class CircleProperty : MonoBehaviour, IObjectProperty {
         }
     }
 
-
-/*
-    void RenderBorderSolid() {
-        int numTris = 200;
-        float centerAngle = 2*Mathf.PI/numTris;
-
-        var line = new Mesh();
-        var verts = new Vector3[numTris*2+1];
-        var uvs = new Vector2[verts.Length];
-        var tris = new int[numTris*3*3]; // 1 for the inner circle, 2 for outer border
-
-        verts[0] = Vector3.zero;
-        uvs[0] = Vector2.zero;
-
-        float innerCircleRatio = 1 - borderThickness/diameter;
-
-        for (int i = 0; i<numTris; i++) {
-            float angle = centerAngle * i;
-            float x = Mathf.Cos(angle);
-            float y = Mathf.Sin(angle);
-
-            int innerIdx = 2*i + 1;
-            int outerIdx = 2*i + 2;
-
-            // inner
-            verts[innerIdx] = new Vector3(x*innerCircleRatio, y*innerCircleRatio, 0);
-            // outer
-            verts[outerIdx] = new Vector3(x, y, 0);
-
-            // TODO adjust this after generating a new texture
-            uvs[innerIdx] = new Vector2(0.5f, 0);
-            uvs[outerIdx] = new Vector2(1.5f, 0);
-
-            // We need to define 3 triangles, one for the inner circle, two for the outer rim
-            // Triangle 1, 0, i, i+1
-            tris[9*i] = 0;
-            tris[9*i+1] = innerIdx+2;
-            tris[9*i+2] = innerIdx;
-
-            tris[9*i+3] = innerIdx+2;
-            tris[9*i+4] = outerIdx+2;
-            tris[9*i+5] = outerIdx;
-
-            tris[9*i+6] = innerIdx;
-            tris[9*i+7] = innerIdx+2;
-            tris[9*i+8] = outerIdx;
-        }
-
-        // TODO this code....
-        tris[tris.Length-8] = 1;
-        tris[tris.Length-6] = 1;
-        tris[tris.Length-5] = 2;
-        tris[tris.Length-2] = 1;
-
-        line.vertices = verts;
-        line.uv = uvs;
-        line.triangles = tris;
-
-        GetComponent<MeshFilter>().mesh = line;
-
-        var tex = new Texture2D(2,1, TextureFormat.ARGB32, false);
-        tex.SetPixel(0, 0, color);
-        tex.SetPixel(1, 0, borderColor);
-        tex.Apply();
-        tex.filterMode = FilterMode.Point;
-        tex.wrapMode = TextureWrapMode.Clamp;
-        GetComponent<Renderer>().sharedMaterial.mainTexture = tex;
-    }
-*/
-
     void RenderBorderDash() {
 
     }
-
-    /* */
-
 }
 
