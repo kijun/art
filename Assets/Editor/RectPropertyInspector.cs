@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using System;
 
 [CustomEditor(typeof(RectProperty))]
 public class RectPropertyInspector : Editor {
@@ -63,6 +64,34 @@ public class RectPropertyInspector : Editor {
             //rect.OnPropertyChange();
             rect.Render();
         }
+    }
+
+    void OnSceneGUI() {
+        var obj = target as RectProperty;
+        Rect2 rect = obj.rect2;
+
+        foreach (Rect2.Direction dir in Enum.GetValues(typeof(Rect2.Direction))) {
+            var anchor = rect.Point(dir);
+
+            Vector2 newAnchor = Handles.FreeMoveHandle(anchor, Quaternion.identity, 0.1f, new Vector2(0.01f, 0.01f), Handles.DotCap);
+            /*
+            if (p1 != line.EndPoint1) {
+                line.EndPoint1 = p1;
+            }
+            */
+        }
+        /*
+        RectProperty rect = (RectProperty)target;
+
+        var rt = new RectTransform();
+        rt.SetDefaultScale();
+        rt.SetPivotAndAnchors(Vector2.zero);
+        rt.SetSize(rect.Size);
+        */
+        //rt.size
+		//rt.rect = new Rect(-0.5f, -0.5f, 1f, 1f);
+
+        //rt.
     }
 }
 

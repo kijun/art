@@ -224,4 +224,67 @@ public class RectProperty : MonoBehaviour, IObjectProperty {
             return borderThickness/Height;
         }
     }
+
+    Rect rect {
+        get {
+            return new Rect(transform.position, transform.localScale);
+        }
+    }
+
+    Vector2 right {
+        get {
+            return Vector2.zero;
+        }
+    }
+
+    public Vector2 Size {
+        get {
+            return new Vector2(Width, Height);
+        }
+
+        set {
+            transform.localScale = transform.localScale.SwapX(value.x).SwapY(value.y);
+        }
+    }
+
+    public Vector2 Center {
+        get {
+            return transform.position;
+        }
+
+        set {
+            transform.position = value;
+        }
+    }
+
+    public Rect2 rect2 {
+        get {
+            return new Rect2(Center, Size, Angle);
+        }
+
+        set {
+            Center = value.center;
+            Size = value.size;
+            Angle = value.angle;
+        }
+    }
+
+    /*
+    void SetWidth(float width, RectAnchor anchor = RectAnchor.Center) {
+        switch (anchor) {
+            case RectAnchor.Left:
+                break;
+            case RectAnchor.Right:
+                break;
+            default:
+                Width = width;
+                break;
+        }
+    }
+    */
+
+    //
+    // mola
+    //
+
 }

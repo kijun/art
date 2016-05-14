@@ -36,12 +36,10 @@ public class LinePropertyInspector : Editor {
         var line = target as LineProperty;
         Vector2 p1 = Handles.FreeMoveHandle(line.EndPoint1, Quaternion.identity, 0.1f, new Vector2(0.01f, 0.01f), Handles.DotCap);
         if (p1 != line.EndPoint1) {
-            Debug.Log("New Endpoint " + p1);
             line.EndPoint1 = p1;
         }
         Vector2 p2 = Handles.FreeMoveHandle(line.EndPoint2, Quaternion.identity, 0.1f, new Vector2(0.01f, 0.01f), Handles.DotCap);
         if (p2 != line.EndPoint2) {
-            Debug.Log("New Endpoint " + p2);
             line.EndPoint2 = p2;
         }
     }
