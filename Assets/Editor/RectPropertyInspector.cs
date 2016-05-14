@@ -72,32 +72,37 @@ public class RectPropertyInspector : Editor {
             return;
         }
         Rect2 rect = obj.rect2;
+        float handleSize = HandleUtility.GetHandleSize(obj.Center);
 
+        // resize handles
         foreach (Rect2.Direction dir in Enum.GetValues(typeof(Rect2.Direction))) {
             var anchor = rect.Point(dir);
 
             Vector2 newAnchor = Handles.FreeMoveHandle(anchor, Quaternion.identity, 0.05f, new Vector2(0.1f, 0.1f), Handles.DotCap);
             if (Vector2.Distance(anchor, newAnchor) > float.Epsilon) {
-                Debug.Log("--Prev--");
-                Debug.Log(rect);
+                //Debug.Log("--Prev--");
+                //Debug.Log(rect);
                 rect.MovePoint(dir, newAnchor);
-                Debug.Log("--Changed--");
-                Debug.Log(rect);
+                //Debug.Log("--Changed--");
+                //Debug.Log(rect);
                 obj.rect2 = rect;
             }
         }
-        /*
-        RectProperty rect = (RectProperty)target;
 
-        var rt = new RectTransform();
-        rt.SetDefaultScale();
-        rt.SetPivotAndAnchors(Vector2.zero);
-        rt.SetSize(rect.Size);
-        */
-        //rt.size
-		//rt.rect = new Rect(-0.5f, -0.5f, 1f, 1f);
+        // rotate handle
+        Quaternion rot = Handles.Disc(
+                Quaternion.Euler(0, 0, obj.Angle),
+                obj.Center,
+                Vector3.forward,
+                0.5f * handleSize,
+                false,
+                5f);
 
-        //rt.
+        float newAngle = rot.eulerAngles.z;
+        if (Mathf.Abs(newAngle - obj.Angle) > float.Epsilon) {
+            //Debug.Log(newAngle + " | " + line.Angle);
+            obj.Angle = newAngle;
+        }
     }
 }
 
