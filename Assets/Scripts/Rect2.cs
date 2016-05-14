@@ -14,7 +14,7 @@ public struct Rect2 {
         center = myCenter;
         size = mySize;
         angle = myAngle;
-        Debug.Log("new rect: " + center + size + angle);
+        //Debug.Log("new rect: " + center + size + angle);
     }
 
     public float width {
@@ -94,11 +94,11 @@ public struct Rect2 {
     }
 
     public Vector2 Point(Direction dir) {
-        Debug.Log(dir+ " | " + LocalPoint(dir) + " | " + LocalToParentPosition(LocalPoint(dir)));
+        //Debug.Log(dir+ " | " + LocalPoint(dir) + " | " + LocalToParentPosition(LocalPoint(dir)));
         return LocalToParentPosition(LocalPoint(dir));
     }
 
-    public void MovePoint(Vector2 pos, Direction dir) {
+    public void MovePoint(Direction dir, Vector2 pos) {
         var prevLocalPos = LocalPoint(dir);
         var newLocalPos = ParentToLocalPosition(pos);
 
@@ -116,9 +116,43 @@ public struct Rect2 {
                 break;
         }
         var displacement = newLocalPos - prevLocalPos;
-        size += displacement;
+
+        // update size
+        switch (dir) {
+            case Direction.Top:
+                size += displacement;
+                break;
+            case Direction.Right:
+                size += displacement;
+                break;
+            case Direction.Bottom:
+                size -= displacement;
+                break;
+            case Direction.Left:
+                size -= displacement;
+                break;
+            case Direction.TopRight:
+                size += displacement;
+                break;
+            case Direction.BottomRight:
+                size += new Vector2(displacement.x, -displacement.y);
+                break;
+            case Direction.BottomLeft:
+                size -= displacement;
+                break;
+            case Direction.TopLeft:
+                size += new Vector2(-displacement.x, displacement.y);
+                break;
+            default:
+                Debug.LogError("unknown direction " + dir);
+                break;
+        }
         // half of displacement gets applied to the fixed half
         var newLocalCenter = displacement/2f;
         center = LocalToParentPosition(newLocalCenter);
+    }
+
+    public override string ToString() {
+        return string.Format("Rect2|Center:{0:F3} Size:{1:F3} Angle:{2:F3}", center, size, angle);
     }
 }

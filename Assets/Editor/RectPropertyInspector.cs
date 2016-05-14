@@ -68,17 +68,23 @@ public class RectPropertyInspector : Editor {
 
     void OnSceneGUI() {
         var obj = target as RectProperty;
+        if (obj == null) {
+            return;
+        }
         Rect2 rect = obj.rect2;
 
         foreach (Rect2.Direction dir in Enum.GetValues(typeof(Rect2.Direction))) {
             var anchor = rect.Point(dir);
 
-            Vector2 newAnchor = Handles.FreeMoveHandle(anchor, Quaternion.identity, 0.1f, new Vector2(0.01f, 0.01f), Handles.DotCap);
-            /*
-            if (p1 != line.EndPoint1) {
-                line.EndPoint1 = p1;
+            Vector2 newAnchor = Handles.FreeMoveHandle(anchor, Quaternion.identity, 0.05f, new Vector2(0.1f, 0.1f), Handles.DotCap);
+            if (Vector2.Distance(anchor, newAnchor) > float.Epsilon) {
+                Debug.Log("--Prev--");
+                Debug.Log(rect);
+                rect.MovePoint(dir, newAnchor);
+                Debug.Log("--Changed--");
+                Debug.Log(rect);
+                obj.rect2 = rect;
             }
-            */
         }
         /*
         RectProperty rect = (RectProperty)target;
