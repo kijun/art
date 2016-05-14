@@ -34,13 +34,34 @@ public class LinePropertyInspector : Editor {
 
     void OnSceneGUI() {
         var line = target as LineProperty;
+        if (line == null) return;
+
+        // point 1
         Vector2 p1 = Handles.FreeMoveHandle(line.EndPoint1, Quaternion.identity, 0.1f, new Vector2(0.01f, 0.01f), Handles.DotCap);
         if (p1 != line.EndPoint1) {
             line.EndPoint1 = p1;
         }
+
+        // point 2
         Vector2 p2 = Handles.FreeMoveHandle(line.EndPoint2, Quaternion.identity, 0.1f, new Vector2(0.01f, 0.01f), Handles.DotCap);
         if (p2 != line.EndPoint2) {
             line.EndPoint2 = p2;
+        }
+
+        // rotation handle
+        float handleSize = HandleUtility.GetHandleSize(line.transform.position);
+        Quaternion rot = Handles.Disc(
+                Quaternion.Euler(0, 0, line.Angle),
+                line.transform.position,
+                Vector3.forward,
+                0.5f * handleSize,
+                false,
+                0.1f);
+
+        float newAngle = rot.eulerAngles.z;
+        if (Mathf.Abs(newAngle - line.Angle) > float.Epsilon) {
+            //Debug.Log(newAngle + " | " + line.Angle);
+            line.Angle = newAngle;
         }
     }
 }
