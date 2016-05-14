@@ -3,7 +3,7 @@ using System.Collections;
 
 public struct Rect2 {
     public enum Direction {
-        Top, Right, Bottom, Left, TopRight, BottomRight, BottomLeft, TopLeft
+        Center, Top, Right, Bottom, Left, TopRight, BottomRight, BottomLeft, TopLeft
     }
 
     public Vector2 center;
@@ -71,6 +71,10 @@ public struct Rect2 {
             case Direction.TopLeft:
                 x = -width/2;
                 y = height/2;
+                break;
+            case Direction.Center:
+                x = 0;
+                y = 0;
                 break;
             default:
                 Debug.LogError("unknown direction " + dir);
@@ -143,13 +147,19 @@ public struct Rect2 {
             case Direction.TopLeft:
                 size += new Vector2(-displacement.x, displacement.y);
                 break;
+            case Direction.Center:
+                // size remains the same
+                break;
             default:
                 Debug.LogError("unknown direction " + dir);
                 break;
         }
         // half of displacement gets applied to the fixed half
-        var newLocalCenter = displacement/2f;
-        center = LocalToParentPosition(newLocalCenter);
+        if (dir == Direction.Center) {
+            center = LocalToParentPosition(displacement);
+        } else {
+            center = LocalToParentPosition(displacement/2f);
+        }
     }
 
     public override string ToString() {
