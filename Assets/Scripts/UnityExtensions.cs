@@ -1,6 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
+public static class CameraExtensions {
+    public static Bounds WorldBounds(this Camera cam) {
+        return new Bounds(cam.transform.position,
+                          new Vector2(CameraHelper.Width, CameraHelper.Height));
+    }
+}
+
 public static class UnityExtensions {
     /*
      * VECTOR3
@@ -90,6 +97,15 @@ public static class UnityExtensions {
         var extents = b.extents;
         return new Vector2(Random.Range(center.x - extents.x, center.x + extents.x),
                            Random.Range(center.y - extents.y, center.y + extents.y));
+    }
+
+    public static Vector2 RandomPoint(this Rect rect) {
+        return new Vector2(Random.Range(rect.xMin, rect.xMax),
+                           Random.Range(rect.yMin, rect.yMax));
+    }
+
+    public static MonoBehaviour ChooseOne(this MonoBehaviour[] scripts) {
+        return scripts[Random.Range(0, scripts.Length)];
     }
 
     public static float RandomValue(this Range r) {
