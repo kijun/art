@@ -12,7 +12,8 @@ public class ResourceLoader {
     // this should probably be separate...
     // TODO line property should be factored out
     /*
-    public LineProperty InstantiateLine() {
+    public LineProperty InstantiateLine(LineProperty2 property) {
+        var prefab = Resources.Load<GameObject>(LINE_PREFAB_PATH);
 
     }
     */

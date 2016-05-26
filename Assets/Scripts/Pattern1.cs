@@ -48,7 +48,7 @@ public class Pattern1 : MonoBehaviour {
 	}
 }
 
-public class CircleProperty2 {
+public struct CircleProperty2 {
     public Vector2 center;
     public float diameter;
     public Color color;

@@ -33,13 +33,21 @@ public class DefaultShapeStyle {
 
 
     public static void Apply(IObjectProperty p) {
+        /*
         if (p.GetType() == typeof(LineProperty)) {
             ApplyToLine((LineProperty)p);
-        } else if (p.GetType() == typeof(RectProperty)) {
+        } else
+        */
+        if (p.GetType() == typeof(RectProperty)) {
             ApplyToRect((RectProperty)p);
         } else if (p.GetType() == typeof(CircleProperty)) {
             ApplyToCircle((CircleProperty)p);
         }
+    }
+
+    // removing cast/interface improves performance
+    public static void Apply(LineProperty lp) {
+        ApplyToLine(lp);
     }
 
     /*
@@ -53,9 +61,9 @@ public class DefaultShapeStyle {
         line.style = borderStyle;
         line.dashLength = dashLength;
         line.gapLength = gapLength;
-        line.Angle = angle;
-        line.Length = lineLength;
-        line.Width = lineWidth;
+        line.angle = angle;
+        line.length = lineLength;
+        line.width = lineWidth;
     }
 
     public static void SetDefaultLineStyle(LineProperty line) {
@@ -63,9 +71,9 @@ public class DefaultShapeStyle {
         borderStyle = line.style;
         dashLength = line.dashLength;
         gapLength = line.gapLength;
-        angle = line.Angle;
-        lineLength = line.Length;
-        lineWidth = line.Width;
+        angle = line.angle;
+        lineLength = line.length;
+        lineWidth = line.width;
     }
 
     /*
