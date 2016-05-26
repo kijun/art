@@ -2,34 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public static class Interpolator {
-    // converts time to ratio and also gives . basic lerp and stuff good.
-    public static float Lerp(Range range, float progress) {
-        progress = Mathf.Clamp(progress, 0f, 1f);
-        return progress * (range.maximum - range.minimum) + range.minimum;
-    }
-
-    public static Vector2 UnitVectorWithAngle(float angleInDegrees) {
-        var angleInRadian = angleInDegrees * Mathf.Deg2Rad;
-        return new Vector2(Mathf.Cos(angleInRadian), Mathf.Sin(angleInRadian));
-    }
-
-    public static Vector2 Lerp(Vector2 start, Vector2 end, float progress) {
-        return Vector3.Lerp(start, end, progress);
-    }
-
-    public static Vector2 Bezier(Vector2 start, Vector2 end, float progress) {
-        return end;
-    }
-}
-
 /* swirling circle */
 /* swirls and then becomes one, and then diverges again */
 public class Pattern1 : MonoBehaviour {
 
     public int numberOfCircles = 10;
-    public Range radius = new Range(1, 5);
-    public float collapseDuration = 3f;
+    public Range radius = new Range(1, 10);
+    public float collapseDuration = 5f;
+    public float delayBetweenCircle = 0.2f;
     List<CircleProperty> circles = new List<CircleProperty>();
     List<Vector2> startPos = new List<Vector2>();
 
@@ -51,12 +31,13 @@ public class Pattern1 : MonoBehaviour {
 	}
 
     IEnumerator Run() {
+        yield return new WaitForSeconds(1);
         float startTime = Time.time;
         while (true) {
             for (int i = 0; i<numberOfCircles; i++) {
                 var circle = circles[i];
-                var progress = (Time.time - startTime) / collapseDuration;
-                circle.center = Interpolator.Lerp(startPos[i], Vector2.zero, progress);
+                var progress = (Time.time - startTime - delayBetweenCircle*i) / collapseDuration;
+                circle.center = Interpolator.Bezier(startPos[i], new Vector2(i-numberOfCircles/2f, i/2f), progress);
             }
             yield return null;
         }
