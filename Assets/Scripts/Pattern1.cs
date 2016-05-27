@@ -67,15 +67,18 @@ public struct CircleProperty2 {
             Color           color = new Color(),
             BorderStyle     borderStyle = BorderStyle.None,
             BorderPosition  borderPosition = BorderPosition.Center,
+            Color           borderColor = new Color(),
             float           borderThickness = 0,
             float           dashLength = 0.05f,
             float           gapLength = 0.05f
     ) {
         this.diameter = diameter;
         this.center = center;
+        this.color = color;
         this.borderStyle = borderStyle;
         this.borderPosition = borderPosition;
         this.borderThickness = borderThickness;
+        this.borderColor = color;
         this.dashLength = dashLength;
         this.gapLength = gapLength;
     }

@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
+using System;
 using System.Collections;
-using System.Linq;
 
 
 public interface IObjectProperty {
     void OnUpdate();
 }
 
+[Serializable]
 public struct LineProperty {
     public Vector2 center;
     public float length;
@@ -22,8 +22,6 @@ public struct LineProperty {
 
     // let's keep p1 p2 as the default data but also
     // provide a constructor for
-    //
-    //
     public Vector2 p1 {
         get {
             return points.Item1;

@@ -5,14 +5,15 @@ using UnityEditor;
 [CustomEditor(typeof(LineProperty))]
 public class LinePropertyInspector : Editor {
     public override void OnInspectorGUI() {
-        LineProperty line = target as LineProperty;
+        //LineProperty line = target as LineProperty;
+        LineProperty line = new LineProperty();
 
         EditorGUI.BeginChangeCheck();
 
         // Width, Length in pixels
-        line.Length = EditorGUILayout.FloatField("Length", line.Length * 100f) / 100f;
-        line.Width = EditorGUILayout.FloatField("Width", line.Width * 100f) / 100f;
-        line.Angle = EditorGUILayout.FloatField("Angle", line.Angle);
+        line.length = EditorGUILayout.FloatField("Length", line.length * 100f) / 100f;
+        line.width = EditorGUILayout.FloatField("Width", line.width * 100f) / 100f;
+        line.angle = EditorGUILayout.FloatField("Angle", line.angle);
 
         // Color
         line.color = EditorGUILayout.ColorField("Color", line.color);
@@ -26,12 +27,15 @@ public class LinePropertyInspector : Editor {
         }
 
         // Render
+        /*
         if (EditorGUI.EndChangeCheck()) {
             line.OnUpdate();
         }
+        */
     }
 
 
+    /*
     void OnSceneGUI() {
         var line = target as LineProperty;
         if (line == null) return;
@@ -64,4 +68,5 @@ public class LinePropertyInspector : Editor {
             line.Angle = newAngle;
         }
     }
+    */
 }
