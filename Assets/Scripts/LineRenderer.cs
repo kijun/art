@@ -21,12 +21,13 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
     }
 
     bool TransformHasChanged() {
-        if (Mathf.Approximately(property.length, TransformLength) ||
-            Mathf.Approximately(property.width, TransformWidth) ||
-            Mathf.Approximately(property.angle, TransformAngle)) {
-            return true;
+        if (Mathf.Approximately(property.length, TransformLength) &&
+            Mathf.Approximately(property.width, TransformWidth) &&
+            Mathf.Approximately(property.angle, TransformAngle) &&
+            property.center == TransformCenter) {
+            return false;
         }
-        return false;
+        return true;
     }
 
 
@@ -48,6 +49,12 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
         }
     }
 
+    Vector2 TransformCenter {
+        get {
+            return transform.position;
+        }
+    }
+
 
     void Update() {
         // TODO check if edit mode
@@ -56,12 +63,14 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
             Debug.Log("Property changed");
             transform.localScale = new Vector3(property.length, property.width, 1);
             transform.eulerAngles = transform.eulerAngles.SwapZ(property.angle);
+            transform.position = property.center;
             OnUpdate();
             cachedPropertyBad = property;
         } else if (TransformHasChanged()) {
             property.length = TransformLength;
             property.width = TransformWidth;
             property.angle = TransformAngle;
+            property.center = TransformCenter;
             OnUpdate();
             cachedPropertyBad = property;
         }
