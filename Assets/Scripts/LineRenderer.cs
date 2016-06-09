@@ -30,6 +30,16 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
         return true;
     }
 
+    bool NeedsRerender() {
+        if (cachedPropertyBad.width == 0 || cachedPropertyBad.length ==0) return true;
+        if (property.style == BorderStyle.Dash &&
+            (!Mathf.Approximately(property.length, cachedPropertyBad.length) ||
+             !Mathf.Approximately(property.width, cachedPropertyBad.width))) {
+            return true;
+        }
+        return false;
+    }
+
 
     float TransformLength {
         get {
@@ -58,13 +68,13 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
 
     void Update() {
         // TODO check if edit mode
-        Debug.Log("updating " + Time.time);
         if (PropertyHasChanged()) {
-            Debug.Log("Property changed");
             transform.localScale = new Vector3(property.length, property.width, 1);
             transform.eulerAngles = transform.eulerAngles.SwapZ(property.angle);
             transform.position = property.center;
-            OnUpdate();
+            if(NeedsRerender()) {
+                OnUpdate();
+            }
             cachedPropertyBad = property;
         } else if (TransformHasChanged()) {
             property.length = TransformLength;
@@ -120,6 +130,7 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
      */
 
     public void OnUpdate() {
+        Debug.Log("onupdatecalled");
         Render();
         DefaultShapeStyle.SetDefaultLineStyle(property);
     }

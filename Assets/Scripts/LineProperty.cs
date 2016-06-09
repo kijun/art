@@ -59,6 +59,12 @@ public struct LineProperty {
     }
 
     // default
+    /*
+    public LineProperty() : this(center: new Vector2()) {
+
+    }
+    */
+
     public LineProperty(
             Vector2         center = new Vector2(),
             float           angle = 0,
@@ -71,7 +77,7 @@ public struct LineProperty {
     ) {
         this.center = center;
         this.angle = angle;
-        this.length = 1;
+        this.length = length;
         this.color = color;
         this.width = width;
         this.style = style;
@@ -79,6 +85,7 @@ public struct LineProperty {
         this.gapLength = gapLength;
     }
 
+    /*
     public LineProperty(
             Vector2         p1 = new Vector2(),
             Vector2         p2 = new Vector2(),
@@ -95,5 +102,6 @@ public struct LineProperty {
 
         this.points = new Tuple<Vector2, Vector2>(p1, p2);
     }
+    */
 }
 

@@ -20,9 +20,9 @@ public static class Interpolator {
     public static Vector2 Bezier(Vector2 start, Vector2 end, float progress) {
         var bez = new Bezier(Vector2.zero, new Vector2(0.1f, 0.04f), new Vector2(0f, 1f), Vector2.one);
         var point = bez.GetPoint(Mathf.Clamp(progress, 0, 1));
-        Debug.Log(point.x.ToString("0.00") + ", " + point.y.ToString("0.00"));
+        //Debug.Log(point.x.ToString("0.00") + ", " + point.y.ToString("0.00"));
         var final = Lerp(start, end, Mathf.Clamp(point.y, 0, 1));
-        Debug.Log("so it should be at" + final.ToString("0.000"));
+        //Debug.Log("so it should be at" + final.ToString("0.000"));
         return final;
     }
 }
