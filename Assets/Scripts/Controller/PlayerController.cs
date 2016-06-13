@@ -78,11 +78,13 @@ public class PlayerController : MonoBehaviour {
                 float dx = (xdir * maxRelativeSpeed.x + zoneVelocity.x) * Time.deltaTime;
                 float dy = (ydir * maxRelativeSpeed.y + zoneVelocity.y) * Time.deltaTime;
 
+                /*
                 if (TopBubble() != null) {
                     var tb = TopBubble();
                     dx += tb.dPos.x;
                     dy += tb.dPos.y;
                 }
+                */
 
                 newPos.x += dx;
                 newPos.y += dy;
@@ -132,9 +134,9 @@ public class PlayerController : MonoBehaviour {
 
     public void SetZoneVelocityAndMaxRelativeSpeedToDefault() {
         Debug.Log("Setting speed to: default ");
-        var z = ZoneController.ZoneForPosition(transform.position);
-        zoneVelocity = z.zoneBaseVelocity;
-        maxRelativeSpeed = z.maxRelativeSpeed;
+        //var z = ZoneController.ZoneForPosition(transform.position);
+        //zoneVelocity = z.zoneBaseVelocity;
+        //maxRelativeSpeed = z.maxRelativeSpeed;
     }
 
     public void Freeze() {
@@ -159,6 +161,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     /** respawn && bubble entrance **/
+    /*
     List<Bubble> bubbles = new List<Bubble>();
 
     void OnTriggerExit2D (Collider2D other) {
@@ -219,6 +222,7 @@ public class PlayerController : MonoBehaviour {
         fader.fadeIn = true;
         ChangeState(State.Normal);
     }
+    */
 
     /* public helpers */
     public float y {

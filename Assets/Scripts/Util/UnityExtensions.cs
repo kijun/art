@@ -1,12 +1,14 @@
 using UnityEngine;
 using System.Collections;
 
+/*
 public static class CameraExtensions {
     public static Bounds WorldBounds(this Camera cam) {
         return new Bounds(cam.transform.position,
                           new Vector2(CameraHelper.Width, CameraHelper.Height));
     }
 }
+*/
 
 public static class UnityExtensions {
     /*

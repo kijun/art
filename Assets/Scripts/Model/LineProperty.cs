@@ -48,7 +48,7 @@ public struct LineProperty {
             return new Tuple<Vector2, Vector2>(pt1, pt2);
         }
         set {
-            var pts = TupleHelper.Sort((Tuple<Vector2, Vector2>)value);
+            var pts = TupleUtil.Sort((Tuple<Vector2, Vector2>)value);
             var pt1 = pts.Item1;
             var pt2 = pts.Item2;
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public static class TupleHelper {
+public static class TupleUtil {
     public static Tuple<Vector2, Vector2> Sort(Tuple<Vector2, Vector2> tup) {
         Vector2 a, b;
         if (tup.Item1.x < tup.Item2.x) {
