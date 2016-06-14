@@ -2,16 +2,31 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// TODO stage
 public class Main : MonoBehaviour {
+
+    List<IEnumerator> patterns = new List<IEnumerator>();
 
 	// Use this for initialization
 	void Start () {
         SetupLevel();
+        StartLevel();
 	}
 
     void SetupLevel() {
-        StartCoroutine(PatternManager.Grid(duration: 5));
+        Add(BasePattern.Grid(duration: 5));
+        Add(BasePattern.Grid(duration: 5));
         //PatternManager.Swarm(duration: 20);
+    }
+
+    void Add(IEnumerator basePattern) {
+        patterns.Add(basePattern);
+    }
+
+    void StartLevel() {
+        foreach (var bp in patterns) {
+            StartCoroutine(bp);
+        }
     }
 
 	// Update is called once per frame
@@ -21,21 +36,19 @@ public class Main : MonoBehaviour {
 }
 
 
-// probabaly there's a better name
-public class PatternManager {
-    // follow camera, move at speed, move with acceleration, constant, bezier, etc. but how?
-    // perhaps too many args?
-    // probably color and particle etc should be taken out as a separate parameter.
-    // TODO maybe like a chain something returns where things should be drawn, and the renderer works on it, perhaps
+// TODO better name
+public class BasePattern {
+    // TODO too many args? color and particle etc should be taken out as a separate parameter.
+    // TODO maybe like a chain something returns where things should be drawn,
+    // and the renderer works on it, perhaps
     // points -> rendering
-    // this refactor should probably happen later
     // TODO remove static
     public static IEnumerator Grid(
             float start=0,
             float duration=10,
             int dots=10,
             float speed=6,
-            float size=5,
+            float size=7,
             float fadeinDuration=5,
             float fadeoutDuration=10,
             float particleSize=0.1f,
@@ -47,6 +60,8 @@ public class PatternManager {
         // TODO fix
         float startTime = Time.time + start;
         float endTime = startTime + duration;
+
+        Object[] renderedObjects = null;
 
         while (Time.time < endTime) {
             float elapsedTime = Time.time - startTime;
@@ -60,17 +75,16 @@ public class PatternManager {
             coeff.Add(3, Complex.FromRadian(-angle));
             Complex[] samples = DFT.GenerateSamples(coeff, dots);
             Vector2[] positions = new Vector2[dots];
-            // TODO maybe apply for each point?
             Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(startDirection,displacement);
+            // TODO maybe apply interpolator for each point? (nonlinear transform)
             if (interpolatePosition != null) {
                 center = interpolatePosition.Interpolate(center, progress, elapsedTime);
             }
             for (int i = 0; i < dots; i++) {
-                Debug.Log("dot" + samples[i]);
                 positions[i] = center + size*new Vector2(samples[i].real, samples[i].img);
             }
 
-            Render(positions, ShapeType.Circle, particleSize);
+            renderedObjects = Render(positions, ShapeType.Circle, particleSize, renderedObjects);
 
             yield return null;
         }
@@ -80,14 +94,35 @@ public class PatternManager {
     }
 
     // TODO remove static
-    public static void Render(Vector2[] pos, ShapeType shape, float particleSize) {
+    public static Object[] Render(
+            Vector2[] pos,
+            ShapeType shape,
+            float particleSize,
+            Object[] rendered) // TODO refactor like hell
+    {
         // TODO got to figure out object recycling
         // TODO smooth interpolator?
+        if (rendered == null) {
+            rendered = new Object[pos.Length];
+        }
+        if (rendered.Length != pos.Length) {
+            Debug.LogError("wrong number of objects dude");
+            return null;
+        }
+
+
         if (shape == ShapeType.Circle) {
-            foreach (Vector2 p in pos) {
+            for (int i=0; i<pos.Length; i++) {
+                var p = pos[i];
                 CircleProperty2 prop = new CircleProperty2(center:p);
-                CircleProperty circle = ResourceLoader.InstantiateCircle(prop);
-                circle.OnUpdate();
+                if (rendered[i] == null) {
+                    rendered[i] = ResourceLoader.InstantiateCircle(prop);
+                } else {
+                    // TODO rewrite desperately needed
+                    ((CircleProperty)rendered[i]).center = prop.center;
+                }
+                // probably should need to call this;
+                ((CircleProperty)rendered[i]).OnUpdate();
             }
         }
         /*
@@ -99,5 +134,6 @@ public class PatternManager {
             var obj = ResourceLoader.InstantiateLine(prop);
         }
         */
+        return rendered;
     }
 }

@@ -26,8 +26,6 @@ public class LinearInterpolator : Interpolator {
     }
 }
 
-public class D {}
-
 public class AcceleratedInterpolator : Interpolator {
     Vector2 velocity;
     Vector2 acceleration;
