@@ -10,7 +10,7 @@ public class Main : MonoBehaviour {
 	}
 
     void SetupLevel() {
-        StartCoroutine(PatternManager.Grid(duration: 60));
+        StartCoroutine(PatternManager.Grid(duration: 5));
         //PatternManager.Swarm(duration: 20);
     }
 
@@ -33,34 +33,41 @@ public class PatternManager {
     public static IEnumerator Grid(
             float start=0,
             float duration=10,
-            int dots=40,
-            float speed= 6,
-            float width=50,
+            int dots=10,
+            float speed=6,
+            float size=5,
             float fadeinDuration=5,
             float fadeoutDuration=10,
             float particleSize=0.1f,
             Direction startDirection=Direction.Center,
             Vector2 displacement = new Vector2(),
-            LinearInterpolator locationInterpolator = null)
+            LinearInterpolator interpolatePosition = null)
     {
 
-        float startTime = Time.time;
+        // TODO fix
+        float startTime = Time.time + start;
         float endTime = startTime + duration;
 
         while (Time.time < endTime) {
-            float progress = (Time.time - startTime) / duration;
-            float angle = progress * speed;
+            float elapsedTime = Time.time - startTime;
+            float progress = elapsedTime / duration;
+            // TODO what about rotation interpolation
+            float angle = progress * speed * 2 * Mathf.PI;
 
             var coeff = new Dictionary<float, Complex>();
-            coeff.Add(1, Complex.FromDegrees(angle));
-            coeff.Add(-2, Complex.FromDegrees(-angle));
-            coeff.Add(3, Complex.FromDegrees(-angle));
+            coeff.Add(1, Complex.FromRadian(angle));
+            coeff.Add(-2, Complex.FromRadian(-angle));
+            coeff.Add(3, Complex.FromRadian(-angle));
             Complex[] samples = DFT.GenerateSamples(coeff, dots);
             Vector2[] positions = new Vector2[dots];
-            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(startDirection);
-
+            // TODO maybe apply for each point?
+            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(startDirection,displacement);
+            if (interpolatePosition != null) {
+                center = interpolatePosition.Interpolate(center, progress, elapsedTime);
+            }
             for (int i = 0; i < dots; i++) {
-                positions[i] = center + new Vector2(samples[i].real, samples[i].img);
+                Debug.Log("dot" + samples[i]);
+                positions[i] = center + size*new Vector2(samples[i].real, samples[i].img);
             }
 
             Render(positions, ShapeType.Circle, particleSize);
@@ -79,7 +86,8 @@ public class PatternManager {
         if (shape == ShapeType.Circle) {
             foreach (Vector2 p in pos) {
                 CircleProperty2 prop = new CircleProperty2(center:p);
-                ResourceLoader.InstantiateCircle(prop);
+                CircleProperty circle = ResourceLoader.InstantiateCircle(prop);
+                circle.OnUpdate();
             }
         }
         /*

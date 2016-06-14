@@ -51,4 +51,9 @@ public struct Complex {
           return new Complex(real/mag, img/mag);
         }
     }
+
+    /* Overrides */
+    public override string ToString() {
+        return real + "+" + img + "i";
+    }
 }
