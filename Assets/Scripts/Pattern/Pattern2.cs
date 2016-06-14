@@ -41,7 +41,7 @@ public class Pattern2 : MonoBehaviour {
                 var line = lines[i];
                 line.angle = angle/numberOfLines*(i+1);
                 //Debug.Log("new angle" + line.angle);
-                line.center = Interpolator.UnitVectorWithAngle(line.angle)*(lineGap*i);
+                line.center = InterpolationUtil.UnitVectorWithAngle(line.angle)*(lineGap*i);
 
                 lineRenderers[i].property = line;
             }

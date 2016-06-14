@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public static class ScreenUtil {
-    public static Vector2 ScreenLocationToWorldPosition(Direction dir, Vector2 displacement = Vector2.zero) {
+    public static Vector2 ScreenLocationToWorldPosition(Direction dir, Vector2 displacement = new Vector2()) {
         Vector2 pos = (Vector2)Camera.main.transform.position + displacement;
         switch (dir) {
             case Direction.Top:

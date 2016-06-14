@@ -10,8 +10,8 @@ public class Main : MonoBehaviour {
 	}
 
     void SetupLevel() {
-        PatternManager.Grid(duration: 60);
-        PatternManager.Swarm(duration: 20);
+        StartCoroutine(PatternManager.Grid(duration: 60));
+        //PatternManager.Swarm(duration: 20);
     }
 
 	// Update is called once per frame
@@ -23,11 +23,27 @@ public class Main : MonoBehaviour {
 
 // probabaly there's a better name
 public class PatternManager {
-    public void Grid(float start=0, float duration=10, int dots=40, float speed= 6, float width=50, float fadeinDuration=5, float fadeoutDuration=10, float particleSize=0.1f, ) {
-        // load prefab? probably not?
-        // there must be a grid script. let's work on that.
-        //
-        //during [start, start+duration]
+    // follow camera, move at speed, move with acceleration, constant, bezier, etc. but how?
+    // perhaps too many args?
+    // probably color and particle etc should be taken out as a separate parameter.
+    // TODO maybe like a chain something returns where things should be drawn, and the renderer works on it, perhaps
+    // points -> rendering
+    // this refactor should probably happen later
+    // TODO remove static
+    public static IEnumerator Grid(
+            float start=0,
+            float duration=10,
+            int dots=40,
+            float speed= 6,
+            float width=50,
+            float fadeinDuration=5,
+            float fadeoutDuration=10,
+            float particleSize=0.1f,
+            Direction startDirection=Direction.Center,
+            Vector2 displacement = new Vector2(),
+            LinearInterpolator locationInterpolator = null)
+    {
+
         float startTime = Time.time;
         float endTime = startTime + duration;
 
@@ -36,13 +52,14 @@ public class PatternManager {
             float angle = progress * speed;
 
             var coeff = new Dictionary<float, Complex>();
-            coeff.put(1, Complex.FromDegrees(angle));
-            coeff.put(-2, Complex.FromDegrees(-angle));
-            coeff.put(3, Complex.FromDegrees(-angle));
-            Complex[] samples = DFT.GenerateSamples(dots, coeff);
-            Vector2[] positions = new Vector2[N];
-            Vector2 center = ScreenUtil.center;
-            for (int i = 0; i < N; i++) {
+            coeff.Add(1, Complex.FromDegrees(angle));
+            coeff.Add(-2, Complex.FromDegrees(-angle));
+            coeff.Add(3, Complex.FromDegrees(-angle));
+            Complex[] samples = DFT.GenerateSamples(coeff, dots);
+            Vector2[] positions = new Vector2[dots];
+            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(startDirection);
+
+            for (int i = 0; i < dots; i++) {
                 positions[i] = center + new Vector2(samples[i].real, samples[i].img);
             }
 
@@ -55,40 +72,24 @@ public class PatternManager {
     public void Swarm(float start=0, float duration=10, int dots=40, float speed= 6, float width=50, float fadeinDuration=5, float fadeoutDuration=10, float dotsize=0.1f) {
     }
 
-    void Render(Vector2[] localPos, ShapeType shape, float particleSize) {
-        // TODO create data, pass to renderer
-        Vector2 center =
-        for (int i=0; i<localPos.Length; i++) {
-            localPos[i] +=
-        }
-        foreach (var local in localPos) {
-
-        }
-        Vector2 centerScreen;// TODO wth?
+    // TODO remove static
+    public static void Render(Vector2[] pos, ShapeType shape, float particleSize) {
+        // TODO got to figure out object recycling
+        // TODO smooth interpolator?
         if (shape == ShapeType.Circle) {
-            CircleProperty2 prop = new CircleProperty2();
-            ResourceLoader.InstantiateCircle();
-        } else if (shape == ShapeType.Line) {
+            foreach (Vector2 p in pos) {
+                CircleProperty2 prop = new CircleProperty2(center:p);
+                ResourceLoader.InstantiateCircle(prop);
+            }
+        }
+        /*
+        else if (shape == ShapeType.Line) {
             LineProperty prop = new LineProperty();
             var obj = ResourceLoader.InstantiateLine(prop);
         } else if (shape == ShapeType.Rect) {
             ResourceLoader.InstantiateRect();
             var obj = ResourceLoader.InstantiateLine(prop);
         }
+        */
     }
-}
-
-public class Grid {
-
-    public void set() {
-    }
-  //coeff2.put(3, Complex.FromDegrees(-baseSpeed*0.5));
-
-  if (sec > s1 && sec < s2) {
-      Complex[] samps = genSamples(coeff2, 200);
-      drawEllipses(samps, 1000, 40, 0, height*3*p1-height/2);
-  }
-        // so scared, i don't want to work, i'd rather hide, it hurts, everything is a chance to fail
-        // i acknowledge that. I really do. It sucks and it hurts to be exposed in such a way.
-        // but shouldn't we bloom together?
 }

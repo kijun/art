@@ -2,6 +2,42 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
+public struct CircleProperty2 {
+    public Vector2 center;
+    public float diameter;
+    public Color color;
+
+    // border
+    public BorderStyle borderStyle;
+    public BorderPosition borderPosition;
+    public Color borderColor;
+    public float borderThickness;
+    public float dashLength;
+    public float gapLength;
+
+    public CircleProperty2(
+            float           diameter = 1,
+            Vector2         center = new Vector2(),
+            Color           color = new Color(),
+            BorderStyle     borderStyle = BorderStyle.None,
+            BorderPosition  borderPosition = BorderPosition.Center,
+            Color           borderColor = new Color(),
+            float           borderThickness = 0,
+            float           dashLength = 0.05f,
+            float           gapLength = 0.05f
+    ) {
+        this.diameter = diameter;
+        this.center = center;
+        this.color = color;
+        this.borderStyle = borderStyle;
+        this.borderPosition = borderPosition;
+        this.borderThickness = borderThickness;
+        this.borderColor = borderColor;
+        this.dashLength = dashLength;
+        this.gapLength = gapLength;
+    }
+}
+
 [ExecuteInEditMode]
 [SelectionBase]
 public class CircleProperty : MonoBehaviour, IObjectProperty {

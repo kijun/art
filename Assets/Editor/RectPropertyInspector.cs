@@ -75,7 +75,7 @@ public class RectPropertyInspector : Editor {
         float handleSize = HandleUtility.GetHandleSize(obj.Center);
 
         // resize handles
-        foreach (Rect2.Direction dir in Enum.GetValues(typeof(Rect2.Direction))) {
+        foreach (Direction dir in Enum.GetValues(typeof(Direction))) {
             var anchor = rect.Point(dir);
 
             Vector2 newAnchor = Handles.FreeMoveHandle(anchor, Quaternion.identity, 0.05f, new Vector2(0.1f, 0.1f), Handles.DotCap);

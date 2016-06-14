@@ -1,3 +1,4 @@
+using UnityEngine;
 using System.Collections.Generic;
 
 public static class DFT {
@@ -11,6 +12,8 @@ public static class DFT {
 
             sum += Xk * new Complex(Mathf.Cos(arg), Mathf.Sin(arg));
         }
+
+        return sum;
     }
 
     public static Complex[] GenerateSamples(Dictionary<float, Complex> coefficients, int N) {
