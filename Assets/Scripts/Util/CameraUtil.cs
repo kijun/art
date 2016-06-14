@@ -1,6 +1,6 @@
 using UnityEngine;
 
-static class CameraUtil {
+public static class CameraUtil {
     public static float HalfWidth {
         get {
             return Camera.main.orthographicSize / Screen.height * Screen.width;

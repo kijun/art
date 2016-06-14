@@ -1,12 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 /* Extended Rect struct with handles */
 
 public struct Rect2 {
-    public enum Direction {
-        Center, Top, Right, Bottom, Left, TopRight, BottomRight, BottomLeft, TopLeft
-    }
 
     public Vector2 center;
     public Vector2 size;

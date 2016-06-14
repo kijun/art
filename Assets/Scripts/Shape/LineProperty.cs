@@ -12,9 +12,7 @@ public struct LineProperty {
     public Vector2 center;
     public float length;
     public float angle;
-
     public float width;
-
     public Color color;
     public BorderStyle style;
     public float dashLength;
@@ -57,13 +55,6 @@ public struct LineProperty {
             angle = Mathf.Atan2(p2.y-p1.y, p2.x-p1.x) * Mathf.Rad2Deg;
         }
     }
-
-    // default
-    /*
-    public LineProperty() : this(center: new Vector2()) {
-
-    }
-    */
 
     public LineProperty(
             Vector2         center = new Vector2(),
