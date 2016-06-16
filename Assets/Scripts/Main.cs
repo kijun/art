@@ -14,8 +14,8 @@ public class Main : MonoBehaviour {
 	}
 
     void SetupLevel() {
-        Add(BasePattern.Grid(duration: 5));
-        Add(BasePattern.Grid(duration: 5));
+        Add(BasePattern.Grid(duration: 20));
+        Add(BasePattern.Grid(duration: 20, size:3, speed:2, dots:100, particleSize:0.02f));
         //PatternManager.Swarm(duration: 20);
     }
 
@@ -35,9 +35,103 @@ public class Main : MonoBehaviour {
 	}
 }
 
+// could make some default delegates
+delegate float FrequencyTransformDelegate(float progress, float elapsedTime);
+delegate Complex CoefficientTransformDelegate(float progress, float elapsedTime);
+
+/* TODO
+- transform with time?
+    - k
+    - amplitude
+    - phase
+    - function
+        - back and forth
+        - accelerated
+        - linear
+*/
+public struct DFTFrequencyParams {
+    public FrequencyTransformDelegate frequencyTransform;
+    public CoefficientTransformDelegate coefficientTransform;
+}
+
+
+// there must be scale embedded with each parameter i think
+public enum FFF {
+    None, XPos, YPos, Width, Height, Angle
+}
+
+// how about if you want to draw a line between dots? yeah that's a real concern right?
+public struct DFTRenderParams {
+    public ShapeType shape;
+    public float size;
+    public FFF realTransform;
+    public FFF imgTransform;
+    public FFF sampleIndexTransform;
+    public Direction startDirection;
+    public Vector2 displacement;
+    // this might not be a simple mapping
+}
+
+public struct DFTSampleParams {}
+public struct DFTRenderParams {}
+
+public struct DFTParams {
+    public float duration;
+    public int N;
+    public DFTFrequencyParams[] frequencies;
+    public DFTRenderParams renderParams;
+    // TODO size interpolator
+    // TODO color interpolator
+}
+
 
 // TODO better name
 public class BasePattern {
+
+    public static IEnumerator RunDFT(DFTParams param) {
+        float startTime = Time.time;
+        float endTime = startTime + param.duration;
+
+        while (Time.time < endTime) {
+            /* create samples */
+            float elapsedTime = Time.time - startTime;
+            float progress = elapsedTime / param.duration;
+
+            var coeff = new Dictionary<float, Complex>();
+            foreach (var fp in param.frequencies) {
+                float k = fp.frequencyTransform(progress, elapsedTime);
+                Complex Xk = fp.coefficientTransform(progress, elapsedTime);
+                coeff.Add(k, Xk);
+            }
+            Complex[] samples = DFT.GenerateSamples(coeff, param.N);
+
+            /* render */
+            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(
+                    param.renderParams.startDirection,
+                    param.renderParams.displacement);
+
+            // samples => shape properties => game objects
+
+            // TODO calculate position per sample - however this could be something
+            // totally different, it could return a cirle, rect, etcetc then what?
+            //TODO Render
+        }
+
+        // render
+    }
+
+    public static DrawSamples(DFTParams param) {
+    }
+
+    public static ShapeParams SamplesToShapes(Complex[] samples) {
+        // TODO how?
+        // what are the params?
+        //
+        // shape type and then yeah.
+        // smart renderer, creates shapes to draw
+    }
+
+
     // TODO too many args? color and particle etc should be taken out as a separate parameter.
     // TODO maybe like a chain something returns where things should be drawn,
     // and the renderer works on it, perhaps
@@ -122,6 +216,7 @@ public class BasePattern {
                     ((CircleProperty)rendered[i]).center = prop.center;
                 }
                 // probably should need to call this;
+                // TODO ineffective so ineffective
                 ((CircleProperty)rendered[i]).OnUpdate();
             }
         }
