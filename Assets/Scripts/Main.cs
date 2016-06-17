@@ -19,6 +19,10 @@ public class Main : MonoBehaviour {
         //PatternManager.Swarm(duration: 20);
     }
 
+    void Level2() {
+
+    }
+
     void Add(IEnumerator basePattern) {
         patterns.Add(basePattern);
     }
@@ -36,8 +40,8 @@ public class Main : MonoBehaviour {
 }
 
 // could make some default delegates
-delegate float FrequencyTransformDelegate(float progress, float elapsedTime);
-delegate Complex CoefficientTransformDelegate(float progress, float elapsedTime);
+public delegate float FrequencyTransformDelegate(float progress, float elapsedTime);
+public delegate Complex CoefficientTransformDelegate(float progress, float elapsedTime);
 
 /* TODO
 - transform with time?
@@ -61,76 +65,105 @@ public enum FFF {
 }
 
 // how about if you want to draw a line between dots? yeah that's a real concern right?
-public struct DFTRenderParams {
-    public ShapeType shape;
-    public float size;
-    public FFF realTransform;
-    public FFF imgTransform;
-    public FFF sampleIndexTransform;
-    public Direction startDirection;
-    public Vector2 displacement;
-    // this might not be a simple mapping
-}
+public delegate IShapeProperty DFTCreateShapeDelegate(Complex sample, Vector2 center);
 
-public struct DFTSampleParams {}
-public struct DFTRenderParams {}
-
-public struct DFTParams {
+public struct DFTSampleParams {
     public float duration;
     public int N;
     public DFTFrequencyParams[] frequencies;
-    public DFTRenderParams renderParams;
+    // public DFTRenderParams renderParams;
     // TODO size interpolator
     // TODO color interpolator
 }
 
+public struct DFTRenderParams {
+    public Direction fleetCenter;
+    public Vector2 fleetCenterInitialDisplacement;
+    public Interpolator fleetCenterInterpolator;
+   // = new ConstantInterpolator();
+    public DFTCreateShapeDelegate createShape;
+}
 
 // TODO better name
 public class BasePattern {
 
-    public static IEnumerator RunDFT(DFTParams param) {
+    public static IEnumerator RunDFT(DFTSampleParams sampleParams, DFTRenderParams renderParams) {
         float startTime = Time.time;
-        float endTime = startTime + param.duration;
+        float endTime = startTime + sampleParams.duration;
+
+        Object[] renderedShapes = null;
 
         while (Time.time < endTime) {
-            /* create samples */
+
             float elapsedTime = Time.time - startTime;
-            float progress = elapsedTime / param.duration;
+            float progress = elapsedTime / sampleParams.duration;
 
-            var coeff = new Dictionary<float, Complex>();
-            foreach (var fp in param.frequencies) {
-                float k = fp.frequencyTransform(progress, elapsedTime);
-                Complex Xk = fp.coefficientTransform(progress, elapsedTime);
-                coeff.Add(k, Xk);
-            }
-            Complex[] samples = DFT.GenerateSamples(coeff, param.N);
+            /* create samples */
+            Complex[] samples = GenerateSamples(sampleParams, elapsedTime, progress);
 
-            /* render */
-            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(
-                    param.renderParams.startDirection,
-                    param.renderParams.displacement);
+            /* convert to shapes */
+            IShapeProperty[] shapeProps = SamplesToShapes(samples, renderParams, elapsedTime, progress);
 
-            // samples => shape properties => game objects
+            /* render shapes */
+            renderedShapes = RenderShapes(shapeProps, renderedShapes);
 
-            // TODO calculate position per sample - however this could be something
-            // totally different, it could return a cirle, rect, etcetc then what?
-            //TODO Render
+            yield return null;
+        }
+    }
+
+    public static Complex[] GenerateSamples(DFTSampleParams param, float elapsedTime, float progress) {
+        var coeff = new Dictionary<float, Complex>();
+        foreach (var fp in param.frequencies) {
+            float k = fp.frequencyTransform(progress, elapsedTime);
+            Complex Xk = fp.coefficientTransform(progress, elapsedTime);
+            coeff.Add(k, Xk);
+        }
+        return DFT.GenerateSamples(coeff, param.N);
+    }
+
+    // not sure what parameters it should use
+    // TODO cache properties
+    public static IShapeProperty[] SamplesToShapes(
+            Complex[] samples,
+            DFTRenderParams renderParams,
+            float elapsedTime,
+            float progress) {
+        // TODO calculate position per sample
+        // TODO doesn't work when camera moves
+        Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(
+                renderParams.fleetCenter,
+                renderParams.fleetCenterInitialDisplacement);
+        center = renderParams.fleetCenterInterpolator.Interpolate(center, progress, elapsedTime);
+
+        // TODO and also i used to have a interpolator - where does it go?
+
+        var shapes = new IShapeProperty[samples.Length];
+
+        for (int i = 0; i<samples.Length; i++) {
+            shapes[i] = renderParams.createShape(samples[i], center);
         }
 
-        // render
+        return shapes;
     }
 
-    public static DrawSamples(DFTParams param) {
-    }
+    public static Object[] RenderShapes(IShapeProperty[] shapeProps, Object[] renderedShapes) {
+        /*
+        // CircleRenderer - lien renderer
+        if (renderedShapes == null) {
+            renderedShapes = new Object[shapeProps.Length];
+        }
 
-    public static ShapeParams SamplesToShapes(Complex[] samples) {
-        // TODO how?
-        // what are the params?
-        //
-        // shape type and then yeah.
-        // smart renderer, creates shapes to draw
-    }
+        foreach (var prop in shapeProps) {
+            var shapeType = prop.GetType();
+            if (shapeType == typeof(CircleProperty)) {
 
+            } else if (shapeType == typeof(LineProperty)) {
+            } else if (shapeType == typeof(RectProperty)) {
+            }
+        }
+        */
+        return renderedShapes;
+    }
 
     // TODO too many args? color and particle etc should be taken out as a separate parameter.
     // TODO maybe like a chain something returns where things should be drawn,

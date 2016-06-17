@@ -7,8 +7,9 @@ public interface IObjectProperty {
     void OnUpdate();
 }
 
+// TODO remove interface!
 [Serializable]
-public struct LineProperty {
+public struct LineProperty : IShapeProperty {
     public Vector2 center;
     public float length;
     public float angle;

@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-public struct CircleProperty2 {
+// TODO remove interface
+public struct CircleProperty2 : IShapeProperty {
     public Vector2 center;
     public float diameter;
     public Color color;
