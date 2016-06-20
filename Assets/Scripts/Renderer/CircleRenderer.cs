@@ -5,75 +5,109 @@ using UnityEngine.UI;
 [SelectionBase]
 public class CircleRenderer : ShapeRenderer {
 
-    const float MAX_FRAGMENT_LENGTH = 0.03f; // make it small enough to be invisible
+    // max polygon side length
+    const float MAX_FRAGMENT_LENGTH = 0.03f;
+    // if diameter changes by more than this recreate mesh
+    const float INNER_MESH_RETAIN_THRESHOLD = 0.3f;
 
-    public CircleProperty property;
-    // TODO used to check dirty, should really belong to lineproperty
-    CircleProperty cachedProperty;
+    public CircleProperty property = new CircleProperty();
+    CircleProperty cachedProperty = new CircleProperty();
+    float innerMeshDiameter; // updated with mesh
 
-    // Prefab should assign these to child gameobjects
+    // WARN: Assign to child GameObjects in prefab
     public MeshFilter innerMeshFilter;
     public MeshRenderer innerMeshRenderer;
     public MeshFilter borderMeshFilter;
     public MeshRenderer borderMeshRenderer;
 
-    public Vector2 center {
-        get {
-            return transform.position;
+    /* ShapeRenderer */
+
+    protected void UpdateGameObject() {
+        center = property.center;
+        diameter = property.diameter;
+    }
+
+    protected bool UpdateMeshIfNeeded() {
+        if ((Mathf.Abs(property.diameter - innerMeshDiameter) / innerMeshDiameter) >
+                INNER_MESH_RETAIN_THRESHOLD) {
+            // mesh dimension change
+            UpdateInnerMesh();
+            UpdateBorderMesh();
+        } else if (property.border.MeshNeedsUpdate(cachedProperty.border)) {
+            // border property change
+            UpdateBorderMesh();
         }
 
-        set {
-            transform.position = new Vector3(value.x, value.y, transform.position.z);
+        // color change
+        if (property.color != cachedProperty.color) {
+            UpdateInnerMeshColor(property.color);
+        }
+
+        if (property.border.style != BorderStyle.None &&
+            property.border.color != cachedProperty.border.color) {
+            UpdateBorderMeshColor(property.border.color);
+        }
+
+    }
+
+    protected bool GameObjectWasModified() {
+        // TODO
+        return false;
+    }
+
+    protected ShapeProperty GameObjectToShapeProperty() {
+        // TODO
+        return null;
+    }
+
+    /*
+     * Create Mesh
+     */
+
+    void UpdateInnerMesh() {
+        CreateInner();
+        innerMeshDiameter = property.diameter;
+    }
+
+    void UpdateBorderMesh() {
+        switch (property.border.style) {
+            case BorderStyle.Solid:
+                CreateBorderSolid();
+                break;
+            case BorderStyle.Dash:
+                // TODO
+                CreateBorderSolid();
+                break;
+            case BorderStyle.None:
+                RemoveBorder();
+                break;
         }
     }
 
-    public float diameter {
-        get {
-            return transform.localScale.x;
-        }
-
-        set {
-            transform.localScale = new Vector3(value, value, 1);
-        }
+    void UpdateInnerMeshColor(Color color) {
+        MeshUtil.UpdateColor(innerMeshRenderer, color);
     }
 
-    public void OnUpdate() {
-        Render();
-        DefaultShapeStyle.SetDefaultCircleStyle(property);
+    void UpdateBorderMeshColor(Color color) {
+        MeshUtil.UpdateColor(borderMeshRenderer, color);
     }
 
     /* RENDERING */
 
-    void Render() {
-        // inner
-        RenderBorderless();
-        switch (property.borderStyle) {
-            case BorderStyle.Solid:
-                RenderBorderSolid();
-                break;
-            case BorderStyle.Dash:
-                RenderBorderSolid();
-                break;
-            case BorderStyle.None:
-                RenderBorderNone();
-                break;
-            default:
-                break;
-        }
-    }
-
-    void RenderBorderNone() {
+    void RemoveBorder() {
         using (var vh = new VertexHelper()) {
             MeshUtil.UpdateMesh(borderMeshFilter, vh);
         }
     }
 
-    void RenderBorderless() {
-        int numTris = Mathf.CeilToInt(diameter * Mathf.PI / MAX_FRAGMENT_LENGTH);
-        float centerAngle = 2*Mathf.PI/numTris;
-        Color c = Color.white;
+    void CreateInner() {
 
         using (var vh = new VertexHelper()) {
+
+            int numTris = Mathf.CeilToInt(diameter * Mathf.PI / MAX_FRAGMENT_LENGTH);
+            float centerAngle = 2*Mathf.PI/numTris;
+            Color c = Color.white;
+
             // create verticies
             vh.AddVert(Vector3.zero, c, Vector2.zero); // midpoint
             for (int i = 0; i < numTris; i++) {
@@ -90,18 +124,18 @@ public class CircleRenderer : ShapeRenderer {
             // come around
             vh.AddTriangle(0, 1, numTris);
             MeshUtil.UpdateMesh(innerMeshFilter, vh);
-            MeshUtil.UpdateColor(innerMeshRenderer, property.color);
         }
     }
 
-    void RenderBorderSolid() {
-        int numQuads = Mathf.CeilToInt(diameter * Mathf.PI / MAX_FRAGMENT_LENGTH);
-        float centerAngle = 2*Mathf.PI/numQuads;
-
-        float scaledBorderThickness = property.borderThickness/property.diameter;
-        Color c = Color.white;
+    void CreateBorderSolid() {
 
         using (var vh = new VertexHelper()) {
+
+            int numQuads = Mathf.CeilToInt(diameter * Mathf.PI / MAX_FRAGMENT_LENGTH);
+            float centerAngle = 2*Mathf.PI/numQuads;
+            float scaledBorderThickness = property.border.thickness/property.diameter;
+            Color c = Color.white;
+
             for (int i = 0; i<numQuads; i++) {
                 float angle = centerAngle * i;
                 float x = Mathf.Cos(angle) * 0.5f;
@@ -109,16 +143,13 @@ public class CircleRenderer : ShapeRenderer {
 
                 float scaledInnerRadius = 1; // default = outer
 
-                switch (property.borderPosition) {
+                switch (property.border.position) {
                     case BorderPosition.Center:
                         scaledInnerRadius -= scaledBorderThickness/2;
                         break;
 
                     case BorderPosition.Inside:
                         scaledInnerRadius -= scaledBorderThickness;
-                        break;
-
-                    default:
                         break;
                 }
 
@@ -143,12 +174,27 @@ public class CircleRenderer : ShapeRenderer {
             vh.AddTriangle(finalIdxBase+1, 0, 1);
 
             MeshUtil.UpdateMesh(borderMeshFilter, vh);
-            MeshUtil.UpdateColor(borderMeshRenderer, property.borderColor);
         }
     }
 
-    void RenderBorderDash() {
+    void CreateBorderDash() {
 
+    }
+
+    /*
+     * Getter/Setters
+     */
+
+    public Vector2 center {
+        get { return transform.position; }
+
+        set { transform.position = new Vector3(value.x, value.y, transform.position.z); }
+    }
+
+    public float diameter {
+        get { return transform.localScale.x; }
+
+        set { transform.localScale = new Vector3(value, value, 1); }
     }
 }
 

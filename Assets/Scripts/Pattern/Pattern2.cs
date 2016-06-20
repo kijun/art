@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/*
 public class Pattern2 : MonoBehaviour {
     public int numberOfLines;
     public float lineLength;
@@ -49,3 +50,4 @@ public class Pattern2 : MonoBehaviour {
         }
     }
 }
+*/

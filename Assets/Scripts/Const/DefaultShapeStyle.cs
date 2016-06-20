@@ -32,7 +32,7 @@ public class DefaultShapeStyle {
     public static float gapLength = 0.10f;
 
 
-    public static void Apply(IObjectProperty p) {
+    public static void Apply(ShapeProperty p) {
         /*
         if (p.GetType() == typeof(LineProperty)) {
             ApplyToLine((LineProperty)p);
@@ -57,6 +57,7 @@ public class DefaultShapeStyle {
     // TODO should probably return a line property struct,
     // and we should refactor rendering code
     static void ApplyToLine(LineProperty line) {
+        /*
         line.color = color;
         line.style = borderStyle;
         line.dashLength = dashLength;
@@ -64,9 +65,11 @@ public class DefaultShapeStyle {
         line.angle = angle;
         line.length = lineLength;
         line.width = lineWidth;
+        */
     }
 
     public static void SetDefaultLineStyle(LineProperty line) {
+        /*
         color = line.color;
         borderStyle = line.style;
         dashLength = line.dashLength;
@@ -74,6 +77,7 @@ public class DefaultShapeStyle {
         angle = line.angle;
         lineLength = line.length;
         lineWidth = line.width;
+        */
     }
 
     /*
@@ -81,6 +85,7 @@ public class DefaultShapeStyle {
      */
 
     static void ApplyToRect(RectProperty obj) {
+        /*
         obj.color = color;
         obj.Height = rectHeight;
         obj.Width = rectWidth;
@@ -90,9 +95,11 @@ public class DefaultShapeStyle {
         obj.borderPosition = borderPosition;
         obj.dashLength = dashLength;
         obj.gapLength = gapLength;
+        */
     }
 
     public static void SetDefaultRectStyle(RectProperty obj) {
+        /*
         color = obj.color;
         rectHeight = obj.Height;
         rectWidth = obj.Width;
@@ -102,12 +109,14 @@ public class DefaultShapeStyle {
         borderPosition = obj.borderPosition;
         dashLength = obj.dashLength;
         gapLength = obj.gapLength;
+        */
     }
 
     /*
      * CIRCLE
      */
     static void ApplyToCircle(CircleProperty obj) {
+        /*
         obj.color = color;
         obj.diameter = diameter;
 
@@ -115,9 +124,11 @@ public class DefaultShapeStyle {
         obj.borderPosition = borderPosition;
         obj.dashLength = dashLength;
         obj.gapLength = gapLength;
+        */
     }
 
     public static void SetDefaultCircleStyle(CircleProperty obj) {
+        /*
         color = obj.color;
         diameter = obj.diameter;
 
@@ -125,6 +136,7 @@ public class DefaultShapeStyle {
         borderPosition = obj.borderPosition;
         dashLength = obj.dashLength;
         gapLength = obj.gapLength;
+        */
     }
 
 }

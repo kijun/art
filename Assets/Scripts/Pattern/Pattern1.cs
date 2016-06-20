@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 /* swirling circle */
 /* swirls and then becomes one, and then diverges again */
+/*
 public class Pattern1 : MonoBehaviour {
 
     public int numberOfCircles = 10;
@@ -47,3 +48,4 @@ public class Pattern1 : MonoBehaviour {
 
 	}
 }
+*/

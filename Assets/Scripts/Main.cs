@@ -65,7 +65,7 @@ public enum FFF {
 }
 
 // how about if you want to draw a line between dots? yeah that's a real concern right?
-public delegate IShapeProperty DFTCreateShapeDelegate(Complex sample, Vector2 center);
+public delegate ShapeProperty DFTCreateShapeDelegate(Complex sample, Vector2 center);
 
 public struct DFTSampleParams {
     public float duration;
@@ -102,7 +102,7 @@ public class BasePattern {
             Complex[] samples = GenerateSamples(sampleParams, elapsedTime, progress);
 
             /* convert to shapes */
-            IShapeProperty[] shapeProps = SamplesToShapes(samples, renderParams, elapsedTime, progress);
+            ShapeProperty[] shapeProps = SamplesToShapes(samples, renderParams, elapsedTime, progress);
 
             /* render shapes */
             renderedShapes = RenderShapes(shapeProps, renderedShapes);
@@ -123,7 +123,7 @@ public class BasePattern {
 
     // not sure what parameters it should use
     // TODO cache properties
-    public static IShapeProperty[] SamplesToShapes(
+    public static ShapeProperty[] SamplesToShapes(
             Complex[] samples,
             DFTRenderParams renderParams,
             float elapsedTime,
@@ -137,7 +137,7 @@ public class BasePattern {
 
         // TODO and also i used to have a interpolator - where does it go?
 
-        var shapes = new IShapeProperty[samples.Length];
+        var shapes = new ShapeProperty[samples.Length];
 
         for (int i = 0; i<samples.Length; i++) {
             shapes[i] = renderParams.createShape(samples[i], center);
@@ -146,7 +146,7 @@ public class BasePattern {
         return shapes;
     }
 
-    public static Object[] RenderShapes(IShapeProperty[] shapeProps, Object[] renderedShapes) {
+    public static Object[] RenderShapes(ShapeProperty[] shapeProps, Object[] renderedShapes) {
         /*
         // CircleRenderer - lien renderer
         if (renderedShapes == null) {
@@ -241,16 +241,16 @@ public class BasePattern {
         if (shape == ShapeType.Circle) {
             for (int i=0; i<pos.Length; i++) {
                 var p = pos[i];
-                CircleProperty2 prop = new CircleProperty2(center:p);
+                var prop = new CircleProperty(center:p);
                 if (rendered[i] == null) {
                     rendered[i] = ResourceLoader.InstantiateCircle(prop);
                 } else {
                     // TODO rewrite desperately needed
-                    ((CircleProperty)rendered[i]).center = prop.center;
+                    //((CircleProperty)rendered[i]).center = prop.center;
                 }
                 // probably should need to call this;
                 // TODO ineffective so ineffective
-                ((CircleProperty)rendered[i]).OnUpdate();
+                //((CircleProperty)rendered[i]).OnUpdate();
             }
         }
         /*

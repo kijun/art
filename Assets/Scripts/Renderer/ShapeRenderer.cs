@@ -3,8 +3,8 @@ using UnityEngine;
 public abstract class ShapeRenderer : MonoBehaviour {
 
     private bool propertyObjectChanged;
-    private IShapeProperty property;
-    private IShapeProperty cachedProperty;
+    private ShapeProperty property;
+    private ShapeProperty cachedProperty;
 
     /*
      * Update Methods
@@ -18,9 +18,7 @@ public abstract class ShapeRenderer : MonoBehaviour {
         if (PropertyWasModified()) {
             UpdateGameObject();
 
-            if (MeshNeedsUpdate()) {
-                GenerateMesh();
-            }
+            UpdateMeshIfNeeded();
 
             CacheProperty();
         }
@@ -33,10 +31,12 @@ public abstract class ShapeRenderer : MonoBehaviour {
 
     protected abstract void UpdateGameObject();
 
-    protected abstract void GenerateMesh();
+    protected abstract void UpdateMeshIfNeeded();
 
     protected void CacheProperty() {
         cachedProperty = property;
+        // TODO should encapsulate
+        propertyObjectChanged = false;
     }
 
     /*
@@ -44,17 +44,17 @@ public abstract class ShapeRenderer : MonoBehaviour {
      */
 
     protected bool PropertyWasModified() {
-        return !property.Equals(cachedProperty);
+        return propertyObjectChanged && !property.Equals(cachedProperty);
     }
-
-    protected abstract bool MeshNeedsUpdate();
 
     protected abstract bool GameObjectWasModified();
 
-    /* Getters, Setters */
-    protected abstract IShapeProperty GameObjectToShapeProperty();
+    /*
+     * Getters, Setters
+     */
+    protected abstract ShapeProperty GameObjectToShapeProperty();
 
-    public IShapeProperty Property {
+    public ShapeProperty Property {
         get {
             return property;
         }
