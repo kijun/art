@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 
 public struct BorderProperty : IEquatable<BorderProperty> {
+//public struct BorderProperty : IEquatable<BorderProperty> {
     public BorderStyle style;
     public Color color;
     public float thickness;
@@ -44,5 +45,50 @@ public struct BorderProperty : IEquatable<BorderProperty> {
         }
 
         return false;
+    }
+
+    /*
+     * Comparators
+     */
+    public override bool Equals(object other) {
+        if (other is BorderProperty) {
+            return Equals((BorderProperty)other);
+        }
+        return false;
+    }
+
+    public bool Equals(BorderProperty other) {
+
+        // Performance?
+        if (style == other.style &&
+            color == other.color &&
+            position == other.position &&
+            Mathf.Approximately(thickness, other.thickness) &&
+            Mathf.Approximately(dashLength, other.dashLength) &&
+            Mathf.Approximately(gapLength, other.gapLength))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public static bool operator ==(BorderProperty p1, BorderProperty p2) {
+        return p1.Equals(p2);
+    }
+
+    public static bool operator !=(BorderProperty p1, BorderProperty p2) {
+        return !p1.Equals(p2);
+    }
+
+    public override int GetHashCode() {
+        // TODO this should be alright
+        int hash = 13;
+        hash = (hash * 7) + GetType().GetHashCode();
+        hash = (hash * 7) + position.GetHashCode();
+        hash = (hash * 7) + color.GetHashCode();
+        hash = (hash * 7) + thickness.GetHashCode();
+        hash = (hash * 7) + dashLength.GetHashCode();
+        hash = (hash * 7) + gapLength.GetHashCode();
+        return hash;
     }
 }

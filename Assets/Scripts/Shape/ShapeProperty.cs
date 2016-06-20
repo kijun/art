@@ -33,7 +33,7 @@ public abstract class ShapeProperty : IEquatable<ShapeProperty> {
      */
 
     public abstract Vector2 scale {
-        get; set;
+        get;
     }
 
 
@@ -49,7 +49,7 @@ public abstract class ShapeProperty : IEquatable<ShapeProperty> {
 
     public bool Equals(ShapeProperty other) {
         // different shape property classes
-        if (this.GetType() != other.GetType()) return;
+        if (this.GetType() != other.GetType()) return false;
 
         // Performance?
         if (center == other.center &&
@@ -76,7 +76,7 @@ public abstract class ShapeProperty : IEquatable<ShapeProperty> {
         hash = (hash * 11) + center.GetHashCode();
         hash = (hash * 17) + scale.GetHashCode();
         hash = (hash * 23) + angle.GetHashCode();
-        hash = (hash * 23) + borderProperty.GetHashCode();
+        hash = (hash * 23) + border.GetHashCode();
         return hash;
     }
 

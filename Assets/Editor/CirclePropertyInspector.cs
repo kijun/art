@@ -2,11 +2,12 @@ using UnityEngine;
 using System.Collections;
 using UnityEditor;
 
-[CustomEditor(typeof(CircleProperty))]
+//[CustomEditor(typeof(CircleProperty))]
 public class CirclePropertyInspector : Editor {
 
     const float MIN_RADIUS_CHANGE = 0.1f;
 
+    /*
     public override void OnInspectorGUI() {
         CircleProperty circle = (CircleProperty)target;
         Transform circleTransform = circle.transform;
@@ -93,4 +94,5 @@ public class CirclePropertyInspector : Editor {
             //Debug.Log(diameter + " " + obj.diameter);
         }
     }
+*/
 }

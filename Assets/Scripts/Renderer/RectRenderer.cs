@@ -20,14 +20,19 @@ public class RectRenderer : ShapeRenderer {
 
     protected override void UpdateGameObject() {
         center = property.center;
-        diameter = property.diameter;
+        width = property.width;
+        height = property.height;
+        angle = property.angle;
     }
 
     protected override void UpdateMeshIfNeeded() {
-        if ((Mathf.Abs(property.diameter - innerMeshDiameter) / innerMeshDiameter) >
-                INNER_MESH_RETAIN_THRESHOLD) {
-            // mesh dimension change
-            UpdateInnerMesh();
+        // if same solid, then no need to update
+        // never update inner
+        // only update border
+        // if border needs
+        if (property.border.style != BorderStyle.None &&
+            (property.width != cachedProperty.width ||
+             property.height != cachedProperty.height)) {
             UpdateBorderMesh();
         } else if (property.border.MeshNeedsUpdate(cachedProperty.border)) {
             // border property change
@@ -62,20 +67,20 @@ public class RectRenderer : ShapeRenderer {
 
     void UpdateInnerMesh() {
         CreateInner();
-        innerMeshDiameter = property.diameter;
     }
 
     void UpdateBorderMesh() {
         switch (property.border.style) {
-            case BorderStyle.Solid:
-                CreateBorderSolid();
-                break;
             case BorderStyle.Dash:
-                // TODO
+                CreateBorderDashed();
+                break;
+            case BorderStyle.Solid:
                 CreateBorderSolid();
                 break;
             case BorderStyle.None:
                 RemoveBorder();
+                break;
+            default:
                 break;
         }
     }
@@ -88,29 +93,7 @@ public class RectRenderer : ShapeRenderer {
         MeshUtil.UpdateColor(borderMeshRenderer, color);
     }
 
-
-    /*
-     * RENDERING
-     */
-    public void Render() {
-        switch (borderStyle) {
-            case BorderStyle.Dash:
-                RenderBorderDashed();
-                break;
-            case BorderStyle.Solid:
-                RenderBorderSolid();
-                break;
-            case BorderStyle.None:
-                RenderBorderNone();
-                break;
-            default:
-                break;
-        }
-        RenderInner();
-        DefaultShapeStyle.SetDefaultRectStyle(this);
-    }
-
-    void RenderInner() {
+    void CreateInner() {
         Color32 color32 = Color.white;
         using (var vh = new VertexHelper()) {
             vh.AddVert(new Vector3(-0.5f, -0.5f), color32, TextureMidPoint);
@@ -120,28 +103,27 @@ public class RectRenderer : ShapeRenderer {
             vh.AddTriangle(0,1,2);
             vh.AddTriangle(2,1,3);
             MeshUtil.UpdateMesh(innerMeshFilter, vh);
-            MeshUtil.UpdateColor(innerMeshRenderer, color);
         }
     }
 
-    void RenderBorderNone() {
+    void RemoveBorder() {
+        // TODO just shut off border obj
         using (var vh = new VertexHelper()) {
             MeshUtil.UpdateMesh(borderMeshFilter, vh);
         }
     }
 
-    void RenderBorderSolid() {
+    void CreateBorderSolid() {
         using (var vh = new VertexHelper()) {
             foreach (Bounds b in BorderSectionBounds()) {
                 MeshUtil.AddRect(b, vh);
             }
 
             MeshUtil.UpdateMesh(borderMeshFilter, vh);
-            MeshUtil.UpdateColor(borderMeshRenderer, borderColor);
         }
     }
 
-    void RenderBorderDashed() {
+    void CreateBorderDashed() {
         using (var vh = new VertexHelper()) {
             var sections = BorderSectionBounds();
             var top = sections[0];
@@ -151,8 +133,8 @@ public class RectRenderer : ShapeRenderer {
             var outerBounds = BorderOuterBounds;
 
             // Horizontal
-            float scaledDashLength = dashLength / Width;
-            float scaledGapLength = gapLength / Width;
+            float scaledDashLength = property.border.dashLength / property.width;
+            float scaledGapLength = property.border.gapLength / property.width;
             int numRects = Mathf.CeilToInt(top.size.x / (scaledDashLength + scaledGapLength));
 
             for (int i = 0; i<numRects; i++) {
@@ -172,8 +154,8 @@ public class RectRenderer : ShapeRenderer {
             }
 
             // Vertical
-            scaledDashLength = dashLength / Height;
-            scaledGapLength = gapLength / Height;
+            scaledDashLength = property.border.dashLength / property.height;
+            scaledGapLength = property.border.gapLength / property.height;
             numRects = Mathf.CeilToInt(right.size.y / (scaledDashLength + scaledGapLength));
 
             for (int i = 0; i<numRects; i++) {
@@ -194,7 +176,6 @@ public class RectRenderer : ShapeRenderer {
 
             // draw bot
             MeshUtil.UpdateMesh(borderMeshFilter, vh);
-            MeshUtil.UpdateColor(borderMeshRenderer, borderColor);
         }
     }
 
@@ -205,9 +186,9 @@ public class RectRenderer : ShapeRenderer {
 
 
             // adjust for border position
-            if (borderPosition == BorderPosition.Center) {
+            if (property.border.position == BorderPosition.Center) {
                 borderOuterBounds.Expand(borderFrame);
-            } else if (borderPosition == BorderPosition.Outside) {
+            } else if (property.border.position == BorderPosition.Outside) {
                 borderOuterBounds.Expand(borderFrame*2f);
             }
 
@@ -236,13 +217,14 @@ public class RectRenderer : ShapeRenderer {
         return new []{top, right, bottom, left};
     }
 
-    public void OnUpdate() {
-        Render();
+    /*
+     * Properties
+     */
+    public Vector2 center {
+        get { return transform.position; }
+        set { transform.position = new Vector3(value.x, value.y, transform.position.z); }
     }
 
-    /*
-     * PROPERTIES
-     */
     public float height {
         get {
             return transform.localScale.y;
@@ -262,13 +244,7 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
-    public Bounds Bounds {
-        get {
-            return new Bounds(transform.position, transform.localScale);
-        }
-    }
-
-    public float Angle {
+    public float angle {
         get {
             return transform.eulerAngles.z;
         }
@@ -277,15 +253,21 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
+    public Bounds bounds {
+        get {
+            return new Bounds(transform.position, transform.localScale);
+        }
+    }
+
     float scaledBorderWidth {
         get  {
-            return borderThickness/Width;
+            return property.border.thickness/property.width;
         }
     }
 
     float scaledBorderHeight {
         get {
-            return borderThickness/Height;
+            return property.border.thickness/height;
         }
     }
 
@@ -301,26 +283,7 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
-    public Vector2 Size {
-        get {
-            return new Vector2(Width, Height);
-        }
-
-        set {
-            transform.localScale = transform.localScale.SwapX(value.x).SwapY(value.y);
-        }
-    }
-
-    public Vector2 Center {
-        get {
-            return transform.position;
-        }
-
-        set {
-            transform.position = value;
-        }
-    }
-
+    /*
     public Rect2 rect2 {
         get {
             return new Rect2(Center, Size, Angle);
@@ -332,6 +295,7 @@ public class RectRenderer : ShapeRenderer {
             Angle = value.angle;
         }
     }
+    */
 
     /*
     void SetWidth(float width, RectAnchor anchor = RectAnchor.Center) {
