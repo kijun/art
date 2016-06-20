@@ -5,19 +5,16 @@ using System.Collections;
 // execute in edit mode
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class LineRenderer : MonoBehaviour, IObjectProperty {
+public class LineRenderer : ShapeRenderer {
 
     const int MAX_FRAGMENTS = 10000;
 
-    public LineProperty property = new LineProperty();
+    public LineProperty property;
     // TODO used to check dirty, should really belong to lineproperty
-    LineProperty cachedPropertyBad = new LineProperty();
-
-    void Start() {
-    }
+    LineProperty cachedProperty;
 
     bool PropertyHasChanged() {
-        return !property.Equals(cachedPropertyBad);
+        return !property.Equals(cachedProperty);
     }
 
     bool TransformHasChanged() {
@@ -31,10 +28,7 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
     }
 
     bool NeedsRerender() {
-        if (cachedPropertyBad.width == 0 || cachedPropertyBad.length ==0) return true;
-        if (property.style == BorderStyle.Dash &&
-            (!Mathf.Approximately(property.length, cachedPropertyBad.length) ||
-             !Mathf.Approximately(property.width, cachedPropertyBad.width))) {
+        if (property.style == BorderStyle.Dash && property != cachedProperty) {
             return true;
         }
         return false;
@@ -65,9 +59,9 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
         }
     }
 
-
     void Update() {
         // TODO check if edit mode
+        // TODO performance
         if (PropertyHasChanged()) {
             transform.localScale = new Vector3(property.length, property.width, 1);
             transform.eulerAngles = transform.eulerAngles.SwapZ(property.angle);
@@ -75,14 +69,14 @@ public class LineRenderer : MonoBehaviour, IObjectProperty {
             if(NeedsRerender()) {
                 OnUpdate();
             }
-            cachedPropertyBad = property;
+            cachedProperty = property;
         } else if (TransformHasChanged()) {
             property.length = TransformLength;
             property.width = TransformWidth;
             property.angle = TransformAngle;
             property.center = TransformCenter;
             OnUpdate();
-            cachedPropertyBad = property;
+            cachedProperty = property;
         }
     }
 

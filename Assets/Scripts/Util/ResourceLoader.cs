@@ -30,7 +30,7 @@ public class ResourceLoader {
         return lr;
     }
 
-    public static CircleProperty InstantiateCircle(CircleProperty2 property) {
+    public static CircleRenderer InstantiateCircle(CircleProperty property) {
         var prefab = Resources.Load<GameObject>(CIRCLE_PREFAB_PATH);
 
         if (prefab == null) {
@@ -44,7 +44,7 @@ public class ResourceLoader {
             Debug.LogError("couldn't instantiate from " + property);
             return null;
         }
-        return go.GetComponent<CircleProperty>();
+        return go.GetComponent<CircleRenderer>();
     }
 
     /*
