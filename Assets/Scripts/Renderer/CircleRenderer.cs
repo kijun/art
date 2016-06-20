@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 [ExecuteInEditMode]
 [SelectionBase]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class CircleRenderer : ShapeRenderer {
 
     // max polygon side length
@@ -22,12 +23,12 @@ public class CircleRenderer : ShapeRenderer {
 
     /* ShapeRenderer */
 
-    protected void UpdateGameObject() {
+    protected override void UpdateGameObject() {
         center = property.center;
         diameter = property.diameter;
     }
 
-    protected bool UpdateMeshIfNeeded() {
+    protected override void UpdateMeshIfNeeded() {
         if ((Mathf.Abs(property.diameter - innerMeshDiameter) / innerMeshDiameter) >
                 INNER_MESH_RETAIN_THRESHOLD) {
             // mesh dimension change
@@ -50,12 +51,12 @@ public class CircleRenderer : ShapeRenderer {
 
     }
 
-    protected bool GameObjectWasModified() {
+    protected override bool GameObjectWasModified() {
         // TODO
         return false;
     }
 
-    protected ShapeProperty GameObjectToShapeProperty() {
+    protected override ShapeProperty GameObjectToShapeProperty() {
         // TODO
         return null;
     }

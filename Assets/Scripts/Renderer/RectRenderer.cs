@@ -2,25 +2,92 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
+[ExecuteInEditMode]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class RectRenderer : ShapeRenderer {
     static Vector2 TextureMidPoint = TextureMidPoint;
 
-    /*
-     * ATTRIBUTES
-     */
-    public Color color;
-    public BorderStyle borderStyle;
-    public Color borderColor;
-    public float borderThickness;
-    public BorderPosition borderPosition;
-    public float dashLength;
-    public float gapLength;
+    public RectProperty property = new RectProperty();
+    RectProperty cachedProperty = new RectProperty();
 
     // Prefab should assign these to child gameobjects
     public MeshFilter innerMeshFilter;
     public MeshRenderer innerMeshRenderer;
     public MeshFilter borderMeshFilter;
     public MeshRenderer borderMeshRenderer;
+
+    /* ShapeRenderer */
+
+    protected override void UpdateGameObject() {
+        center = property.center;
+        diameter = property.diameter;
+    }
+
+    protected override void UpdateMeshIfNeeded() {
+        if ((Mathf.Abs(property.diameter - innerMeshDiameter) / innerMeshDiameter) >
+                INNER_MESH_RETAIN_THRESHOLD) {
+            // mesh dimension change
+            UpdateInnerMesh();
+            UpdateBorderMesh();
+        } else if (property.border.MeshNeedsUpdate(cachedProperty.border)) {
+            // border property change
+            UpdateBorderMesh();
+        }
+
+        // color change
+        if (property.color != cachedProperty.color) {
+            UpdateInnerMeshColor(property.color);
+        }
+
+        if (property.border.style != BorderStyle.None &&
+            property.border.color != cachedProperty.border.color) {
+            UpdateBorderMeshColor(property.border.color);
+        }
+
+    }
+
+    protected override bool GameObjectWasModified() {
+        // TODO
+        return false;
+    }
+
+    protected override ShapeProperty GameObjectToShapeProperty() {
+        // TODO
+        return null;
+    }
+
+    /*
+     * Create Mesh
+     */
+
+    void UpdateInnerMesh() {
+        CreateInner();
+        innerMeshDiameter = property.diameter;
+    }
+
+    void UpdateBorderMesh() {
+        switch (property.border.style) {
+            case BorderStyle.Solid:
+                CreateBorderSolid();
+                break;
+            case BorderStyle.Dash:
+                // TODO
+                CreateBorderSolid();
+                break;
+            case BorderStyle.None:
+                RemoveBorder();
+                break;
+        }
+    }
+
+    void UpdateInnerMeshColor(Color color) {
+        MeshUtil.UpdateColor(innerMeshRenderer, color);
+    }
+
+    void UpdateBorderMeshColor(Color color) {
+        MeshUtil.UpdateColor(borderMeshRenderer, color);
+    }
+
 
     /*
      * RENDERING
@@ -176,7 +243,7 @@ public class RectRenderer : ShapeRenderer {
     /*
      * PROPERTIES
      */
-    public float Height {
+    public float height {
         get {
             return transform.localScale.y;
         }
@@ -186,7 +253,7 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
-    public float Width {
+    public float width {
         get {
             return transform.localScale.x;
         }
