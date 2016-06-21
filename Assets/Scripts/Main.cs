@@ -241,9 +241,11 @@ public class BasePattern {
         if (shape == ShapeType.Circle) {
             for (int i=0; i<pos.Length; i++) {
                 var p = pos[i];
-                var prop = new CircleProperty(center:p);
+                var prop = new CircleProperty(center:p, color:Color.black);
                 if (rendered[i] == null) {
-                    rendered[i] = ResourceLoader.InstantiateCircle(prop);
+                    var circle = ResourceLoader.InstantiateCircle(prop);
+                    circle.RenderAndUpdatePropertyIfNeeded();
+                    rendered[i] = circle;
                 } else {
                     // TODO rewrite desperately needed
                     //((CircleProperty)rendered[i]).center = prop.center;

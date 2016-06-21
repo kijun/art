@@ -10,10 +10,10 @@ public abstract class ShapeRenderer : MonoBehaviour {
 
     void Update() {
     //    Debug.Log("update " + this);
-        RenderAndUpdatePropertyIfNeeded();
+    //    RenderAndUpdatePropertyIfNeeded();
     }
 
-    void RenderAndUpdatePropertyIfNeeded() {
+    public void RenderAndUpdatePropertyIfNeeded() {
         if (propertyObjectChanged) {
             Debug.Log("property modified");
             UpdateGameObject();

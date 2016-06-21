@@ -44,7 +44,9 @@ public class ResourceLoader {
             Debug.LogError("couldn't instantiate from " + property);
             return null;
         }
-        return go.GetComponent<CircleRenderer>();
+        CircleRenderer rd = go.GetComponent<CircleRenderer>();
+        rd.property = property;
+        return rd;
     }
 
     /*

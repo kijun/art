@@ -6,8 +6,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class CircleRenderer : ShapeRenderer {
 
-    private CircleProperty cachedProperty = new CircleProperty(color:Color.black);
     private CircleProperty _property = new CircleProperty(color:Color.black);
+    private CircleProperty cachedProperty = new CircleProperty(color:Color.black, diameter:float.Epsilon);
 
     // max polygon side length
     const float MAX_FRAGMENT_LENGTH = 0.03f;
@@ -93,6 +93,7 @@ public class CircleRenderer : ShapeRenderer {
     }
 
     void UpdateInnerMeshColor(Color color) {
+        Debug.Log(color);
         MeshUtil.UpdateColor(innerMeshRenderer, color);
     }
 
