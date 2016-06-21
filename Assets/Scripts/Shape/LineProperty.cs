@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 
+[System.Serializable]
 public class LineProperty : ShapeProperty {
 
     public float length;

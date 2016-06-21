@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 
+[System.Serializable]
 public struct BorderProperty : IEquatable<BorderProperty> {
 //public struct BorderProperty : IEquatable<BorderProperty> {
     public BorderStyle style;

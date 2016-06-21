@@ -2,6 +2,7 @@
 using System;
 
 //public interface IShapeProperty {
+[System.Serializable]
 public abstract class ShapeProperty : IEquatable<ShapeProperty> {
 
     /*

@@ -44,6 +44,11 @@ public class LineRenderer : ShapeRenderer {
         return null;
     }
 
+    protected override void CacheProperty() {
+        cachedProperty = property;
+        propertyObjectChanged = false;
+    }
+
     /*
      * Mesh
      */

@@ -61,6 +61,11 @@ public class RectRenderer : ShapeRenderer {
         return null;
     }
 
+    protected override void CacheProperty() {
+        cachedProperty = property;
+        propertyObjectChanged = false;
+    }
+
     /*
      * Create Mesh
      */

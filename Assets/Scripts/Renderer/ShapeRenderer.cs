@@ -2,25 +2,26 @@ using UnityEngine;
 
 public abstract class ShapeRenderer : MonoBehaviour {
 
-    private bool propertyObjectChanged;
-    private ShapeProperty property;
-    private ShapeProperty cachedProperty;
+    protected bool propertyObjectChanged;
 
     /*
      * Update Methods
      */
 
     void Update() {
+    //    Debug.Log("update " + this);
         RenderAndUpdatePropertyIfNeeded();
     }
 
     void RenderAndUpdatePropertyIfNeeded() {
-        if (PropertyWasModified()) {
+        if (propertyObjectChanged) {
+            Debug.Log("property modified");
             UpdateGameObject();
 
             UpdateMeshIfNeeded();
 
             CacheProperty();
+            propertyObjectChanged = false;
         }
         /* TODO enable only in editor mode
         else if (GameObjectWasModified()) {
@@ -29,23 +30,19 @@ public abstract class ShapeRenderer : MonoBehaviour {
         */
     }
 
+    /*
+     * Needs to be implemented in children
+     */
+
     protected abstract void UpdateGameObject();
 
     protected abstract void UpdateMeshIfNeeded();
 
-    protected void CacheProperty() {
-        cachedProperty = property;
-        // TODO should encapsulate
-        propertyObjectChanged = false;
-    }
+    protected abstract void CacheProperty();
 
     /*
      * Rerender criteria
      */
-
-    protected bool PropertyWasModified() {
-        return propertyObjectChanged && !property.Equals(cachedProperty);
-    }
 
     protected abstract bool GameObjectWasModified();
 
@@ -54,13 +51,21 @@ public abstract class ShapeRenderer : MonoBehaviour {
      */
     protected abstract ShapeProperty GameObjectToShapeProperty();
 
-    public ShapeProperty Property {
+    /*
+    public abstract ShapeProperty property {
+        get; set;
+    }
+    */
+
+    /*
+    public ShapeProperty property {
         get {
-            return property;
+            return _property;
         }
         set {
             propertyObjectChanged = true;
-            property = value;
+            _property = value;
         }
     }
+    */
 }

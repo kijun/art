@@ -1,70 +1,53 @@
+using UnityEditor;
 using UnityEngine;
 using System.Collections;
-using UnityEditor;
 
-//[CustomEditor(typeof(CircleProperty))]
+[CustomEditor(typeof(CircleRenderer))]
 public class CirclePropertyInspector : Editor {
 
     const float MIN_RADIUS_CHANGE = 0.1f;
 
-    /*
     public override void OnInspectorGUI() {
-        CircleProperty circle = (CircleProperty)target;
-        Transform circleTransform = circle.transform;
+        var circleR = (CircleRenderer)target;
+        CircleProperty circle = circleR.property;
 
         EditorGUI.BeginChangeCheck();
 
         // Width, Length in pixels
-        //
         circle.diameter = EditorGUILayout.FloatField("Diameter", circle.diameter);
 
-
-        // Color
-        circle.color = EditorGUILayout.ColorField("Color", circle.color);
-
-        // Circle Style
-        circle.borderStyle = (BorderStyle)EditorGUILayout.EnumPopup("Style", circle.borderStyle);
-
-        if (circle.borderStyle != BorderStyle.None) {
-            circle.borderColor = EditorGUILayout.ColorField("Border Color", circle.borderColor);
-            circle.borderPosition = (BorderPosition)EditorGUILayout.EnumPopup("Border Position", circle.borderPosition);
-            circle.borderThickness = EditorGUILayout.FloatField("Border Thickness",
-                    circle.borderThickness * 100f) / 100f;
-            if (circle.borderStyle == BorderStyle.Dash) {
-                circle.dashLength = EditorGUILayout.FloatField("Dash Length", circle.dashLength);
-                circle.gapLength = EditorGUILayout.FloatField("Gap Length", circle.gapLength);
-            }
-        }
+        circle = (CircleProperty)ShapePropertyInspector.Inspect(circle);
 
         // MeshFilter/Renderer
-        circle.innerMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
+        circleR.innerMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
                 "Inner Mesh Renderer",
-                circle.innerMeshRenderer,
+                circleR.innerMeshRenderer,
                 typeof(MeshRenderer),
                 true);
-        circle.innerMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
+        circleR.innerMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
                 "Inner Mesh Filter",
-                circle.innerMeshFilter,
+                circleR.innerMeshFilter,
                 typeof(MeshFilter),
                 true);
 
-        circle.borderMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
+        circleR.borderMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
                 "Border Mesh Renderer",
-                circle.borderMeshRenderer,
+                circleR.borderMeshRenderer,
                 typeof(MeshRenderer),
                 true);
-        circle.borderMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
+        circleR.borderMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
                 "Border Mesh Filter",
-                circle.borderMeshFilter,
+                circleR.borderMeshFilter,
                 typeof(MeshFilter),
                 true);
 
         // Render
         if (EditorGUI.EndChangeCheck()) {
-            circle.OnUpdate();
+            circleR.property = circle;
         }
     }
 
+    /*
     void OnSceneGUI() {
         var obj = target as CircleProperty;
 
@@ -94,5 +77,5 @@ public class CirclePropertyInspector : Editor {
             //Debug.Log(diameter + " " + obj.diameter);
         }
     }
-*/
+    */
 }

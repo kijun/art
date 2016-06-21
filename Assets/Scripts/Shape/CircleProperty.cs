@@ -1,6 +1,7 @@
 using UnityEngine;
 
 // TODO remove interface
+[System.Serializable]
 public class CircleProperty : ShapeProperty {
     public float diameter;
 

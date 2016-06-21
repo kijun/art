@@ -6,13 +6,14 @@ using UnityEngine.UI;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class CircleRenderer : ShapeRenderer {
 
+    private CircleProperty cachedProperty = new CircleProperty(color:Color.black);
+    private CircleProperty _property = new CircleProperty(color:Color.black);
+
     // max polygon side length
     const float MAX_FRAGMENT_LENGTH = 0.03f;
     // if diameter changes by more than this recreate mesh
     const float INNER_MESH_RETAIN_THRESHOLD = 0.3f;
 
-    public CircleProperty property = new CircleProperty();
-    CircleProperty cachedProperty = new CircleProperty();
     float innerMeshDiameter; // updated with mesh
 
     // WARN: Assign to child GameObjects in prefab
@@ -22,7 +23,6 @@ public class CircleRenderer : ShapeRenderer {
     public MeshRenderer borderMeshRenderer;
 
     /* ShapeRenderer */
-
     protected override void UpdateGameObject() {
         center = property.center;
         diameter = property.diameter;
@@ -33,7 +33,9 @@ public class CircleRenderer : ShapeRenderer {
                 INNER_MESH_RETAIN_THRESHOLD) {
             // mesh dimension change
             UpdateInnerMesh();
+            UpdateInnerMeshColor(property.color);
             UpdateBorderMesh();
+            UpdateBorderMeshColor(property.border.color);
         } else if (property.border.MeshNeedsUpdate(cachedProperty.border)) {
             // border property change
             UpdateBorderMesh();
@@ -59,6 +61,11 @@ public class CircleRenderer : ShapeRenderer {
     protected override ShapeProperty GameObjectToShapeProperty() {
         // TODO
         return null;
+    }
+
+    protected override void CacheProperty() {
+        cachedProperty = property;
+        propertyObjectChanged = false;
     }
 
     /*
@@ -196,6 +203,16 @@ public class CircleRenderer : ShapeRenderer {
         get { return transform.localScale.x; }
 
         set { transform.localScale = new Vector3(value, value, 1); }
+    }
+
+    public CircleProperty property {
+        get {
+            return _property;
+        }
+        set {
+            propertyObjectChanged = true;
+            _property = value;
+        }
     }
 }
 
