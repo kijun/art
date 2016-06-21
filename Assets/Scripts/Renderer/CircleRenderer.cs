@@ -93,7 +93,6 @@ public class CircleRenderer : ShapeRenderer {
     }
 
     void UpdateInnerMeshColor(Color color) {
-        Debug.Log(color);
         MeshUtil.UpdateColor(innerMeshRenderer, color);
     }
 

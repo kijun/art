@@ -15,7 +15,6 @@ public abstract class ShapeRenderer : MonoBehaviour {
 
     public void RenderAndUpdatePropertyIfNeeded() {
         if (propertyObjectChanged) {
-            Debug.Log("property modified");
             UpdateGameObject();
 
             UpdateMeshIfNeeded();

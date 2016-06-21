@@ -247,6 +247,9 @@ public class BasePattern {
                     circle.RenderAndUpdatePropertyIfNeeded();
                     rendered[i] = circle;
                 } else {
+                    var circle = (CircleRenderer)rendered[i];
+                    circle.property = prop;
+                    circle.RenderAndUpdatePropertyIfNeeded();
                     // TODO rewrite desperately needed
                     //((CircleProperty)rendered[i]).center = prop.center;
                 }
