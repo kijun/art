@@ -20,6 +20,7 @@ public struct Complex : IEquatable<Complex>, IEquatable<float> {
     }
 
     public static Complex FromRadian(float radian) {
+      //Debug.Log("deg = " + radian*Mathf.Rad2Deg);
       return new Complex(Mathf.Cos(radian), Mathf.Sin(radian));
     }
 

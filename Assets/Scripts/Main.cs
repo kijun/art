@@ -18,7 +18,7 @@ public class Main : MonoBehaviour {
     }
 
     IEnumerator Test() {
-        var seq = HarmonicSequenceGenerator.Star(100, 5);
+        var seq = HarmonicSequenceGenerator.RotatingStar(100, 3);
         var viz = HarmonicSequenceVisualizer.BaseCircle(new CircleProperty(
                         color:new Color(235, 205, 205, 0.3f)
                     ), 10);
@@ -30,7 +30,7 @@ public class Main : MonoBehaviour {
             float elapsedTime = Time.time - startTime;
             float progress = elapsedTime / seq.duration;
             // TODO what about rotation interpolation
-            Complex[] samples = seq.GenerateSamples(elapsedTime, progress);
+            Complex[] samples = seq.GenerateSamples(progress:progress, elapsedTime:elapsedTime);
             Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(Direction.Center, Vector2.zero);
             ShapeProperty[] shapes = viz.SamplesToShapes(samples, center);
 
