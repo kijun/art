@@ -3,14 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 
 // TODO stage
+//
+[System.Serializable]
+public struct TempRotParams {
+    public float k;
+    public float secPerRotation;
+    public float scale;
+}
+
 public class Main : MonoBehaviour {
 
-    List<IEnumerator> patterns = new List<IEnumerator>();
+    public int N = 20;
+    public TempRotParams[] rotParams;
+    public CircleProperty circleProp = new CircleProperty(
+                            diameter: 7,
+                            color:new Color(235, 205, 205, 0.3f)
+                        );
 
 	// Use this for initialization
 	void Start () {
         SetupLevel();
-        StartLevel();
 	}
 
     void SetupLevel() {
@@ -18,8 +30,51 @@ public class Main : MonoBehaviour {
     }
 
     IEnumerator Test() {
-        var seq = HarmonicSequenceGenerator.RotatingStar(100, 3);
+        float duration = 100000;
+
+        float startTime = Time.time;
+        float endTime = startTime + duration;
+        ShapeRenderer[] renderedObjects = null;
+
+        while (Time.time < endTime) {
+            // linq?
+            var freqs = new HarmonicFrequencyGenerator[rotParams.Length];
+            var viz = HarmonicSequenceVisualizer.BaseCircle(circleProp, 1);
+
+            for (int i = 0; i<rotParams.Length; i++) {
+                var param = rotParams[i];
+                /*
+                if (param null) {
+                    Debug.Log("empty params");
+                    yield return null;
+                }
+                */
+                freqs[i] = HarmonicFrequencyGenerator.Rotation(
+                        frequency:param.k,
+                        secPerRotation:param.secPerRotation,
+                        scale: param.scale);
+            }
+            var seq = new HarmonicSequenceGenerator(duration, N, freqs);
+
+
+            float elapsedTime = Time.time - startTime;
+            float progress = elapsedTime / seq.duration;
+            // TODO what about rotation interpolation
+            Complex[] samples = seq.GenerateSamples(progress:progress, elapsedTime:elapsedTime);
+            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(Direction.Center, Vector2.zero);
+            ShapeProperty[] shapes = viz.SamplesToShapes(samples, center);
+
+            renderedObjects = RenderShapes(shapes, renderedObjects);
+
+            yield return null;
+        }
+    }
+
+    /*
+    IEnumerator Test_Old() {
+        var seq = HarmonicSequenceGenerator.RotatingStar(100, 30);
         var viz = HarmonicSequenceVisualizer.BaseCircle(new CircleProperty(
+                        diameter: 7,
                         color:new Color(235, 205, 205, 0.3f)
                     ), 10);
         float startTime = Time.time;
@@ -39,15 +94,20 @@ public class Main : MonoBehaviour {
             yield return null;
         }
     }
+    */
 
-    Object[] RenderShapes(ShapeProperty[] shapes, Object[] rendered) {
+
+    ShapeRenderer[] RenderShapes(ShapeProperty[] shapes, ShapeRenderer[] rendered) {
         if (rendered == null) {
-            rendered = new Object[shapes.Length];
+            rendered = new ShapeRenderer[shapes.Length];
         }
         // TODO extend at will
         if (rendered.Length != shapes.Length) {
-            Debug.LogError("wrong number of objects dude");
-            return null;
+            Debug.Log("new cache");
+            foreach (var o in rendered) {
+                Destroy(o.gameObject);
+            }
+            rendered = new ShapeRenderer[shapes.Length];
         }
 
         for (int i=0; i<shapes.Length; i++) {
@@ -60,6 +120,7 @@ public class Main : MonoBehaviour {
         return rendered;
     }
 
+    /*
     void Add(IEnumerator basePattern) {
         patterns.Add(basePattern);
     }
@@ -69,6 +130,7 @@ public class Main : MonoBehaviour {
             StartCoroutine(bp);
         }
     }
+    */
 
 	// Update is called once per frame
 	void Update () {

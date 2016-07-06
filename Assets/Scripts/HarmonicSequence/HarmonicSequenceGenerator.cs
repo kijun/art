@@ -21,8 +21,19 @@ public class HarmonicSequenceGenerator {
 
     // TODO actually might be able to chain all of these
     public static HarmonicSequenceGenerator RotatingStar(float duration, int N) {
-        HarmonicFrequencyGenerator[] freqs = {HarmonicFrequencyGenerator.Rotation(
-                frequency:1, secPerRotation:3f, scale:1)};
+        HarmonicFrequencyGenerator[] freqs = {
+            HarmonicFrequencyGenerator.Rotation(frequency:1, secPerRotation:30f, scale:2),
+            HarmonicFrequencyGenerator.Rotation(frequency:4, secPerRotation:50f, scale:0.5f),
+            HarmonicFrequencyGenerator.Rotation(frequency:7, secPerRotation:-20f, scale:0.9f)
+        };
+        return new HarmonicSequenceGenerator(duration, N, freqs);
+    }
+
+    public static HarmonicSequenceGenerator RotatingStarr(float duration, int N) {
+        HarmonicFrequencyGenerator[] freqs = {
+            HarmonicFrequencyGenerator.Rotation(frequency:2, secPerRotation:30f, scale:2),
+            HarmonicFrequencyGenerator.Rotation(frequency:50, secPerRotation:-16f, scale:3f)
+        };
         return new HarmonicSequenceGenerator(duration, N, freqs);
     }
 
@@ -30,7 +41,11 @@ public class HarmonicSequenceGenerator {
         var coeff = new Dictionary<float, Complex>();
         foreach (var fp in frequencies) {
             HarmonicFrequency freq = fp.GenerateFrequency(progress:progress, elapsedTime:elapsedTime);
-            coeff.Add(freq.frequency, freq.coefficient);
+            if (coeff.ContainsKey(freq.frequency)) {
+                coeff[freq.frequency] += freq.coefficient;
+            } else {
+                coeff.Add(freq.frequency, freq.coefficient);
+            }
         }
         return DFT.GenerateSamples(coeff, N);
     }
