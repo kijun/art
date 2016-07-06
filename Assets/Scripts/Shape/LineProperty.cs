@@ -14,7 +14,7 @@ public class LineProperty : ShapeProperty {
             float           angle = 0,
             Color           color = new Color(),
             BorderProperty  border = new BorderProperty()
-    ) : base(center:center, angle:angle, color:color, border:border) {
+    ) : base(shapeType: ShapeType.Line, center:center, angle:angle, color:color, border:border) {
         this.length = length;
         this.width = width;
     }

@@ -14,13 +14,50 @@ public class Main : MonoBehaviour {
 	}
 
     void SetupLevel() {
-        Add(BasePattern.Grid(duration: 20));
-        Add(BasePattern.Grid(duration: 20, size:3, speed:2, dots:100, particleSize:0.02f));
-        //PatternManager.Swarm(duration: 20);
+        StartCoroutine(Test());
     }
 
-    void Level2() {
+    IEnumerator Test() {
+        var seq = HarmonicSequenceGenerator.Star(100, 5);
+        var viz = HarmonicSequenceVisualizer.BaseCircle(new CircleProperty(
+                        color:new Color(235, 205, 205, 0.3f)
+                    ), 10);
+        float startTime = Time.time;
+        float endTime = startTime + seq.duration;
+        Object[] renderedObjects = null;
 
+        while (Time.time < endTime) {
+            float elapsedTime = Time.time - startTime;
+            float progress = elapsedTime / seq.duration;
+            // TODO what about rotation interpolation
+            Complex[] samples = seq.GenerateSamples(elapsedTime, progress);
+            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(Direction.Center, Vector2.zero);
+            ShapeProperty[] shapes = viz.SamplesToShapes(samples, center);
+
+            renderedObjects = RenderShapes(shapes, renderedObjects);
+
+            yield return null;
+        }
+    }
+
+    Object[] RenderShapes(ShapeProperty[] shapes, Object[] rendered) {
+        if (rendered == null) {
+            rendered = new Object[shapes.Length];
+        }
+        // TODO extend at will
+        if (rendered.Length != shapes.Length) {
+            Debug.LogError("wrong number of objects dude");
+            return null;
+        }
+
+        for (int i=0; i<shapes.Length; i++) {
+            if (rendered[i] == null) {
+                rendered[i] = ShapeGOFactory.InstantiateShape(shapes[i]);
+            } else {
+                ShapeGOFactory.UpdateShapeProperty((ShapeRenderer)rendered[i], shapes[i]);
+            }
+        }
+        return rendered;
     }
 
     void Add(IEnumerator basePattern) {
@@ -39,90 +76,37 @@ public class Main : MonoBehaviour {
 	}
 }
 
-// could make some default delegates
-public delegate float FrequencyTransformDelegate(float progress, float elapsedTime);
-public delegate Complex CoefficientTransformDelegate(float progress, float elapsedTime);
-
-/* TODO
-- transform with time?
-    - k
-    - amplitude
-    - phase
-    - function
-        - back and forth
-        - accelerated
-        - linear
-*/
-public struct DFTFrequencyParams {
-    public FrequencyTransformDelegate frequencyTransform;
-    public CoefficientTransformDelegate coefficientTransform;
-}
-
-
-// there must be scale embedded with each parameter i think
-public enum FFF {
-    None, XPos, YPos, Width, Height, Angle
-}
-
-// how about if you want to draw a line between dots? yeah that's a real concern right?
-public delegate ShapeProperty DFTCreateShapeDelegate(Complex sample, Vector2 center);
-
-public struct DFTSampleParams {
-    public float duration;
-    public int N;
-    public DFTFrequencyParams[] frequencies;
-    // public DFTRenderParams renderParams;
-    // TODO size interpolator
-    // TODO color interpolator
-}
-
-public struct DFTRenderParams {
-    public Direction fleetCenter;
-    public Vector2 fleetCenterInitialDisplacement;
-    public Interpolator fleetCenterInterpolator;
-   // = new ConstantInterpolator();
-    public DFTCreateShapeDelegate createShape;
-}
-
 // TODO better name
 public class BasePattern {
 
-    public static IEnumerator RunDFT(DFTSampleParams sampleParams, DFTRenderParams renderParams) {
-        float startTime = Time.time;
-        float endTime = startTime + sampleParams.duration;
+//    public static IEnumerator RunDFT(DFTSampleParams sampleParams, DFTRenderParams renderParams) {
+//        float startTime = Time.time;
+//        float endTime = startTime + sampleParams.duration;
+//
+//        Object[] renderedShapes = null;
+//
+//        while (Time.time < endTime) {
+//
+//            float elapsedTime = Time.time - startTime;
+//            float progress = elapsedTime / sampleParams.duration;
+//
+//            /* create samples */
+//            Complex[] samples = GenerateSamples(sampleParams, elapsedTime, progress);
+//
+//            /* convert to shapes */
+//            ShapeProperty[] shapeProps = SamplesToShapes(samples, renderParams, elapsedTime, progress);
+//
+//            /* render shapes */
+//            renderedShapes = RenderShapes(shapeProps, renderedShapes);
+//
+//            yield return null;
+//        }
+//    }
 
-        Object[] renderedShapes = null;
-
-        while (Time.time < endTime) {
-
-            float elapsedTime = Time.time - startTime;
-            float progress = elapsedTime / sampleParams.duration;
-
-            /* create samples */
-            Complex[] samples = GenerateSamples(sampleParams, elapsedTime, progress);
-
-            /* convert to shapes */
-            ShapeProperty[] shapeProps = SamplesToShapes(samples, renderParams, elapsedTime, progress);
-
-            /* render shapes */
-            renderedShapes = RenderShapes(shapeProps, renderedShapes);
-
-            yield return null;
-        }
-    }
-
-    public static Complex[] GenerateSamples(DFTSampleParams param, float elapsedTime, float progress) {
-        var coeff = new Dictionary<float, Complex>();
-        foreach (var fp in param.frequencies) {
-            float k = fp.frequencyTransform(progress, elapsedTime);
-            Complex Xk = fp.coefficientTransform(progress, elapsedTime);
-            coeff.Add(k, Xk);
-        }
-        return DFT.GenerateSamples(coeff, param.N);
-    }
 
     // not sure what parameters it should use
     // TODO cache properties
+    /*
     public static ShapeProperty[] SamplesToShapes(
             Complex[] samples,
             DFTRenderParams renderParams,
@@ -161,9 +145,9 @@ public class BasePattern {
             } else if (shapeType == typeof(RectProperty)) {
             }
         }
-        */
         return renderedShapes;
     }
+        */
 
     // TODO too many args? color and particle etc should be taken out as a separate parameter.
     // TODO maybe like a chain something returns where things should be drawn,
@@ -241,7 +225,14 @@ public class BasePattern {
         if (shape == ShapeType.Circle) {
             for (int i=0; i<pos.Length; i++) {
                 var p = pos[i];
-                var prop = new CircleProperty(center:p, color:Color.black);
+                var prop = new CircleProperty(
+                        center:p,
+                        diameter:particleSize,
+                        color:new Color(235, 205, 205, 0.3f),
+                        border: new BorderProperty(
+                            style:BorderStyle.Solid,
+                            //color: new Color(255, 255, 255,0.3f),
+                            thickness: 5f));
                 if (rendered[i] == null) {
                     var circle = ResourceLoader.InstantiateCircle(prop);
                     circle.RenderAndUpdatePropertyIfNeeded();

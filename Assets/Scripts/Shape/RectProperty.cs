@@ -13,7 +13,7 @@ public class RectProperty : ShapeProperty {
             float           angle = 0,
             Color           color = new Color(),
             BorderProperty  border = new BorderProperty()
-    ) : base(center:center, angle:angle, color:color, border:border) {
+    ) : base(shapeType:ShapeType.Rect, center:center, angle:angle, color:color, border:border) {
         this.height = height;
         this.width = width;
     }

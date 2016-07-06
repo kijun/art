@@ -12,17 +12,20 @@ public abstract class ShapeProperty : IEquatable<ShapeProperty> {
     public float angle;
     public Color color;
     public BorderProperty border;
+    public ShapeType shapeType;
 
     /*
      * Constructor
      */
 
     protected ShapeProperty(
+            ShapeType       shapeType,
             Vector2         center = new Vector2(),
             float           angle = 0,
             Color           color = new Color(),
             BorderProperty  border = new BorderProperty()
     ) {
+        this.shapeType = shapeType;
         this.center = center;
         this.angle = angle;
         this.color = color;

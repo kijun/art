@@ -10,7 +10,7 @@ public abstract class ShapeRenderer : MonoBehaviour {
 
     void Update() {
     //    Debug.Log("update " + this);
-    //    RenderAndUpdatePropertyIfNeeded();
+        RenderAndUpdatePropertyIfNeeded();
     }
 
     public void RenderAndUpdatePropertyIfNeeded() {

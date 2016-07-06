@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public static class DFT {
-    public static Complex DrawSample(int n, int N, Dictionary<float, Complex> coefficients) {
+    public static Complex DrawSample(Dictionary<float, Complex> coefficients, int n, int N) {
         Complex sum = Complex.Zero;
 
         foreach(KeyValuePair<float, Complex> coeff in coefficients) {
@@ -20,7 +20,7 @@ public static class DFT {
       Complex[] data = new Complex[N];
 
       for (int n = 0; n<N; n++) {
-          data[n] = DrawSample(n, N, coefficients);
+          data[n] = DrawSample(coefficients, n, N);
       }
 
       return data;

@@ -8,10 +8,9 @@ public class CircleProperty : ShapeProperty {
     public CircleProperty(
             Vector2         center = new Vector2(),
             float           diameter = 1,
-            float           angle = 0,
             Color           color = new Color(),
             BorderProperty  border= new BorderProperty()
-    ) : base(center:center, angle:angle, color:color, border:border) {
+    ) : base(shapeType: ShapeType.Circle, center:center, angle:0, color:color, border:border) {
         this.diameter = diameter;
     }
 
