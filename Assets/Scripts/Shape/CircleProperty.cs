@@ -19,5 +19,9 @@ public class CircleProperty : ShapeProperty {
     public override Vector2 scale {
         get { return new Vector2(diameter, diameter); }
     }
+
+    public override object Clone() {
+        return new CircleProperty(center:center, diameter:diameter, color:color, border:border);
+    }
 }
 

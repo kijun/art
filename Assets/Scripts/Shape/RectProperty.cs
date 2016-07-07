@@ -23,4 +23,8 @@ public class RectProperty : ShapeProperty {
     public override Vector2 scale {
         get { return new Vector2(width, height); }
     }
+
+    public override object Clone() {
+        return new RectProperty(center:center, height:height, width:width, angle:angle, color:color, border:border);
+    }
 }

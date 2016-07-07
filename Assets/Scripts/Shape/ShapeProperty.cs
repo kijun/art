@@ -3,7 +3,7 @@ using System;
 
 //public interface IShapeProperty {
 [System.Serializable]
-public abstract class ShapeProperty : IEquatable<ShapeProperty> {
+public abstract class ShapeProperty : IEquatable<ShapeProperty>, ICloneable {
 
     /*
      * Shared Attributes
@@ -40,6 +40,7 @@ public abstract class ShapeProperty : IEquatable<ShapeProperty> {
         get;
     }
 
+    public abstract object Clone();
 
     /*
      * Comparators

@@ -9,7 +9,7 @@ public class CirclePropertyInspector : Editor {
 
     public override void OnInspectorGUI() {
         var circleR = (CircleRenderer)target;
-        CircleProperty circle = circleR.property;
+        CircleProperty circle = circleR.property.Clone() as CircleProperty;
 
         EditorGUI.BeginChangeCheck();
 

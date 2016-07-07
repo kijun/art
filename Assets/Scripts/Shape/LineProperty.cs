@@ -25,6 +25,10 @@ public class LineProperty : ShapeProperty {
         get { return new Vector2(length, width); }
     }
 
+    public override object Clone() {
+        return new LineProperty(center:center, length:length, width:width, angle:angle, color:color, border:border);
+    }
+
     /* Generated Properties */
     public Vector2 p1 {
         get {
