@@ -8,8 +8,10 @@ public class LineRenderer : ShapeRenderer {
 
     const int MAX_FRAGMENTS = 10000;
 
-    public LineProperty property = new LineProperty();
+    public LineProperty _property = new LineProperty();
     LineProperty cachedProperty = new LineProperty();
+
+    bool instantiated = false;
 
     /* ShapeRenderer */
 
@@ -23,13 +25,19 @@ public class LineRenderer : ShapeRenderer {
     protected override void UpdateMeshIfNeeded() {
         if (property.border.MeshNeedsUpdate(cachedProperty.border)) {
             // border property change
+            Debug.Log("border property change");
             UpdateMesh();
         } else if (property.border.style == BorderStyle.Dash &&
                    !Mathf.Approximately(property.length, cachedProperty.length)) {
+            Debug.Log("length change");
             UpdateMesh();
+        } else if (!instantiated) {
+            instantiated = true;
+            UpdateMesh(); // need to create it at least once;
         }
 
         if (property.color != cachedProperty.color) {
+            Debug.Log("color change");
             UpdateMeshColor(property.color);
         }
     }
@@ -68,6 +76,7 @@ public class LineRenderer : ShapeRenderer {
     }
 
     void CreateSolid() {
+        Debug.Log("solid line");
         using (var vh = new VertexHelper()) {
             MeshUtil.AddRect(BoundsUtil.UnitBounds, vh);
             MeshUtil.UpdateMesh(GetComponent<MeshFilter>(), vh);
@@ -118,6 +127,16 @@ public class LineRenderer : ShapeRenderer {
 
     void SetEndPoints(Vector2 p1, Vector2 p2) {
         property.points = new Tuple<Vector2, Vector2>(p1, p2);
+    }
+
+    public LineProperty property {
+        get {
+            return _property;
+        }
+        set {
+            propertyObjectChanged = true;
+            _property = value;
+        }
     }
 }
 

@@ -54,6 +54,14 @@ public static class UnityExtensions {
         return v;
     }
 
+    public static float AngleInRadian(this Vector2 v) {
+        return Mathf.Atan2(v.y, v.x);
+    }
+
+    public static float AngleInDegrees(this Vector2 v) {
+        return Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
+    }
+
     /*
      * BOUNDS
      */

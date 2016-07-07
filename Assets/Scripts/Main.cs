@@ -19,6 +19,9 @@ public class Main : MonoBehaviour {
                             diameter: 7,
                             color:new Color(235, 205, 205, 0.3f)
                         );
+    public LineProperty lineProp = new LineProperty(
+                            color:new Color(235, 205, 205, 0.3f)
+                        );
 
 	// Use this for initialization
 	void Start () {
@@ -35,11 +38,13 @@ public class Main : MonoBehaviour {
         float startTime = Time.time;
         float endTime = startTime + duration;
         ShapeRenderer[] renderedObjects = null;
+        ShapeRenderer[] renderedObjects2 = null;
 
         while (Time.time < endTime) {
             // linq?
             var freqs = new HarmonicFrequencyGenerator[rotParams.Length];
             var viz = HarmonicSequenceVisualizer.BaseCircle(circleProp, 1);
+            var viz2 = HarmonicSequenceVisualizer.BaseLine(lineProp, new Vector2(0, 1), 1);
 
             for (int i = 0; i<rotParams.Length; i++) {
                 var param = rotParams[i];
@@ -61,10 +66,11 @@ public class Main : MonoBehaviour {
             float progress = elapsedTime / seq.duration;
             // TODO what about rotation interpolation
             Complex[] samples = seq.GenerateSamples(progress:progress, elapsedTime:elapsedTime);
-            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(Direction.Center, Vector2.zero);
-            ShapeProperty[] shapes = viz.SamplesToShapes(samples, center);
 
-            renderedObjects = RenderShapes(shapes, renderedObjects);
+            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(Direction.Center, Vector2.zero);
+
+            renderedObjects = RenderShapes(viz.SamplesToShapes(samples, center), renderedObjects);
+            renderedObjects2 = RenderShapes(viz2.SamplesToShapes(samples, center), renderedObjects2);
 
             yield return null;
         }
