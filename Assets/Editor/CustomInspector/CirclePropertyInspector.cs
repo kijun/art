@@ -44,6 +44,8 @@ public class CirclePropertyInspector : Editor {
         // Render
         if (EditorGUI.EndChangeCheck()) {
             circleR.property = circle;
+            circleR.RenderAndUpdatePropertyIfNeeded();
+            EditorUtility.SetDirty(circleR);
         }
     }
 

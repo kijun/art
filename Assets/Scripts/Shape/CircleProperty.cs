@@ -23,5 +23,17 @@ public class CircleProperty : ShapeProperty {
     public override object Clone() {
         return new CircleProperty(center:center, diameter:diameter, color:color, border:border);
     }
+
+    public float innerCircleDiameter {
+        get {
+            return diameter - 2*border.thickness;
+        }
+        set {
+            Debug.Log("dia" + diameter);
+            Debug.Log(value);
+            border.thickness = (diameter - value)/2f;
+        }
+    }
+    // TODO:comparator belongs here
 }
 

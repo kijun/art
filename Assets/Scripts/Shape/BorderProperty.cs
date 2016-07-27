@@ -36,6 +36,7 @@ public struct BorderProperty : IEquatable<BorderProperty> {
         // thickness or border position changed - update
         if (!Mathf.Approximately(thickness, other.thickness) || position != other.position) {
             return true;
+        } else {
         }
 
         // dashed border & gap/length changed - update

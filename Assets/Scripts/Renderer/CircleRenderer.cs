@@ -6,7 +6,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class CircleRenderer : ShapeRenderer {
 
+    [SerializeField]
     private CircleProperty _property = new CircleProperty(color:Color.black);
+    [SerializeField]
     private CircleProperty cachedProperty = new CircleProperty(color:Color.black, diameter:float.Epsilon);
 
     // max polygon side length
@@ -60,6 +62,13 @@ public class CircleRenderer : ShapeRenderer {
 
     protected override ShapeProperty GameObjectToShapeProperty() {
         // TODO
+        /*
+        new CircleProperty(
+                center:center,
+                diameter:diameter,
+                color:
+                */
+
         return null;
     }
 
@@ -203,6 +212,16 @@ public class CircleRenderer : ShapeRenderer {
         get { return transform.localScale.x; }
 
         set { transform.localScale = new Vector3(value, value, 1); }
+    }
+
+    public Color color {
+        get {
+            return innerMeshRenderer.material.color;
+        }
+
+        set {
+            UpdateInnerMeshColor(value);
+        }
     }
 
     public CircleProperty property {
