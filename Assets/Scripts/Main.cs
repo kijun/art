@@ -45,22 +45,18 @@ public class Main : MonoBehaviour {
             var freqs = new HarmonicFrequencyGenerator[rotParams.Length];
             var viz = HarmonicSequenceVisualizer.BaseCircle(circleProp, 1);
             var viz2 = HarmonicSequenceVisualizer.BaseLine(lineProp, new Vector2(0, 1), 1);
+            //
+//            SampleToShapeDelegaet
+//                alksdjfalkdsf
 
             for (int i = 0; i<rotParams.Length; i++) {
                 var param = rotParams[i];
-                /*
-                if (param null) {
-                    Debug.Log("empty params");
-                    yield return null;
-                }
-                */
                 freqs[i] = HarmonicFrequencyGenerator.Rotation(
                         frequency:param.k,
                         secPerRotation:param.secPerRotation,
                         scale: param.scale);
             }
             var seq = new HarmonicSequenceGenerator(duration, N, freqs);
-
 
             float elapsedTime = Time.time - startTime;
             float progress = elapsedTime / seq.duration;
@@ -75,33 +71,6 @@ public class Main : MonoBehaviour {
             yield return null;
         }
     }
-
-    /*
-    IEnumerator Test_Old() {
-        var seq = HarmonicSequenceGenerator.RotatingStar(100, 30);
-        var viz = HarmonicSequenceVisualizer.BaseCircle(new CircleProperty(
-                        diameter: 7,
-                        color:new Color(235, 205, 205, 0.3f)
-                    ), 10);
-        float startTime = Time.time;
-        float endTime = startTime + seq.duration;
-        Object[] renderedObjects = null;
-
-        while (Time.time < endTime) {
-            float elapsedTime = Time.time - startTime;
-            float progress = elapsedTime / seq.duration;
-            // TODO what about rotation interpolation
-            Complex[] samples = seq.GenerateSamples(progress:progress, elapsedTime:elapsedTime);
-            Vector2 center = ScreenUtil.ScreenLocationToWorldPosition(Direction.Center, Vector2.zero);
-            ShapeProperty[] shapes = viz.SamplesToShapes(samples, center);
-
-            renderedObjects = RenderShapes(shapes, renderedObjects);
-
-            yield return null;
-        }
-    }
-    */
-
 
     ShapeRenderer[] RenderShapes(ShapeProperty[] shapes, ShapeRenderer[] rendered) {
         if (rendered == null) {
@@ -125,18 +94,6 @@ public class Main : MonoBehaviour {
         }
         return rendered;
     }
-
-    /*
-    void Add(IEnumerator basePattern) {
-        patterns.Add(basePattern);
-    }
-
-    void StartLevel() {
-        foreach (var bp in patterns) {
-            StartCoroutine(bp);
-        }
-    }
-    */
 
 	// Update is called once per frame
 	void Update () {

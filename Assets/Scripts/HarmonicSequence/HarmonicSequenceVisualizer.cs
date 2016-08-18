@@ -1,13 +1,13 @@
 using UnityEngine;
 
 // TODO proper
-delegate ShapeProperty SampleToShapeDelegate(Complex sample, Vector2 center);
+public delegate ShapeProperty SampleToShapeDelegate(Complex sample, Vector2 center);
 
 public class HarmonicSequenceVisualizer {
     // TODO fleet needs to move, but we'll figure out how later
     SampleToShapeDelegate createShape;
 
-    HarmonicSequenceVisualizer (SampleToShapeDelegate createShape) {
+    public HarmonicSequenceVisualizer (SampleToShapeDelegate createShape) {
         this.createShape = createShape;
     }
 
