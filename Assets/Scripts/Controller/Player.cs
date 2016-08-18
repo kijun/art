@@ -4,8 +4,8 @@ public class Player : MonoBehaviour {
 
 
     /***** PRIVATE VARIABLES *****/
-    Vector2 baseVelocity;
-    Vector2 maxRelativeSpeed;
+    //Vector2 baseVelocity;
+    //Vector2 maxRelativeSpeed;
     bool moving;
 
 
@@ -36,8 +36,8 @@ public class Player : MonoBehaviour {
         float ydir = Input.GetAxisRaw("Vertical");
         Vector2 newPos = transform.position;
 
-        float dx = (xdir * maxRelativeSpeed.x + baseVelocity.x) * Time.deltaTime;
-        float dy = (ydir * maxRelativeSpeed.y + baseVelocity.y) * Time.deltaTime;
+        float dx = (xdir * MaxRelativeSpeed.x + BaseVelocity.x) * Time.deltaTime;
+        float dy = (ydir * MaxRelativeSpeed.y + BaseVelocity.y) * Time.deltaTime;
 
         newPos.x += dx;
         newPos.y += dy;
