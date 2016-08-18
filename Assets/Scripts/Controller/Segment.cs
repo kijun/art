@@ -7,6 +7,12 @@ using UnityEngine;
 public class Segment : MonoBehaviour {
 
 
+    /***** PUBLIC VARIABLES *****/
+    public Vector2 segmentBaseVelocity = new Vector2(0, 0.5f);
+    public Vector2 playerMaxSpeed = new Vector2(1, 0.5f);
+    public Transform defaultStartPosition;
+
+
     /***** PRIVATE VARIABLES *****/
 
     Player player;
@@ -22,9 +28,14 @@ public class Segment : MonoBehaviour {
         this.player = player;
         this.camera = camera;
         if (resetPlayerPosition) {
+            // TODO use bounds to set position;
             this.player.Position = DefaultPlayerPosition;
             this.camera.Position = DefaultCameraPosition;
         }
+
+        player.BaseVelocity = segmentBaseVelocity;
+        player.MaxRelativeSpeed = playerMaxSpeed;
+        camera.Velocity = segmentBaseVelocity;
     }
 
     /*
@@ -59,7 +70,7 @@ public class Segment : MonoBehaviour {
 
     Vector2 DefaultPlayerPosition {
         get {
-            return transform.position;
+            return defaultStartPosition.position;
         }
     }
 

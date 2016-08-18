@@ -20,9 +20,12 @@ public class Game : MonoBehaviour {
     // TODO refactor
     public Level level;
 
+    /* TEMP OBJECTS */
+    public Level currentLevel;
+
 
     /***** PRIVATE VARIABLES *****/
-    Level currentLevel;
+    //Level currentLevel;
     Player player;
 
 
