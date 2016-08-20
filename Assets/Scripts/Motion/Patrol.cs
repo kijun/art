@@ -18,6 +18,7 @@ public class Patrol : MonoBehaviour {
 
     /***** PUBLIC: VARIABLES *****/
     public float speed;
+    public bool repeat = true;
 
 
     /***** PRIVATE: VARIABLES *****/
@@ -58,6 +59,9 @@ public class Patrol : MonoBehaviour {
         while (true) {
             GetComponent<Rigidbody2D>().velocity = velocityVector;
             yield return new WaitForSeconds(timeToReachDestination);
+
+            if (!repeat) break;
+
             GetComponent<Rigidbody2D>().velocity = -1 * velocityVector;
             yield return new WaitForSeconds(timeToReachDestination);
         }
