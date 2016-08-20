@@ -6,25 +6,31 @@ using UnityEngine.UI;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class CircleRenderer : ShapeRenderer {
 
-    [SerializeField]
-    private CircleProperty _property = new CircleProperty(color:Color.black);
-    [SerializeField]
-    private CircleProperty cachedProperty = new CircleProperty(color:Color.black, diameter:float.Epsilon);
 
+    /***** CONSTS *****/
     // max polygon side length
     const float MAX_FRAGMENT_LENGTH = 0.03f;
     // if diameter changes by more than this recreate mesh
     const float INNER_MESH_RETAIN_THRESHOLD = 0.3f;
 
-    float innerMeshDiameter; // updated with mesh
 
-    // WARN: Assign to child GameObjects in prefab
+    /***** PUBLIC: VARIABLES *****/
+    // should be assigned
     public MeshFilter innerMeshFilter;
     public MeshRenderer innerMeshRenderer;
     public MeshFilter borderMeshFilter;
     public MeshRenderer borderMeshRenderer;
 
-    /* ShapeRenderer */
+
+    /***** PRIVATE: VARIABLES *****/
+    [SerializeField]
+    CircleProperty _property = new CircleProperty(color:Color.black);
+    [SerializeField]
+    CircleProperty cachedProperty = new CircleProperty(color:Color.black, diameter:float.Epsilon);
+    float innerMeshDiameter; // updated with mesh
+
+
+    /***** OVERRIDE: SHAPE RENDERER *****/
     protected override void UpdateGameObject() {
         center = property.center;
         diameter = property.diameter;
@@ -52,7 +58,6 @@ public class CircleRenderer : ShapeRenderer {
             property.border.color != cachedProperty.border.color) {
             UpdateBorderMeshColor(property.border.color);
         }
-
     }
 
     protected override bool GameObjectWasModified() {
@@ -62,13 +67,6 @@ public class CircleRenderer : ShapeRenderer {
 
     protected override ShapeProperty GameObjectToShapeProperty() {
         // TODO
-        /*
-        new CircleProperty(
-                center:center,
-                diameter:diameter,
-                color:
-                */
-
         return null;
     }
 
@@ -77,9 +75,8 @@ public class CircleRenderer : ShapeRenderer {
         propertyObjectChanged = false;
     }
 
-    /*
-     * Create Mesh
-     */
+
+    /***** PRIVATE: MESH CREATION *****/
 
     void UpdateInnerMesh() {
         CreateInner();
@@ -101,7 +98,7 @@ public class CircleRenderer : ShapeRenderer {
         }
     }
 
-    void UpdateInnerMeshColor(Color color) {
+    void UpdateInnerMeshColor(Color newColor) {
         MeshUtil.UpdateColor(innerMeshRenderer, color);
     }
 
@@ -109,7 +106,8 @@ public class CircleRenderer : ShapeRenderer {
         MeshUtil.UpdateColor(borderMeshRenderer, color);
     }
 
-    /* RENDERING */
+
+    /***** PRIVATE: RENDERING *****/
 
     void RemoveBorder() {
         using (var vh = new VertexHelper()) {
@@ -147,7 +145,6 @@ public class CircleRenderer : ShapeRenderer {
     void CreateBorderSolid() {
 
         using (var vh = new VertexHelper()) {
-
             int numQuads = Mathf.CeilToInt(diameter * Mathf.PI / MAX_FRAGMENT_LENGTH);
             float centerAngle = 2*Mathf.PI/numQuads;
             float scaledBorderThickness = property.border.thickness/property.diameter;
@@ -198,32 +195,8 @@ public class CircleRenderer : ShapeRenderer {
 
     }
 
-    /*
-     * Getter/Setters
-     */
 
-    public Vector2 center {
-        get { return transform.position; }
-
-        set { transform.position = new Vector3(value.x, value.y, transform.position.z); }
-    }
-
-    public float diameter {
-        get { return transform.localScale.x; }
-
-        set { transform.localScale = new Vector3(value, value, 1); }
-    }
-
-    public Color color {
-        get {
-            return innerMeshRenderer.material.color;
-        }
-
-        set {
-            UpdateInnerMeshColor(value);
-        }
-    }
-
+    /***** PUBLIC: PROPERTIES *****/
     public CircleProperty property {
         get {
             return _property;
@@ -231,6 +204,31 @@ public class CircleRenderer : ShapeRenderer {
         set {
             propertyObjectChanged = true;
             _property = value;
+        }
+    }
+
+
+    /***** PRIVATE: PROPERTIES *****/
+
+    Vector2 center {
+        get { return transform.position; }
+
+        set { transform.position = new Vector3(value.x, value.y, transform.position.z); }
+    }
+
+    float diameter {
+        get { return transform.localScale.x; }
+
+        set { transform.localScale = new Vector3(value, value, 1); }
+    }
+
+    Color color {
+        get {
+            return innerMeshRenderer.material.color;
+        }
+
+        set {
+            UpdateInnerMeshColor(value);
         }
     }
 }
