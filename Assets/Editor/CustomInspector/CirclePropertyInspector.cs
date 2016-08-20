@@ -9,7 +9,7 @@ public class CirclePropertyInspector : Editor {
 
     public override void OnInspectorGUI() {
         var circleR = (CircleRenderer)target;
-        CircleProperty circle = circleR.property.Clone() as CircleProperty;
+        var circle = circleR.property.Clone() as CircleProperty;
 
         EditorGUI.BeginChangeCheck();
 
@@ -17,29 +17,6 @@ public class CirclePropertyInspector : Editor {
         circle.diameter = EditorGUILayout.FloatField("Diameter", circle.diameter);
 
         circle = (CircleProperty)ShapePropertyInspector.Inspect(circle);
-
-        // MeshFilter/Renderer
-        circleR.innerMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
-                "Inner Mesh Renderer",
-                circleR.innerMeshRenderer,
-                typeof(MeshRenderer),
-                true);
-        circleR.innerMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
-                "Inner Mesh Filter",
-                circleR.innerMeshFilter,
-                typeof(MeshFilter),
-                true);
-
-        circleR.borderMeshRenderer = (MeshRenderer)EditorGUILayout.ObjectField(
-                "Border Mesh Renderer",
-                circleR.borderMeshRenderer,
-                typeof(MeshRenderer),
-                true);
-        circleR.borderMeshFilter = (MeshFilter)EditorGUILayout.ObjectField(
-                "Border Mesh Filter",
-                circleR.borderMeshFilter,
-                typeof(MeshFilter),
-                true);
 
         // Render
         if (EditorGUI.EndChangeCheck()) {

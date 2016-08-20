@@ -77,7 +77,6 @@ public class CircleRenderer : ShapeRenderer {
 
 
     /***** PRIVATE: MESH CREATION *****/
-
     void UpdateInnerMesh() {
         CreateInner();
         innerMeshDiameter = property.diameter;
@@ -108,7 +107,6 @@ public class CircleRenderer : ShapeRenderer {
 
 
     /***** PRIVATE: RENDERING *****/
-
     void RemoveBorder() {
         using (var vh = new VertexHelper()) {
             MeshUtil.UpdateMesh(borderMeshFilter, vh);
@@ -209,7 +207,6 @@ public class CircleRenderer : ShapeRenderer {
 
 
     /***** PRIVATE: PROPERTIES *****/
-
     Vector2 center {
         get { return transform.position; }
 

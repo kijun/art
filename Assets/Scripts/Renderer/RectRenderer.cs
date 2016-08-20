@@ -3,21 +3,31 @@ using UnityEngine.UI;
 using System.Collections;
 
 [ExecuteInEditMode]
+[SelectionBase]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class RectRenderer : ShapeRenderer {
-    static Vector2 TextureMidPoint = TextureMidPoint;
 
-    public RectProperty property = new RectProperty();
-    RectProperty cachedProperty = new RectProperty();
 
-    // Prefab should assign these to child gameobjects
+    /***** STATIC: READONLY *****/
+    static readonly Vector2 TEXTURE_MID_POINT = new Vector2(0.5f, 0.5f);
+
+
+    /***** PUBLIC: VARIABLES *****/
+    // should be assigned
     public MeshFilter innerMeshFilter;
     public MeshRenderer innerMeshRenderer;
     public MeshFilter borderMeshFilter;
     public MeshRenderer borderMeshRenderer;
 
-    /* ShapeRenderer */
 
+    /***** PRIVATE: VARIABLES *****/
+    [SerializeField]
+    RectProperty _property = new RectProperty(color:Color.black);
+    [SerializeField]
+    RectProperty cachedProperty = new RectProperty(color:Color.black, width:float.Epsilon);
+
+
+    /***** OVERRIDE: SHAPE RENDERER *****/
     protected override void UpdateGameObject() {
         center = property.center;
         width = property.width;
@@ -26,16 +36,16 @@ public class RectRenderer : ShapeRenderer {
     }
 
     protected override void UpdateMeshIfNeeded() {
-        // if same solid, then no need to update
-        // never update inner
-        // only update border
-        // if border needs
+        if (!HasInnerMesh()) {
+            UpdateInnerMesh();
+        }
+
+        // TODO: epsilon
         if (property.border.style != BorderStyle.None &&
             (property.width != cachedProperty.width ||
              property.height != cachedProperty.height)) {
             UpdateBorderMesh();
         } else if (property.border.MeshNeedsUpdate(cachedProperty.border)) {
-            // border property change
             UpdateBorderMesh();
         }
 
@@ -66,10 +76,8 @@ public class RectRenderer : ShapeRenderer {
         propertyObjectChanged = false;
     }
 
-    /*
-     * Create Mesh
-     */
 
+    /***** PRIVATE: MESH UPDATE *****/
     void UpdateInnerMesh() {
         CreateInner();
     }
@@ -98,23 +106,25 @@ public class RectRenderer : ShapeRenderer {
         MeshUtil.UpdateColor(borderMeshRenderer, color);
     }
 
-    void CreateInner() {
-        Color32 color32 = Color.white;
+    void RemoveBorder() {
+        // TODO just disable
         using (var vh = new VertexHelper()) {
-            vh.AddVert(new Vector3(-0.5f, -0.5f), color32, TextureMidPoint);
-            vh.AddVert(new Vector3(-0.5f, 0.5f), color32, TextureMidPoint);
-            vh.AddVert(new Vector3(0.5f, -0.5f), color32, TextureMidPoint);
-            vh.AddVert(new Vector3(0.5f, 0.5f), color32, TextureMidPoint);
-            vh.AddTriangle(0,1,2);
-            vh.AddTriangle(2,1,3);
-            MeshUtil.UpdateMesh(innerMeshFilter, vh);
+            MeshUtil.UpdateMesh(borderMeshFilter, vh);
         }
     }
 
-    void RemoveBorder() {
-        // TODO just shut off border obj
+
+    /***** PRIVATE: MESH CREATION *****/
+    void CreateInner() {
+        Color32 color32 = Color.white;
         using (var vh = new VertexHelper()) {
-            MeshUtil.UpdateMesh(borderMeshFilter, vh);
+            vh.AddVert(new Vector3(-0.5f, -0.5f), color32, TEXTURE_MID_POINT);
+            vh.AddVert(new Vector3(-0.5f, 0.5f), color32, TEXTURE_MID_POINT);
+            vh.AddVert(new Vector3(0.5f, -0.5f), color32, TEXTURE_MID_POINT);
+            vh.AddVert(new Vector3(0.5f, 0.5f), color32, TEXTURE_MID_POINT);
+            vh.AddTriangle(0,1,2);
+            vh.AddTriangle(2,1,3);
+            MeshUtil.UpdateMesh(innerMeshFilter, vh);
         }
     }
 
@@ -184,6 +194,16 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
+
+    /****** PRIVATE: MESH HELPERS *****/
+    bool HasInnerMesh() {
+        var innerMesh = innerMeshFilter.mesh;
+        if (innerMesh == null || innerMesh.vertices.Length == 0) {
+            return false;
+        }
+        return true;
+    }
+
     Bounds BorderOuterBounds {
         get {
             var borderOuterBounds = new Bounds(Vector3.zero, new Vector3(1,1,0)); // Original bound
@@ -222,15 +242,26 @@ public class RectRenderer : ShapeRenderer {
         return new []{top, right, bottom, left};
     }
 
-    /*
-     * Properties
-     */
-    public Vector2 center {
+
+    /***** PUBLIC: PROPERTIES *****/
+    public RectProperty property {
+        get {
+            return _property;
+        }
+        set {
+            propertyObjectChanged = true;
+            _property = value;
+        }
+    }
+
+
+    /***** PRIVATE: PROPERTIES *****/
+     Vector2 center {
         get { return transform.position; }
         set { transform.position = new Vector3(value.x, value.y, transform.position.z); }
     }
 
-    public float height {
+    float height {
         get {
             return transform.localScale.y;
         }
@@ -240,7 +271,7 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
-    public float width {
+    float width {
         get {
             return transform.localScale.x;
         }
@@ -249,7 +280,7 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
-    public float angle {
+    float angle {
         get {
             return transform.eulerAngles.z;
         }
@@ -258,7 +289,7 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
-    public Bounds bounds {
+    Bounds bounds {
         get {
             return new Bounds(transform.position, transform.localScale);
         }
@@ -282,43 +313,12 @@ public class RectRenderer : ShapeRenderer {
         }
     }
 
+    /*
     Vector2 right {
         get {
             return Vector2.zero;
         }
     }
-
-    /*
-    public Rect2 rect2 {
-        get {
-            return new Rect2(Center, Size, Angle);
-        }
-
-        set {
-            Center = value.center;
-            Size = value.size;
-            Angle = value.angle;
-        }
-    }
     */
-
-    /*
-    void SetWidth(float width, RectAnchor anchor = RectAnchor.Center) {
-        switch (anchor) {
-            case RectAnchor.Left:
-                break;
-            case RectAnchor.Right:
-                break;
-            default:
-                Width = width;
-                break;
-        }
-    }
-    */
-
-    //
-    // mola
-    //
-
 }
 
