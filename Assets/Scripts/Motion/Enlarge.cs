@@ -10,15 +10,12 @@ public class Enlarge : MonoBehaviour {
     public bool repeat = true;
 
 
+    /***** INITIALIZER *****/
 	// Use this for initialization
 	void Start () {
         StartCoroutine(RunEnlarge());
 	}
 
-	// Update is called once per frame
-	void Update () {
-
-	}
 
     /***** PRIVATE: METHODS *****/
     IEnumerator RunEnlarge() {

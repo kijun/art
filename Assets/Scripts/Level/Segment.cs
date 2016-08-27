@@ -4,23 +4,33 @@ using UnityEngine;
  * Segment is a section of a level.
  * When players die, they respawn at the beginning of the segment.
  */
+[ExecuteInEditMode]
+[SelectionBase]
 public class Segment : MonoBehaviour {
 
 
     /***** PUBLIC VARIABLES *****/
     public Vector2 segmentBaseVelocity = new Vector2(0, 0.5f);
     public Vector2 playerMaxSpeed = new Vector2(1, 0.5f);
-    public Transform defaultStartPosition;
+    public Transform respawnLocation;
 
 
     /***** PRIVATE VARIABLES *****/
-
     Player player;
     CameraController camera;
 
 
-    /***** PUBLIC METHODS *****/
+    /***** INITIALIZER *****/
+    void Awake() {
+        if (respawnLocation == null) {
+            var rl = new GameObject("RespawnLocation");
+            respawnLocation = rl.transform;
+            respawnLocation.parent = transform;
+        }
+    }
 
+
+    /***** PUBLIC METHODS *****/
     /*
      * Play segment from the top.
      */
@@ -32,6 +42,8 @@ public class Segment : MonoBehaviour {
             this.player.Position = DefaultPlayerPosition;
             this.camera.Position = DefaultCameraPosition;
         }
+
+        Debug.Log("segment base velocity" + segmentBaseVelocity);
 
         player.BaseVelocity = segmentBaseVelocity;
         player.MaxRelativeSpeed = playerMaxSpeed;
@@ -70,7 +82,7 @@ public class Segment : MonoBehaviour {
 
     Vector2 DefaultPlayerPosition {
         get {
-            return defaultStartPosition.position;
+            return respawnLocation.position;
         }
     }
 

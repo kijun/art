@@ -4,8 +4,8 @@ public class Player : MonoBehaviour {
 
 
     /***** PRIVATE VARIABLES *****/
-    //Vector2 baseVelocity;
-    //Vector2 maxRelativeSpeed;
+    public Vector2 BaseVelocity;
+    public Vector2 MaxRelativeSpeed;
     bool moving;
 
 
@@ -51,21 +51,30 @@ public class Player : MonoBehaviour {
             stroke2.angularVelocity = stroke2BaseAngularVelocity;
         }
         */
-
         transform.position = newPos;
     }
 
 
     /*
      * Velocity of the current segment.
-     */
     public Vector2 BaseVelocity {
-        get; set;
+        get {
+            return baseVelocity;
+        }
+        set {
+            baseVelocity = value;
+        }
     }
 
     public Vector2 MaxRelativeSpeed{
-        get; set;
+        get {
+            return maxRelativeSpeed;
+        }
+        set {
+            maxRelativeSpeed = value;
+        }
     }
+     */
 }
 
 

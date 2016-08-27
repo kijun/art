@@ -20,6 +20,9 @@ public class CameraController : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
     }
 
+    void Start () {
+    }
+
 
     /***** PUBLIC METHODS *****/
 
@@ -29,6 +32,12 @@ public class CameraController : MonoBehaviour {
 
     public void UnlockCamera() {
         // TODO
+    }
+
+
+    /***** MONOBEHAVIOUR *****/
+    void Update() {
+        Debug.Log(GetComponent<Rigidbody2D>().velocity);
     }
 
 
@@ -71,8 +80,6 @@ public class CameraController : MonoBehaviour {
 
 
     /***** MONOBEHAVIOUR *****/
-	void Update () {
-	}
 
 
     /***** PRIVATE METHODS *****/
