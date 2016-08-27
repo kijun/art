@@ -62,13 +62,23 @@ public class RectRenderer : ShapeRenderer {
     }
 
     protected override bool GameObjectWasModified() {
-        // TODO
-        return false;
+        /* Return true if GameObject was modified in Editor Mode.
+         * Only the transform is modifiable. */
+
+        return GameObjectToShapeProperty() != property;
     }
 
     protected override ShapeProperty GameObjectToShapeProperty() {
-        // TODO
-        return null;
+        var goProperty = property.Clone() as RectProperty;
+        goProperty.center = center;
+        goProperty.angle = angle;
+        goProperty.width = width;
+        goProperty.height = height;
+        return goProperty;
+    }
+
+    protected override void SetProperty(ShapeProperty newProperty) {
+        property = newProperty as RectProperty;
     }
 
     protected override void CacheProperty() {

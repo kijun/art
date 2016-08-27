@@ -52,6 +52,10 @@ public class LineRenderer : ShapeRenderer {
         return null;
     }
 
+    protected override void SetProperty(ShapeProperty newProperty) {
+        property = newProperty as LineProperty;
+    }
+
     protected override void CacheProperty() {
         cachedProperty = property;
         propertyObjectChanged = false;

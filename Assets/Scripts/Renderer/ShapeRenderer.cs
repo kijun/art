@@ -21,12 +21,15 @@ public abstract class ShapeRenderer : MonoBehaviour {
 
             CacheProperty();
             propertyObjectChanged = false;
+        } else if (Application.isEditor && GameObjectWasModified()) {
+            SetProperty(GameObjectToShapeProperty());
+            UpdateGameObject();
+
+            UpdateMeshIfNeeded();
+
+            CacheProperty();
+            propertyObjectChanged = false;
         }
-        /* TODO enable only in editor mode
-        else if (GameObjectWasModified()) {
-            // update property
-        }
-        */
     }
 
     /*
@@ -38,6 +41,8 @@ public abstract class ShapeRenderer : MonoBehaviour {
     protected abstract void UpdateMeshIfNeeded();
 
     protected abstract void CacheProperty();
+
+    protected abstract void SetProperty(ShapeProperty property);
 
     /*
      * Rerender criteria

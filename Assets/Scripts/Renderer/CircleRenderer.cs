@@ -70,6 +70,10 @@ public class CircleRenderer : ShapeRenderer {
         return null;
     }
 
+    protected override void SetProperty(ShapeProperty newProperty) {
+        property = newProperty as CircleProperty;
+    }
+
     protected override void CacheProperty() {
         cachedProperty = property;
         propertyObjectChanged = false;
