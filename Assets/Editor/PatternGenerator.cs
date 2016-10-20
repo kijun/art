@@ -139,7 +139,7 @@ public class PatternGenerator : MonoBehaviour {
     static void SetupPlayerAndCamera(Vector3 startPos) {
         Camera.main.transform.position = new Vector3(startPos.x, cameraHeight/2+startPos.y, -10);
         var player = GameObject.FindWithTag("Player");
-        player.transform.position = startPos.IncrY(0.5f);
+        player.transform.position = startPos.IncrY(1f);
     }
 
     static float CenterX(int patNum) {
