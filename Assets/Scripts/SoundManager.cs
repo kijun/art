@@ -19,7 +19,7 @@ public class SoundManager : MonoBehaviour {
             Destroy (gameObject);
 
         //Set SoundManager to DontDestroyOnLoad so that it won't be destroyed when reloading our scene.
-        DontDestroyOnLoad (gameObject);
+        //DontDestroyOnLoad (gameObject);
     }
 
     //Used to play single sound clips.

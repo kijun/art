@@ -13,7 +13,7 @@ public class GameStateDefeat : GameState {
         } else if (instance != this) {
             Destroy(gameObject);
         }
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
     public override void Run(GameStateChangeRequestDelegate onChange) {

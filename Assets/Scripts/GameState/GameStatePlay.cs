@@ -24,7 +24,7 @@ public class GameStatePlay : GameState {
         } else if (instance != this) {
             Destroy(gameObject);
         }
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
 
         stages = new List<Stage>();

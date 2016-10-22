@@ -13,8 +13,8 @@ public class CameraController : MonoBehaviour {
 
     // INIT
     void Awake () {
-        Screen.fullScreen = false;
-        Screen.SetResolution(375,667,false);
+        //Screen.fullScreen = false;
+        //Screen.SetResolution(375,667,false);
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         // Assign static instance
@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour {
         } else if (instance != this) {
             Destroy(gameObject);
         }
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
 	void Start () {

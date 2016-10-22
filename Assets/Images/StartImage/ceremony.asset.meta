@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: dbb86c5b8e05349a6a95505f7ab991dc
+timeCreated: 1477053234
+licenseType: Free
+NativeFormatImporter:
+  userData: "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg width=\"1920px\"
+    height=\"1200px\" viewBox=\"0 0 1920 1200\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"
+    xmlns:xlink=\"http://www.w3.org/1999/xlink\" style=\"background: #000000;\">\n
+    \   <!-- Generator: Sketch 40.3 (33839) - http://www.bohemiancoding.com/sketch
+    -->\n    <title>Artboard</title>\n    <desc>Created with Sketch.</desc>\n    <defs>\n
+    \       <circle id=\"path-1\" cx=\"266.5\" cy=\"266.5\" r=\"266.5\"></circle>\n
+    \       <mask id=\"mask-2\" maskContentUnits=\"userSpaceOnUse\" maskUnits=\"objectBoundingBox\"
+    x=\"0\" y=\"0\" width=\"533\" height=\"533\" fill=\"white\">\n            <use
+    xlink:href=\"#path-1\"></use>\n        </mask>\n    </defs>\n    <g id=\"Page-1\"
+    stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <g
+    id=\"Artboard\">\n            <text id=\"ceremony\" font-family=\"BrandonGrotesque-ThinItalic,
+    Brandon Grotesque\" font-size=\"300\" font-style=\"italic\" font-weight=\"300\"
+    fill=\"#FFFFFF\">\n                <tspan x=\"129\" y=\"905\">ceremony</tspan>\n
+    \           </text>\n            <text id=\"press-any-key\" font-family=\"BrandonGrotesque-LightItalic,
+    Brandon Grotesque\" font-size=\"100\" font-style=\"italic\" font-weight=\"300\"
+    fill=\"#FFFFFF\">\n                <tspan x=\"129\" y=\"1040\">press any key</tspan>\n
+    \           </text>\n            <g id=\"Group-2\" transform=\"translate(105.000000,
+    129.000000)\" stroke=\"#222222\" stroke-width=\"2\" stroke-linecap=\"square\">\n
+    \               <use id=\"Oval\" mask=\"url(#mask-2)\" fill=\"#FFFFFF\" xlink:href=\"#path-1\"></use>\n
+    \               <g id=\"Group\" transform=\"translate(204.000000, 233.000000)\">\n
+    \                   <path d=\"M0.5,3.5 L125.025098,128.025098\" id=\"Line\"></path>\n
+    \                   <path d=\"M115.5,0.5 L83.5,134.5\" id=\"Line\"></path>\n                </g>\n
+    \           </g>\n        </g>\n    </g>\n</svg>"
+  assetBundleName: 
+  assetBundleVariant: 

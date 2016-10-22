@@ -51,8 +51,6 @@ public class BackgroundController : MonoBehaviour {
         }
         newObject.transform.localScale = Vector3.one * diameter;
         //newObject.color = color;
-        Debug.Log(color +"/" + newObject.color);
-        Debug.Log(color.GetType() + "/" + newObject.color.GetType());
         newObject.color = color;
 
         // choose spawn point
@@ -97,7 +95,6 @@ public class BackgroundController : MonoBehaviour {
             Destroy(go);
         };
         backgroundObjects.Add(newObject.gameObject);
-        Debug.Log("new object created");
     }
 
     int numberOfLargeObjects() {
