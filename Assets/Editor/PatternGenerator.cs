@@ -8,7 +8,7 @@ public class PatternGenerator : MonoBehaviour {
 
     const float cameraWidth = 5.63f;
     const float cameraHeight = 10f;
-    const float gapBetweenPatterns = cameraWidth*2;
+    const float gapBetweenPatterns = 40f;
     const string patternDirPath = "Assets/Patterns";
     const string patternBackgroundPath = "Assets/Prefabs/PatternBackground.prefab";
     const string playerPrefabPath = "Assets/Prefabs/Player.prefab";
@@ -29,7 +29,7 @@ public class PatternGenerator : MonoBehaviour {
         Debug.Log(background);
         background.transform.localScale = new Vector2(cameraWidth, cameraHeight*2);
         background.transform.SetParent(go.transform);
-        background.transform.localPosition = new Vector3(0, cameraHeight, 100); // clip
+        background.transform.localPosition = new Vector3(0, cameraHeight, 10); // clip
 
         // if transforms are selected, give option to set them as
         // children of the new pattern
@@ -143,7 +143,7 @@ public class PatternGenerator : MonoBehaviour {
     }
 
     static float CenterX(int patNum) {
-        return (cameraWidth + gapBetweenPatterns) * patNum;
+        return (gapBetweenPatterns) * patNum;
     }
 
     static GameObject InstantiateFromPath(string path) {
