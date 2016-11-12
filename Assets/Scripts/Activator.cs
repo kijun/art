@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Activator : MonoBehaviour {
+public class Activatorr : MonoBehaviour {
 
     public float distanceToActivate = 5;
     public float distanceToDeactivate = 0;
