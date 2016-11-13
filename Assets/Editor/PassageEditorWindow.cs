@@ -1,17 +1,110 @@
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 
 
-public class PassageDataWrapper {
-    public PassageData passageData;
-    // something something prefab
+public class Passage : Cell {
 }
 
-// every passage has a passage data -
-public class PassageData {
-    public CellData[] cells;
+public class Cell : MonoBehaviour {
+    /* Animation clip contains all animations specific to itself
+     * if there are child objects, they contain their own animation clips
+     * on launch, these are compiled and gathered into a single animation that controlls
+     * the passage */
+
+    public AnimationClip clip;
+
+    public void Play(float time=0f) {
+        var anim = GetComponent<Animation>();
+        if (anim == null) {
+            anim = gameObject.AddComponent<Animation>();
+        }
+
+        BuildAnimationClip();
+        anim.AddClip(clip, "Default");
+        anim.Play("Default");
+        anim["Default"].time = time;
+    }
+
+    void BuildAnimationClip() {
+        clip = new AnimationClip();
+
+        // traverse
+        foreach (var child in TraverseChildCells()) {
+            var childPath = AnimationUtility.CalculateTransformPath(child.transform, transform);
+
+            foreach (var curve in AnimationUtility.GetAllCurves(child.clip)) {
+                clip.SetCurve(
+                        System.IO.Path.Combine(childPath, curve.path),
+                        curve.type,
+                        curve.propertyName,
+                        curve.curve
+                );
+            }
+        }
+    }
+
+    public void SetKeyFrame(Type componentType, string propertyName, float time, float value) {
+        var curve = AnimationUtility.GetEditorCurve(clip, null, componentType, propertyName);
+        if (curve == null) {
+            curve = new AnimationCurve();
+        }
+        // replace value or add key
+        // dedup if no change
+        bool replaced = false;
+        for (int i = 0; i < curve.keys.Length; i++) {
+            var key = curve.keys[i];
+            if (key.time == time) {
+                key.value = value;
+                replaced = true;
+                break;
+            }
+        }
+
+        if (!replaced) {
+            curve.AddKey(time, value);
+        }
+    }
+
+    // localposition?
+    // it should always be local - the problem is when
+    public void SetPositionAtTime(Vector3 position, float time, GameObject target=null) {
+        // if child is specified, this is a helper method that sets it
+        if (target == null) {
+            SetKeyFrame(typeof(Transform), "localPosition.x", time, position.x);
+            SetKeyFrame(typeof(Transform), "localPosition.y", time, position.y);
+            SetKeyFrame(typeof(Transform), "localPosition.z", time, position.z);
+        }
+        // for each child, call target
+        // if target is inside current object, then set it
+        // otherwise call children?
+        // usually we'll just set it to
+    }
+
+    public void RemoveKeyFrame(Type componentType, string propertyName, float time) {
+        var curve = AnimationUtility.GetEditorCurve(clip, null, componentType, propertyName);
+        for (int i = 0; i < curve.keys.Length; i++) {
+            if (curve.keys[i].time == time) {
+                curve.RemoveKey(i);
+                break;
+            }
+        }
+    }
+
+    public void MoveKeyFrame(Type componentType, string propertyName, float time, float timeto) {
+        // TODO
+    }
+
+    protected IEnumerable<Cell> TraverseChildCells() {
+        yield return this;
+        foreach (Transform child in transform) {
+            var childCell = child.gameObject.GetComponent<Cell>();
+            if (childCell != null) yield return childCell;
+        }
+    }
 }
 
 // each cell corresponds to a GameObject
@@ -50,6 +143,7 @@ public class KeyframePlayer : MonoBehaviour {
     }
 }
 
+/*
 public class Passage : MonoBehaviour {
     public CellData[] cells;
 
@@ -86,6 +180,7 @@ public class Cell : MonoBehaviour {
         // hmm
     }
 }
+*/
 
 /*
  * How does each keyframe get rendered?
@@ -101,40 +196,30 @@ public class Cell : MonoBehaviour {
 public class PassageEditorWindow : EditorWindow {
     Passage passage;
 
-	[MenuItem ("Window/Passage Editor")]
-	static void Init () {
-		// Get existing open window or if none, make a new one:
-		PassageEditorWindow window = (PassageEditorWindow)EditorWindow.GetWindow(
+    [MenuItem ("Window/Passage Editor")]
+    static void Init () {
+        // Get existing open window or if none, make a new one:
+        PassageEditorWindow window = (PassageEditorWindow)EditorWindow.GetWindow(
                 typeof (PassageEditorWindow));
         window.Initialize();
-		window.Show();
+        window.Show();
         // if passage was selected
         var go = Selection.activeGameObject;
         var passage = go.GetComponent<Passage>();
 
+        /*
         if (this.passage != null) {
             this.passage = passage;
         }
-	}
+        */
+    }
 
 
     void OnGUI() {
         EditorGUILayout.BeginVertical();
-        EditorGUILayout.LabelField(currentPassage.gameObject.name);
+        EditorGUILayout.LabelField(passage.gameObject.name);
         if (GUILayout.Button("Play")) {
             passage.Play(0);
-        }
-
-        dialogue.id = EditorGUILayout.IntField("ID", dialogue.id);
-        dialogue.priority = EditorGUILayout.IntField("Priority", dialogue.priority);
-        var lines = "";
-        if (dialogue.lines != null) {
-            lines = dialogue.lines;
-        }
-        dialogue.lines = EditorGUILayout.TextArea(lines);
-        if (GUILayout.Button("save")) {
-            dsw.AddDialogue(dialogue);
-            this.Close();
         }
 
         // Draw Top Bar
@@ -164,10 +249,6 @@ public class PassageEditorWindow : EditorWindow {
     }
     // deselect, move to origin
     //
-    void Save() {
-
-    }
-
 
     void Initialize() { }
 
@@ -203,38 +284,6 @@ public class PassageEditorWindow : EditorWindow {
 /*
  */
 
-	void OnGUI () {
-        /*
-        List<Dialogue> ds = dialogueHolder.dialogues;
-        Dialogue toRemove = null;
-
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("+")) {
-            var newDialogueID = 0;
-            if (ds.Count > 0) {
-                newDialogueID = ds[ds.Count-1].id + 1;
-            }
-            DialogueWindow.Open(new Dialogue(newDialogueID), this);
-        }
-        GUILayout.EndHorizontal();
-
-        foreach (Dialogue d in dialogueHolder.dialogues) {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(d.id + ": " + d.lines.Substring(0, Mathf.Min(20, d.lines.Length)));
-            if (GUILayout.Button("edit")) {
-                DialogueWindow.Open(d, this);
-            }
-            if (GUILayout.Button("del")) {
-                toRemove = d;
-            }
-            GUILayout.EndHorizontal();
-        }
-        if (toRemove != null) {
-            dialogueHolder.dialogues.Remove(toRemove);
-        }
-        */
-	}
-
     void OnDestroy() {
         Save();
     }
@@ -260,18 +309,18 @@ public class DialogueWindow : EditorWindow {
     private PassageEditorWindow dsw;
 
     public static void Open(Dialogue d, PassageEditorWindow dsw) {
-		DialogueWindow window = (DialogueWindow)EditorWindow.GetWindow(
+        DialogueWindow window = (DialogueWindow)EditorWindow.GetWindow(
                 typeof (DialogueWindow));
         window.Initialize(d, dsw);
-		window.Show();
-	}
+        window.Show();
+    }
 
     void Initialize(Dialogue d, PassageEditorWindow dsw) {
         dialogue = d;
         this.dsw = dsw;
     }
 
-	void OnGUI () {
+    void OnGUI () {
         dialogue.id = EditorGUILayout.IntField("ID", dialogue.id);
         dialogue.priority = EditorGUILayout.IntField("Priority", dialogue.priority);
         var lines = "";
@@ -283,7 +332,7 @@ public class DialogueWindow : EditorWindow {
             dsw.AddDialogue(dialogue);
             this.Close();
         }
-	}
+    }
 }
 */
 
