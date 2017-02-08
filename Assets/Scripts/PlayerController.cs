@@ -9,14 +9,14 @@ public delegate void OnHitDelegate();
 public class ShipStats {
     public float maxXSpeed = 1.05f;
     public float maxYSpeed = 1.05f;
-    public float baseYSpeed = 0.5f;
+    public float baseYSpeed = 0f;
 }
 
 public class PlayerController : MonoBehaviour {
 
     //public float xSpeed { get; private set;}
-    public float yDeltaSpeed {get; private set;}
-    public float yBaseSpeed {get; private set;}
+    public float yDeltaSpeed;// {get; private set;}
+    public float yBaseSpeed;// {get; private set;}
     public float stroke1BaseAngularVelocity;
     public float stroke1MaxAngularVelocity;
     public float stroke2BaseAngularVelocity;
