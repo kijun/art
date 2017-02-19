@@ -36,7 +36,12 @@ public class MovementField2 : BaseField {
 
         var distanceFromOrigin = cameraDiameter / 2 + Mathf.Sqrt(width * width + height * height) / 2;
 
+
         var objectPos = Quaternion.Euler(0, 0, entryAngle) * Vector2.up * distanceFromOrigin;
+
+        Debug.Log("Dist = " + distanceFromOrigin);
+        Debug.Log("Width = " + width + " Height = " + height);
+        Debug.Log("Pos = " + objectPos);
 
         var animatable = GameObject.Instantiate<Animatable>(target, objectPos, Quaternion.identity);
 
@@ -55,12 +60,15 @@ public class MovementField2 : BaseField {
         yield return new WaitForSeconds(waitTime);
 
         target.StopMovement();
+//        Destroy(target.gameObject);
     }
 
     float cameraDiameter {
         get {
             var inGameHeight = Camera.main.orthographicSize * 2;
-            var inGameWidth = Screen.width / Screen.height * inGameHeight;
+            var inGameWidth = (float)Screen.width / (float)Screen.height * inGameHeight;
+            Debug.Log("InGameHeight = " + inGameHeight);
+            Debug.Log("InGameWidth = " + inGameWidth);
 
             var cameraDiameter = Mathf.Sqrt(inGameHeight * inGameHeight + inGameWidth * inGameWidth);
 
