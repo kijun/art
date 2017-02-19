@@ -60,7 +60,7 @@ public class MovementField2 : BaseField {
         yield return new WaitForSeconds(waitTime);
 
         target.StopMovement();
-//        Destroy(target.gameObject);
+        Destroy(target.gameObject);
     }
 
     float cameraDiameter {
