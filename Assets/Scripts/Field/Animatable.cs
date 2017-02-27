@@ -15,7 +15,6 @@ public class Animatable : MonoBehaviour {
     void FixedUpdate() {
         if (Mathf.Abs(scaleVelocity.sqrMagnitude) > float.Epsilon) {
             transform.localScale += (Vector3)scaleVelocity * Time.deltaTime;
-            Debug.Log("setting local scale to " + transform.localScale);
         }
     }
 

@@ -11,6 +11,11 @@ public class MovementField2 : BaseField {
     public Range timeBetweenActivation;
     public Vector2 origin = new Vector2(0, 0);
 
+    public bool turn = false;
+    public float turnDuration = 0;
+
+    public float randomPause = 0;
+
     void Start() {
         StartCoroutine(Run());
     }
@@ -39,9 +44,11 @@ public class MovementField2 : BaseField {
 
         var objectPos = Quaternion.Euler(0, 0, entryAngle) * Vector2.up * distanceFromOrigin;
 
+        /*
         Debug.Log("Dist = " + distanceFromOrigin);
         Debug.Log("Width = " + width + " Height = " + height);
         Debug.Log("Pos = " + objectPos);
+        */
 
         var animatable = GameObject.Instantiate<Animatable>(target, objectPos, Quaternion.identity);
 
@@ -54,10 +61,44 @@ public class MovementField2 : BaseField {
 
         var waitTime = (cameraDiameter + target.localScale.magnitude) / velocity.magnitude;
 
+        /*
         Debug.Log("Diameter" + cameraDiameter);
         Debug.Log(waitTime);
+        */
 
-        yield return new WaitForSeconds(waitTime);
+        if (turn) {
+            yield return new WaitForSeconds(waitTime/2);
+
+            // Rotation
+            var scaleGoal = new Vector2(target.localScale.y, target.localScale.x);
+            var scaleVelocity = (scaleGoal - target.localScale) / turnDuration;
+            target.StopMovement();
+            target.scaleVelocity = scaleVelocity;
+            yield return new WaitForSeconds(turnDuration);
+            target.scaleVelocity = Vector2.zero;
+
+            target.velocity = Random.value > 0.5 ? Quaternion.Euler(0, 0, 90) * velocity : Quaternion.Euler(0, 0, -90) * velocity;
+            // just make sure it exits
+            yield return new WaitForSeconds(waitTime);
+        } else {
+            if (randomPause > float.Epsilon) {
+                var randomTime = waitTime * 0.5f;
+                yield return new WaitForSeconds(randomTime);
+
+                var scaleV = new Vector2(Mathf.Abs(target.localScale.x-1), Mathf.Abs(target.localScale.y-1));
+                target.scaleVelocity = -1 * scaleV / randomPause;
+                target.velocity = velocity.normalized * target.scaleVelocity.magnitude;
+                yield return new WaitForSeconds(randomPause);
+                target.scaleVelocity = scaleV / randomPause;
+                yield return new WaitForSeconds(randomPause);
+
+                target.scaleVelocity = Vector2.zero;
+                target.velocity = velocity;
+                yield return new WaitForSeconds(waitTime - randomTime);
+            } else {
+                yield return new WaitForSeconds(waitTime);
+            }
+        }
 
         target.StopMovement();
         Destroy(target.gameObject);
@@ -67,8 +108,6 @@ public class MovementField2 : BaseField {
         get {
             var inGameHeight = Camera.main.orthographicSize * 2;
             var inGameWidth = (float)Screen.width / (float)Screen.height * inGameHeight;
-            Debug.Log("InGameHeight = " + inGameHeight);
-            Debug.Log("InGameWidth = " + inGameWidth);
 
             var cameraDiameter = Mathf.Sqrt(inGameHeight * inGameHeight + inGameWidth * inGameWidth);
 

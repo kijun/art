@@ -159,6 +159,7 @@ public class PlayerController : MonoBehaviour {
             var go = hit.collider.gameObject;
             StartCoroutine(FadeInOut(go));
         } else {
+            return;
             Debug.LogError("raycast result null", this);
         }
     }
