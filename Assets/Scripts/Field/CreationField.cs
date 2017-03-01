@@ -21,7 +21,9 @@ public class CreationField : BaseField {
     IEnumerator Run() {
         yield return new WaitForSeconds(startTime);
         while (endTime < float.Epsilon || Time.time < endTime) {
-            var target = CreateObject();
+            for (int i = 0; i < objectsPerCreationEvent; i++) {
+                var target = CreateObject();
+            }
             /*
             if (target) {
                 StartCoroutine(MoveObject(target));
@@ -37,9 +39,9 @@ public class CreationField : BaseField {
         // Determine position
         var entryAngle = objectAngle.RandomValue();
 
-        var objectPos = Camera.main.rect.RandomPosition();
+        var objectPos = CameraHelper.WorldRect.RandomPosition();
 
-        var animatable = GameObject.Instantiate<Animatable>(target, objectPos, Quaternion.identity);
+        var animatable = GameObject.Instantiate<Animatable>(target, objectPos, Quaternion.Euler(0, 0, entryAngle));
 
         animatable.localScale = RandomHelper.RandomVector2(minObjectSize, maxObjectSize);
         return animatable;

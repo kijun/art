@@ -36,7 +36,7 @@ public class Animatable : MonoBehaviour {
 
     public Vector2 position {
         get { return transform.position; }
-        set { transform.position = value; }
+        set { transform.position = ((Vector3)value).SwapZ(transform.position.z); }
     }
 
     public float rotation {

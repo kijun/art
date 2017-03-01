@@ -30,4 +30,13 @@ static class CameraHelper {
             return Camera.main.rect;
         }
     }
+
+    public static Rect WorldRect {
+        get {
+            var origin = Camera.main.transform.position;
+            return new Rect(
+                    new Vector2(origin.x-HalfWidth, origin.y - HalfHeight),
+                    new Vector2(Width, Height));
+        }
+    }
 }
