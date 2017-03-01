@@ -24,4 +24,10 @@ static class CameraHelper {
             return 2 * HalfHeight;
         }
     }
+
+    public static Rect Rect {
+        get {
+            return Camera.main.rect;
+        }
+    }
 }

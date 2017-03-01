@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public static class UnityExtensions {
+    /*** VECTOR3 ***/
     public static Vector3 SwapX(this Vector3 v, float val) {
         v.x = val;
         return v;
@@ -88,5 +89,10 @@ public static class UnityExtensions {
             return rend.material.color.a;
         }
         return 1;
+    }
+
+    /*** RECT ***/
+    public static Vector2 RandomPosition(this Rect rect) {
+        return new Vector2(Random.Range(rect.xMin, rect.xMax), Random.Range(rect.yMin, rect.yMax));
     }
 }

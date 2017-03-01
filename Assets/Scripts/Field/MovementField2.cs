@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Creates objects outside camera
+ */
 public class MovementField2 : BaseField {
     // 0 is up, 180 is down
     public Vector2 velocity;
