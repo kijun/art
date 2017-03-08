@@ -54,6 +54,9 @@ public class MovementField2 : BaseField {
         */
 
         var animatable = GameObject.Instantiate<Animatable>(target, objectPos, Quaternion.identity);
+        var c = animatable.GetComponent<SpriteRenderer>().material.color;
+        c.a = Random.Range(0.5f, 0.95f);
+        animatable.GetComponent<SpriteRenderer>().material.color = c;
 
         animatable.localScale = new Vector2(width, height);
         return animatable;

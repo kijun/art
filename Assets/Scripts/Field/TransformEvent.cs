@@ -15,8 +15,8 @@ public class TransformEvent : BaseEvent {
     IEnumerator Run() {
         yield return new WaitForSeconds(startTime);
         foreach (var target in targets) {
-            target.position = position;
-            target.rotation = rotation;
+            if (applyPosition) target.position = position;
+            if (applyRotation) target.rotation = rotation;
         }
     }
 }

@@ -13,6 +13,7 @@ public class MovementField3 : BaseField {
     public Range allowedAngle = new Range(135, 215);
     public Range timeBetweenActivation;
     public Vector2 centerRange;
+    public Range objPerActivation = new Range(1, 1);
 
     public bool turn = false;
     public float turnDuration = 0;
@@ -26,7 +27,10 @@ public class MovementField3 : BaseField {
     IEnumerator Run() {
         yield return new WaitForSeconds(startTime);
         while (endTime < float.Epsilon || Time.time < endTime) {
-            StartCoroutine(CreateAndMoveObject());
+            var numObj = Mathf.RoundToInt(objPerActivation.RandomValue());
+            for (int i = 0; i < numObj; i++) {
+                StartCoroutine(CreateAndMoveObject());
+            }
             yield return new WaitForSeconds(timeBetweenActivation.RandomValue());
         }
     }
@@ -50,6 +54,11 @@ public class MovementField3 : BaseField {
         var rotation = Quaternion.Euler(0, 0, entryAngle);
 
         var target = GameObject.Instantiate<Animatable>(prefab, objectPos, rotation);
+
+        var c = target.GetComponent<SpriteRenderer>().material.color;
+        c.a = Random.Range(0.3f, 0.8f);
+        target.GetComponent<SpriteRenderer>().material.color = c;
+
 
         target.localScale = new Vector2(width, height);
 
