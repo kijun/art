@@ -18,6 +18,12 @@ public class Range {
     public float maximum;
 
     //Assignment constructor.
+    public Range (float val) {
+        minimum = val;
+        maximum = val;
+    }
+
+    //Assignment constructor.
     public Range (float min, float max) {
         minimum = min;
         maximum = max;

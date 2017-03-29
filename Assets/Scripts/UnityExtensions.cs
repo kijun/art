@@ -33,6 +33,23 @@ public static class UnityExtensions {
         return v;
     }
 
+    /*** VECTOR2 ***/
+    public static Vector2 MultiplyEach(this Vector2 v, float x, float y) {
+        return new Vector2(v.x * x, v.y * y);
+    }
+
+    public static Vector2 MultiplyEach(this Vector2 v, Vector2 multiplier) {
+        return new Vector2(v.x * multiplier.x, v.y * multiplier.y);
+    }
+
+    public static Vector2 DivideEach(this Vector2 v, float x, float y) {
+        return new Vector2(v.x / x, v.y / y);
+    }
+
+    public static Vector2 DivideEach(this Vector2 v, Vector2 multiplier) {
+        return new Vector2(v.x / multiplier.x, v.y / multiplier.y);
+    }
+
     public static void SetAlpha(this Material m, float val) {
         var color = m.color;
         color.a = val;

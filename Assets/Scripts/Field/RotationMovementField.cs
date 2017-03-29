@@ -5,7 +5,7 @@ using UnityEngine;
 /*
  * Creates objects outside camera, and pushes it near origin
  */
-public class MovementField3 : BaseField {
+public class RotationMovementField : BaseField {
     // 0 is up, 180 is down
     public Vector2 velocity;
     public Range heightRange;

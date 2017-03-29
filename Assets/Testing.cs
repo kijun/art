@@ -5,6 +5,7 @@ using UnityEngine.Audio;
 
 public class Testing : MonoBehaviour {
     public float startTime = 0;
+    public float timeScale = 1;
     public AudioSource mainAudioSource;
     bool fastForward;
 	// Use this for initialization
@@ -16,13 +17,15 @@ public class Testing : MonoBehaviour {
             if (mainAudioSource != null) {
                 mainAudioSource.Stop();
             }
+        } else {
+            Time.timeScale = timeScale;
         }
 	}
 
 	// Update is called once per frame
 	void Update () {
         if (fastForward && Time.time > startTime) {
-            Time.timeScale = 1;
+            Time.timeScale = timeScale;
             if (mainAudioSource != null) {
                 mainAudioSource.time = Time.time;
                 mainAudioSource.Play();

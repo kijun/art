@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Animatable : MonoBehaviour {
+public class Animatable2 : MonoBehaviour {
 
     Vector2 originalScale;
     float originalRotation;
@@ -73,4 +73,19 @@ public class Animatable : MonoBehaviour {
     public Vector2 scaleVelocity;
     public bool nonNegativeScale = false;
 
+
+    public Vector2 pivot {
+        get {
+            return ((Vector2)child.localPosition).MultiplyEach(localScale) * -1;
+        }
+        set {
+            child.localPosition = -1 * value.DivideEach(localScale);
+        }
+    }
+
+    /*** PRIVATE ***/
+    Transform child {
+        get { return transform.GetChild(0); }
+    }
 }
+
