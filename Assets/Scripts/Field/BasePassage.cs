@@ -6,7 +6,8 @@ using UnityEngine;
 public enum CellType {
     None = 0,
     // lets try to use two args to define all
-    Velocity = 10,
+    VelocityEvent = 10,
+    VelocityForce = 11,
     Rotation = 20,
     Scale = 30,
     Color = 40,
@@ -77,7 +78,9 @@ public class BasePassage : MonoBehaviour {
                              objectPositionRange.y * Random.value - objectPositionRange.y/2));
 
             var rotation = Quaternion.Euler(0, 0, entryAngle);
-            objects[i] = GameObject.Instantiate<Animatable2>(objectPrefab, objectPos, rotation);
+            var target = GameObject.Instantiate<Animatable2>(objectPrefab, objectPos, rotation);
+            target.localScale = new Vector2(width, height);
+            objects[i] = target;
         }
 
 
@@ -90,11 +93,27 @@ public class BasePassage : MonoBehaviour {
 
     IEnumerator RunCell(CellDefinition cell, Animatable2[] objects) {
         yield return new WaitForSeconds(cell.startTime);
+
+        var arg1 = cell.arg1.RandomValue();
+        var arg2 = cell.arg2.RandomValue();
+        var vec = new Vector2(arg1, arg2);
+
         // probably multiple methods
         foreach (var obj in objects) {
             switch (cell.type) {
-                case CellType.Velocity:
-                    obj.velocity = new Vector2(cell.arg1.RandomValue(), cell.arg2.RandomValue());
+                case CellType.VelocityEvent:
+                    obj.velocity = vec;
+                    break;
+
+                case CellType.VelocityForce:
+                    var duration = cell.endTime < float.Epsilon ? float.PositiveInfinity : cell.endTime - cell.startTime;
+                    StartCoroutine(AddForce(obj, vec, duration));
+                    break;
+
+                case CellType.Rotation:
+                    obj.angularVelocity = cell.arg1.RandomValue();
+                    break;
+                case CellType.Scale:
                     break;
             }
         }
@@ -104,6 +123,14 @@ public class BasePassage : MonoBehaviour {
         target.GetComponent<SpriteRenderer>().material.color = c;
 
         */
+    }
+
+    IEnumerator AddForce(Animatable2 obj, Vector2 force, float duration) {
+        float end = Time.time + duration;
+        while (Time.time < end) {
+            obj.rigidbody2D.AddForce(force);
+            yield return null;
+        }
     }
 
     float cameraDiameter {
