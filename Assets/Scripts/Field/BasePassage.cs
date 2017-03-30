@@ -11,6 +11,7 @@ public enum CellType {
     Rotation = 20,
     Scale = 30,
     Color = 40,
+    Centripetal = 50,
     Destruction = 90
 }
 
@@ -97,6 +98,7 @@ public class BasePassage : MonoBehaviour {
         var arg1 = cell.arg1.RandomValue();
         var arg2 = cell.arg2.RandomValue();
         var vec = new Vector2(arg1, arg2);
+        var duration = cell.endTime < float.Epsilon ? float.PositiveInfinity : cell.endTime - cell.startTime;
 
         // probably multiple methods
         foreach (var obj in objects) {
@@ -106,7 +108,6 @@ public class BasePassage : MonoBehaviour {
                     break;
 
                 case CellType.VelocityForce:
-                    var duration = cell.endTime < float.Epsilon ? float.PositiveInfinity : cell.endTime - cell.startTime;
                     StartCoroutine(AddForce(obj, vec, duration));
                     break;
 
@@ -114,6 +115,10 @@ public class BasePassage : MonoBehaviour {
                     obj.angularVelocity = cell.arg1.RandomValue();
                     break;
                 case CellType.Scale:
+                    break;
+
+                case CellType.Centripetal:
+                    StartCoroutine(Centripetal(obj, arg1, duration));
                     break;
             }
         }
@@ -129,6 +134,16 @@ public class BasePassage : MonoBehaviour {
         float end = Time.time + duration;
         while (Time.time < end) {
             obj.rigidbody2D.AddForce(force);
+            yield return null;
+        }
+    }
+
+    IEnumerator Centripetal(Animatable2 obj, float forceMagnitude, float duration) {
+        float end = Time.time + duration;
+        while (Time.time < end) {
+            var velocity = obj.rigidbody2D.velocity;
+            var forceDirection = Quaternion.Euler(0, 0, 90) * velocity * forceMagnitude;
+            obj.rigidbody2D.AddForce(forceDirection);
             yield return null;
         }
     }
