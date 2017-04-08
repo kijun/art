@@ -78,9 +78,10 @@ public class BasePassage : MonoBehaviour {
                  new Vector2(objectPositionRange.x * Random.value - objectPositionRange.x/2,
                              objectPositionRange.y * Random.value - objectPositionRange.y/2));
 
-            var rotation = Quaternion.Euler(0, 0, entryAngle);
+            var rotation = Quaternion.Euler(0, 0, objectInitialAngle.RandomValue()); //Quaternion.Euler(0, 0, entryAngle);
             var target = GameObject.Instantiate<Animatable2>(objectPrefab, objectPos, rotation);
             target.localScale = new Vector2(width, height);
+            //target.pivot = new Vector2(0.5f, 0);
             objects[i] = target;
         }
 
@@ -95,13 +96,13 @@ public class BasePassage : MonoBehaviour {
     IEnumerator RunCell(CellDefinition cell, Animatable2[] objects) {
         yield return new WaitForSeconds(cell.startTime);
 
-        var arg1 = cell.arg1.RandomValue();
-        var arg2 = cell.arg2.RandomValue();
-        var vec = new Vector2(arg1, arg2);
-        var duration = cell.endTime < float.Epsilon ? float.PositiveInfinity : cell.endTime - cell.startTime;
-
         // probably multiple methods
         foreach (var obj in objects) {
+            var arg1 = cell.arg1.RandomValue();
+            var arg2 = cell.arg2.RandomValue();
+            var vec = new Vector2(arg1, arg2);
+            var duration = cell.endTime < float.Epsilon ? float.PositiveInfinity : cell.endTime - cell.startTime;
+
             switch (cell.type) {
                 case CellType.VelocityEvent:
                     obj.velocity = vec;
@@ -138,14 +139,23 @@ public class BasePassage : MonoBehaviour {
         }
     }
 
-    IEnumerator Centripetal(Animatable2 obj, float forceMagnitude, float duration) {
+    IEnumerator Centripetal(Animatable2 obj, float radius, float duration) {
         float end = Time.time + duration;
+        var rgbd = obj.rigidbody2D;
+        var speed = obj.rigidbody2D.velocity.magnitude;
+        var period = (Mathf.PI * 2 * radius / speed);
+        rgbd.angularVelocity = 360 / period;
         while (Time.time < end) {
             var velocity = obj.rigidbody2D.velocity;
-            var forceDirection = Quaternion.Euler(0, 0, 90) * velocity * forceMagnitude;
+            var forceMagnitude = speed * speed / radius;
+            var forceDirection = Quaternion.Euler(0, 0, 90) * velocity.normalized * forceMagnitude;
+
             obj.rigidbody2D.AddForce(forceDirection);
-            yield return null;
+            obj.rigidbody2D.velocity = Vector3.ClampMagnitude(velocity, speed);
+
+            yield return new WaitForFixedUpdate();
         }
+
     }
 
     float cameraDiameter {
