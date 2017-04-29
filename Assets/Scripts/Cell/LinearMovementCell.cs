@@ -2,39 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public enum CellType {
-    None = 0,
-    // lets try to use two args to define all
-    VelocityEvent = 10,
-    VelocityForce = 11,
-    Rotation = 20,
-    Scale = 30,
-    Color = 40,
-    Centripetal = 50,
-    Destruction = 90
-}
-
-[System.Serializable]
-public struct CellDefinition {
-    public Range startTime;
-    public Range endTime;
-    public CellType type;
-
-    public Range arg1;
-    public Range arg2;
-
-    public Range spread1;
-    public Range spread2;
-}
-
-[System.Serializable]
-public struct OrnamentSpec {
-    public bool hasOrnaments;
-    public Range count;
-}
-
-public class BasePassage : MonoBehaviour {
+public class LinearMovementCell : MonoBehaviour {
 
     /* Activation logic */
     public float startTime;
@@ -50,7 +18,6 @@ public class BasePassage : MonoBehaviour {
     public Range objectsPerActivation = new Range(1);
     public Range objectEntryAngle;
     public Vector2 objectPositionRange;
-    public OrnamentSpec ornamentSpec;
 
     /* Passage Cells */
     public CellDefinition[] cells;
@@ -90,9 +57,6 @@ public class BasePassage : MonoBehaviour {
             target.localScale = new Vector2(width, height);
             //target.pivot = new Vector2(0.5f, 0);
             objects[i] = target;
-
-
-
         }
 
 
@@ -140,17 +104,6 @@ public class BasePassage : MonoBehaviour {
         c.a = Random.Range(0.3f, 0.8f);
         target.GetComponent<SpriteRenderer>().material.color = c;
 
-        */
-    }
-
-    void CreateOrnaments() {
-        // get current obj, velocity
-        // smaller area
-        /*
-        var numObj = (int)ornamentSpec.count.RandomValue();
-        for (int i = 0; i<numObj; i++) {
-            var target = GameObject.Instantiate<Animatable2>(objectPrefab, objectPos, rotation);
-        }
         */
     }
 
