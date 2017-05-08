@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CellB : BaseCell {
-    /* [] [] [] [] [] */
+public class CellC : BaseCell {
+    /* [], moves to the center */
     public Vector2 scale = new Vector2(0.5f, 2);
     public int count = 1;
     public float speed = 1;
     public float entryAngle = 0;
+    public float initialObjectAngle = 0;
     public float angularVelocity = 0;
     public Vector2 scaleVelocity;
     public Color color;
@@ -21,7 +22,7 @@ public class CellB : BaseCell {
         var x = inGameWidth / -2 + distBetweenObj/2;
         var entryQ = Quaternion.Euler(0, 0, entryAngle);
         for (int i = 0; i < count; i++) {
-            var p = CreatePlane(entryQ);
+            var p = CreatePlane(Quaternion.Euler(0, 0, initialObjectAngle));
             p.localScale = scale;
             p.level = level;
             p.position = entryQ * new Vector2(x, startDistanceFromOrigin(scale));
@@ -39,3 +40,4 @@ public class CellB : BaseCell {
         return Instantiate<Animatable2>(prefab, scale, entryAngle);
     }
 }
+

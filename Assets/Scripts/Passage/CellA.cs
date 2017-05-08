@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CellA : MonoBehaviour {
+    /*
+     *       []
+     *
+     *
+     *  []        []
+     *
+     */
 
     public Animatable2 prefab;
     public Vector2 scale = new Vector2(0.5f, 2);
     public int count = 1;
     public float speed = 1;
+    public Color color;
+    public Vector2 scaleVelocity;
 
     public float startAngle = 0;
 
@@ -35,7 +44,7 @@ public class CellA : MonoBehaviour {
             p.localScale = scale;
             p.rotation = rotation;
             p.velocity = Quaternion.Euler(0, 0, rotation) * Vector2.down * speed;
-
+            p.scaleVelocity = scaleVelocity;
 
             var width = scale.x ;
             var height = scale.y;
@@ -45,6 +54,7 @@ public class CellA : MonoBehaviour {
                 Quaternion.Euler(0, 0, entryAngle) * (Vector2.up * distanceFromOrigin);
 
             p.position = objectPos;
+            p.color = color;
 
             rotation += unitOfRotation;
         }

@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class BaseCell : MonoBehaviour {
     public Animatable2 prefab;
+    public float level;
+
+    public virtual void Run() {
+    }
 
     protected float cameraDiameter {
         get {

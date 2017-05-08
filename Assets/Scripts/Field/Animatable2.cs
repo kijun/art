@@ -73,6 +73,12 @@ public class Animatable2 : MonoBehaviour {
     public Vector2 scaleVelocity;
     public bool nonNegativeScale = false;
 
+    public Color color {
+        set {
+            child.GetComponent<SpriteRenderer>().material.color = value;
+        }
+    }
+
 
     public Vector2 pivot {
         get {
@@ -80,6 +86,16 @@ public class Animatable2 : MonoBehaviour {
         }
         set {
             child.localPosition = -1 * value.DivideEach(localScale);
+        }
+    }
+
+    public float level {
+        get {
+            return transform.position.z;
+        }
+
+        set {
+            transform.position = transform.position.SwapZ(value);
         }
     }
 

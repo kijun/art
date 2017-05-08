@@ -2,22 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PhraseA : MonoBehaviour {
+public class PhraseF : MonoBehaviour {
+    /* Random Entry */
 
-    public CellA cellA;
+    public BaseCell cell;
     public float period = 0.5f;
+    public int count = 20;
 
     void Start() {
         StartCoroutine(Run());
     }
 
     IEnumerator Run() {
-        for (int i = 0; i < 640000; i++) {
-            cellA.count = 2*Random.Range(2,6) + 1;
-            cellA.Run();
+        for (int i = 0; i < count; i++) {
+            cell.Run();
             yield return new WaitForSeconds(period);
         }
     }
 }
+
+
+
+
+
+
 
 

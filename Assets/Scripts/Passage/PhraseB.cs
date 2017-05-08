@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PhraseB : MonoBehaviour {
 
+    public Color color;
+
     public CellB cellB;
     public float period = 0.5f;
 
@@ -12,9 +14,27 @@ public class PhraseB : MonoBehaviour {
     }
 
     IEnumerator Run() {
-        for (int i = 0; i < 200; i++) {
-            var baseCnt = 1+(i/10f);
-            var cnt = 1+(i/10f);
+        for (int i = 0; i < 10; i++) {
+            //var baseCnt = 1+(i/10f);
+            var cnt = 1+(i/4f);
+            //var cnt = Random.Range(baseCnt, baseCnt*2);
+            cellB.count = (int)cnt;
+            cellB.Run();
+            cellB.entryAngle += 90;
+            cellB.Run();
+            cellB.entryAngle += 90;
+            cellB.Run();
+            cellB.entryAngle += 90;
+            cellB.Run();
+            cellB.entryAngle += 90;
+            //cellB.entryAngle = Random.Range(0, 4) * 90;
+            //cellB.scale = Vector2.one * (5f / cnt);
+            yield return new WaitForSeconds(period);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            //var baseCnt = 1+(i/10f);
+            var cnt = 3-(i/4f);
             //var cnt = Random.Range(baseCnt, baseCnt*2);
             cellB.count = (int)cnt;
             cellB.Run();
