@@ -91,11 +91,12 @@ public class Animatable2 : MonoBehaviour {
 
     public float level {
         get {
-            return transform.position.z;
+            return transform.position.z * -1;
         }
 
         set {
-            transform.position = transform.position.SwapZ(value);
+            Debug.Log("level" + value);
+            transform.position = transform.position.SwapZ(value * -1);
         }
     }
 

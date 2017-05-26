@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public enum Direction {
-    Up, Right, Down, Left
-}
-
 public class CellD : BaseCell {
     /* multiple [] bricks*/
     public Vector2[] scales;
@@ -23,8 +19,8 @@ public class CellD : BaseCell {
         List<int> randomized = randArray.OrderBy(u => Random.value).ToList();
 
         int randomIndex = Random.Range(0, 3);
-        int randomDirection = Random.value > 0.5 ? -1 : 1;
         for (int i = 0; i < objsPerRun; i++) {
+            //var dir = (Direction)randomized[i];
             var dir = (Direction)randomized[i];
             var p = CreatePlane(Quaternion.identity);
             var scale = scales[i];

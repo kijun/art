@@ -50,6 +50,23 @@ public static class UnityExtensions {
         return new Vector2(v.x / multiplier.x, v.y / multiplier.y);
     }
 
+    public static Direction ToDirection(this Vector2 v) {
+        if (Mathf.Abs(v.x) > Mathf.Abs(v.y)) {
+            if (v.x > 0) {
+                return Direction.Right;
+            } else {
+                return Direction.Left;
+            }
+        } else {
+            if (v.y > 0) {
+                return Direction.Up;
+            } else {
+                return Direction.Down;
+            }
+        }
+        return Direction.None;
+    }
+
     public static void SetAlpha(this Material m, float val) {
         var color = m.color;
         color.a = val;
@@ -65,6 +82,10 @@ public static class UnityExtensions {
 
     public static float RandomValue(this Range r) {
         return Random.Range(r.minimum, r.maximum);
+    }
+
+    public static float RandomFraction(this float v, float minFraction, float maxFraction) {
+        return Random.Range(v * minFraction, v * maxFraction);
     }
 
     public static IEnumerator Glide(this Transform trans, Vector3 startPos, Vector3 endPos, float duration) {
@@ -109,7 +130,4 @@ public static class UnityExtensions {
     }
 
     /*** RECT ***/
-    public static Vector2 RandomPosition(this Rect rect) {
-        return new Vector2(Random.Range(rect.xMin, rect.xMax), Random.Range(rect.yMin, rect.yMax));
-    }
 }

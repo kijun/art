@@ -39,4 +39,88 @@ static class CameraHelper {
                     new Vector2(Width, Height));
         }
     }
+
+    public static float Diameter {
+        get {
+            var inGameHeight = Camera.main.orthographicSize * 2;
+            var inGameWidth = (float)Screen.width / (float)Screen.height * inGameHeight;
+
+            var cameraDiameter = Mathf.Sqrt(inGameHeight * inGameHeight + inGameWidth * inGameWidth);
+
+            return cameraDiameter;
+        }
+    }
+
+    public static Vector2 PositionOnTop(float xOffset = 0, Vector2 scale = new Vector2(), float rotation = 0)  {
+        float extraHeight = BoundingRectForRotatedVector(scale, rotation).y / 2;
+        return new Vector2(xOffset, HalfHeight + extraHeight);
+    }
+
+    public static Vector2 PositionOnBottom(float xOffset = 0, Vector2 scale = new Vector2(), float rotation = 0) {
+        float extraHeight = BoundingRectForRotatedVector(scale, rotation).y / 2;
+        return new Vector2(xOffset, -1 * (HalfHeight + extraHeight));
+    }
+
+    public static Vector2 PositionOnRight(float yOffset = 0, Vector2 scale = new Vector2(), float rotation = 0) {
+        float extraWidth = BoundingRectForRotatedVector(scale, rotation).x / 2;
+        return new Vector2(HalfWidth + extraWidth, yOffset);
+    }
+
+    public static Vector2 PositionOnLeft(float yOffset = 0, Vector2 scale = new Vector2(), float rotation = 0) {
+        float extraWidth = BoundingRectForRotatedVector(scale, rotation).x / 2;
+        return new Vector2(-1 * (HalfWidth + extraWidth), yOffset);
+    }
+
+    // perimeter position for object
+    public static Vector2 PerimeterPositionForMovingObject(Direction dir, float offset = 0, Vector2 scale = new Vector2(), float rotation = 0) {
+        var perimeter = Vector2.zero;
+
+        switch (dir) {
+            case Direction.Down:
+                perimeter = PositionOnTop(offset, scale, rotation);
+                break;
+            case Direction.Up:
+                perimeter = PositionOnBottom(offset, scale, rotation);
+                break;
+            case Direction.Right:
+                perimeter = PositionOnLeft(offset, scale, rotation);
+                break;
+            case Direction.Left:
+                perimeter = PositionOnRight(offset, scale, rotation);
+                break;
+        }
+
+        return perimeter;
+    }
+
+    public static Rect BoundingRectOnPerimeter(Location loc, float width, float height, float offset) {
+        var rect = new Rect();
+        switch (loc) {
+            case Location.Top:
+                rect = Rect.MinMaxRect(offset-width/2, HalfHeight, offset+width/2, HalfHeight + height);
+                break;
+            case Location.Bottom:
+                rect = Rect.MinMaxRect(offset-width/2, -HalfHeight-height, offset+width/2, -HalfHeight);
+                break;
+            case Location.Right:
+                rect = Rect.MinMaxRect(HalfWidth, offset-height/2, HalfWidth+width, offset+height/2);
+                break;
+            case Location.Left:
+                rect = Rect.MinMaxRect(-HalfWidth-width, offset-height/2, -HalfWidth, offset+height/2);
+                break;
+        }
+        return rect;
+    }
+
+    static Vector2 BoundingRectForRotatedVector(Vector2 scale, float rotation) {
+        return Quaternion.Euler(0, 0, rotation) * scale;
+    }
+
+    public static float RandomXOffset(float range = 1) {
+        return (Random.value * Width - HalfWidth) * range;
+    }
+
+    public static float RandomYOffset(float range = 1) {
+        return (Random.value * Height - HalfHeight) * range;
+    }
 }
