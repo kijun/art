@@ -13,7 +13,6 @@ public static class MotionController {
         p.localScale = lp.scale;
         p.position = lp.position;
         // must come after position
-        Debug.Log(lp.level);
         p.level = lp.level;
         p.velocity = mp.velocity;
         p.color = lp.color;

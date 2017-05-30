@@ -95,7 +95,6 @@ public class Animatable2 : MonoBehaviour {
         }
 
         set {
-            Debug.Log("level" + value);
             transform.position = transform.position.SwapZ(value * -1);
         }
     }

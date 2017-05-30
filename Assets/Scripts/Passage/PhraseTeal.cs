@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public static class ShapeZLevel {
+    public const float Back = -5;
+    public const float Default = 0;
+    public const float Front = 5;
+}
+
 public class PhraseTeal : MonoBehaviour {
     /* For certain duration, */
 
@@ -10,10 +16,17 @@ public class PhraseTeal : MonoBehaviour {
     public Color red;
     public Color blue;
 
+    public float defaultLineWidth;
+    public float defaultLineSpeed;
+    public float defaultLineHeight;
+
+    public Color lineColor;
+
     public TimeSignature timeSignature;
 
     void Start() {
-        StartCoroutine(RunTeal());
+//        StartCoroutine(RunTeal());
+        StartCoroutine(RunLineIntro());
 //        StartCoroutine(RunBlue());
  //       StartCoroutine(RunRed());
         /*
@@ -24,61 +37,101 @@ public class PhraseTeal : MonoBehaviour {
     }
 
     IEnumerator RunTeal() {
-        foreach (var i in Times(0)) {
-            AnimateRect(Direction.Down, 5, Vector2.one, teal, CameraHelper.RandomXOffset(0.6f), level:0);
+        foreach (var i in Times(10)) {
+            AnimateRect(Direction.Down, 1, Vector2.one*2, teal, CameraHelper.RandomXOffset(0.9f), level:0);
             yield return Rest(1);
         }
 
+        int ornamentation = 1;
+        float boundFactor = 0.1f;
         foreach (var i in Times(20)) {
+            var progress = i / 20f;
+
             // Gradually add ornamentation
             var offset = CameraHelper.RandomXOffset(0.6f);
             var scale = Vector2.one * Random.Range(2, 3); // the big one
-            var speed = 2;
+            var speed = 1;
 
             var boundingRect = CameraHelper.BoundingRectOnPerimeter(
-                    Location.Top, CameraHelper.Width * 0.5f, CameraHelper.Height * 0.5f, offset);
+                    Location.Top, CameraHelper.Width * boundFactor, CameraHelper.Height * boundFactor, offset);
             var foundationRect = RectHelper.RectFromCenterAndSize(boundingRect.center, scale);
-            var formation = GenerateFormation(foundationRect, boundingRect, Random.Range(30, 40));
+            var formation = GenerateFormation(foundationRect, boundingRect, Random.Range(1, 3));
             foreach (var rect in formation) {
-                var lineSpeed =  speed * Random.Range(0.9f, 1.3f);
+                var lineSpeed =  speed * Random.Range(1f-0.3f*progress, 1f + 0.3f*progress);
                 var level = 0;
                 if (rect == formation[0]) {
                     lineSpeed = speed;
                     level = -1;
                 }
-                Debug.Log(level);
                 AnimateRect(
                         Direction.Down,
                         lineSpeed,
                         rect.size,
-                        new Color[]{teal, blue, red}[Random.Range(0, 3)],
+                        new Color[]{teal, blue, red}[Random.Range(0, Mathf.CeilToInt(3*progress))],
                         rect.center,
-                        Random.Range(0, 270), level);
+                        0);
             }
-            yield return Rest(1);
+            yield return Rest(2);
+
+            ornamentation++;
+            boundFactor += 0.05f;
         }
     }
 
-    List<Rect> GenerateFormation(Rect foundation, Rect boundary, int count, bool nonOverlapping=true) {
-        var rects = new List<Rect>();
-        rects.Add(foundation);
-        Debug.Log("Foundation " + foundation);
-        int retries = 0;
-        while (rects.Count <= count && retries < 1000) {
-            var enclosed = new Vector2(
-                    foundation.width.RandomFraction(0.05f, 0.5f),
-                    foundation.height.RandomFraction(0.05f, 0.8f));
-            var candidate = RectHelper.RectFromCenterAndSize(boundary.RandomPosition(), enclosed);
-            if (nonOverlapping && rects.Any(r => r.Overlaps(candidate))) {
-                retries++;
-                continue;
-            }
-            rects.Add(candidate);
-            //Debug.Log("Added " + candidate);
-        }
-        Debug.Log(retries);
-        return rects;
+    IEnumerator RunLineIntro() {
+        // 16 measures for the first minute
+        // 4, 5, 2
+        _Lines(Direction.Up, 1);
+        yield return Rest(4);
+        _Lines(Direction.Up, 1);
+        yield return Rest(2);
+        _Lines(Direction.Right, 1);
+        yield return Rest(3);
+        _Lines(Direction.Left, 1);
+        yield return Rest(2);
+        _Lines(Direction.Up, 4);
+        yield return Rest(2);
+        _Lines(Direction.Up, 2);
+        yield return Rest(1);
+        _Lines(Direction.Right, 1);
+        yield return Rest(1);
+        _Lines(Direction.Down, 1);
+        yield return Rest(1);
+        _Lines(Direction.Down, 1);
+        yield return Rest(1);
+
+        _Lines(Direction.Up, 4);
+        yield return Rest(2);
+
+        _Lines(Direction.Up, 4);
     }
+
+    void _Lines(Direction dir, int count) {
+        foreach (var i in Times(count)) {
+            float offset = 0;
+            if (dir == Direction.Left|| dir == Direction.Right) {
+                offset = CameraHelper.RandomYOffset(0.8f);
+            } else {
+                offset = CameraHelper.RandomXOffset(0.8f);
+            }
+            _Line(dir, defaultLineHeight, offset);
+        }
+    }
+
+    void _Line(Direction dir, float height, float offset, float deltaSpeed=0) {
+        var scale = dir.Align(new Vector2(defaultLineWidth, height));
+        var lp = new LineParams2 {
+            position = CameraHelper.PerimeterPositionForMovingObject(dir, offset, scale, 0),
+            color = lineColor,
+            scale = scale,
+            rotation = 0,
+            level = ShapeZLevel.Front};
+        var mp = new MotionParams { velocity = dir.ToVelocity(defaultLineSpeed + deltaSpeed) };
+
+        MotionController.Animate(lp, mp);
+    }
+
+
 
     IEnumerator RunBlue() {
         foreach (var i in Times(10)) {
@@ -102,6 +155,24 @@ public class PhraseTeal : MonoBehaviour {
         }
     }
 
+    List<Rect> GenerateFormation(Rect foundation, Rect boundary, int count, bool nonOverlapping=true) {
+        var rects = new List<Rect>();
+        rects.Add(foundation);
+        int retries = 0;
+        while (rects.Count <= count && retries < 1000) {
+            var enclosed = new Vector2(
+                    foundation.width.RandomFraction(0.05f, 0.5f),
+                    foundation.height.RandomFraction(0.05f, 0.8f));
+            var candidate = RectHelper.RectFromCenterAndSize(boundary.RandomPosition(), enclosed);
+            if (nonOverlapping && rects.Any(r => r.Overlaps(candidate))) {
+                retries++;
+                continue;
+            }
+            rects.Add(candidate);
+        }
+        return rects;
+    }
+
     void AnimateRect(Direction dir, float speed, Vector2 scale, Color color, float offset=0, float rotation=0, float level=0) {
         var lp = new LineParams2 { position = CameraHelper.PerimeterPositionForMovingObject(dir, offset, scale, rotation),
                                    color = color,
@@ -119,44 +190,18 @@ public class PhraseTeal : MonoBehaviour {
                                    scale = scale,
                                    rotation = rotation,
                                    level = level};
-        Debug.Log(level);
-        Debug.Log(lp.level);
         var mp = new MotionParams { velocity = dir.ToVelocity(speed) };
 
         MotionController.Animate(lp, mp);
     }
 
-    /*
-    IEnumerator RunRed() {
-        // -> up
-    }
-
-    IEnumerator RunYellow() {
-        // -> down
-    }
-
-    IEnumerator RunLine1() {
-        // horizontal
-        StartCoroutine(CellA());
-        yield return Rest(2);
-    }
-
-    IEnumerator RunLine2() {
-        // vertical
-    }
-
-    //void Ornamentation(Line
-    // ornamentation
-    //
-    //
-    //
-    */
+    /** helpers, to be extracted into another class */
 
     IEnumerable<int> Times(int measures) {
         return Enumerable.Range(0, measures);
     }
 
-    IEnumerator Rest(int measures, float beats = 0) {
+    IEnumerator Rest(float measures, float beats = 0) {
         yield return new WaitForSeconds((measures * timeSignature.beatsPerMeasure + beats) * BeatDurationInSeconds);
     }
 
