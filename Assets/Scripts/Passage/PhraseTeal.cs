@@ -79,15 +79,44 @@ public class PhraseTeal : MonoBehaviour {
     }
 
     IEnumerator RunLineIntro() {
+        var score = @"
+3020100010203040504
+0101011111111001001
+0102030405040302010
+0003000030000303000
+";
+        score = score.Trim();
+        var voicesInString = score.Split('\n');
+
+        Debug.Log(voicesInString);
+        int[,] voices = new int[voicesInString.Length, voicesInString[0].Length];
+        int scoreLen = voices.GetLength(1);
+        Debug.Log(voices.GetLength(0));
+        Debug.Log(voices.GetLength(1));
+
+        // initialize score Obj
+        for (int i = 0; i < scoreLen; i++) {
+            foreach (var j in Times(4)) {
+                voices[j, i] = int.Parse(voicesInString[j][i].ToString());
+            }
+        }
+
+        for (int i = 0; i<scoreLen; i++) {
+            _Lines(Direction.Down, voices[0, i]);
+            _Lines(Direction.Up, voices[1, i]);
+            _Lines(Direction.Right, voices[2, i]);
+            _Lines(Direction.Left, voices[3, i]);
+            yield return Rest();
+        }
+        /*
         // 16 measures for the first minute
         // 4, 5, 2
         _Lines(Direction.Up, 1);
         yield return Rest(4);
         _Lines(Direction.Up, 1);
         yield return Rest(2);
-        _Lines(Direction.Right, 1);
-        yield return Rest(3);
         _Lines(Direction.Left, 1);
+        yield return Rest(3);
         yield return Rest(2);
         _Lines(Direction.Up, 4);
         yield return Rest(2);
@@ -104,6 +133,13 @@ public class PhraseTeal : MonoBehaviour {
         yield return Rest(2);
 
         _Lines(Direction.Up, 4);
+        */
+    }
+
+    IEnumerator RunHorizontal() {
+        yield return Rest(6);
+        _Lines(Direction.Right, 1);
+        yield return Rest(3);
     }
 
     void _Lines(Direction dir, int count) {
@@ -201,7 +237,7 @@ public class PhraseTeal : MonoBehaviour {
         return Enumerable.Range(0, measures);
     }
 
-    IEnumerator Rest(float measures, float beats = 0) {
+    IEnumerator Rest(float measures=1, float beats = 0) {
         yield return new WaitForSeconds((measures * timeSignature.beatsPerMeasure + beats) * BeatDurationInSeconds);
     }
 
