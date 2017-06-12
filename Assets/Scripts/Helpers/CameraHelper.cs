@@ -116,11 +116,22 @@ static class CameraHelper {
         return Quaternion.Euler(0, 0, rotation) * scale;
     }
 
-    public static float RandomXOffset(float range = 1) {
-        return (Random.value * Width - HalfWidth) * range;
+    public static float RandomXOffset(float range = 1, float quantized = 0) {
+        var offset = (Random.value * Width - HalfWidth) * range;
+
+        if (quantized > float.Epsilon) {
+            float optionsPerUnitLength = 1 / quantized;
+            offset = (Mathf.RoundToInt(offset * optionsPerUnitLength)) / optionsPerUnitLength;
+        }
+        return offset;
     }
 
-    public static float RandomYOffset(float range = 1) {
-        return (Random.value * Height - HalfHeight) * range;
+    public static float RandomYOffset(float range = 1, float quantized = 0) {
+        var offset = (Random.value * Height - HalfHeight) * range;
+        if (quantized > float.Epsilon) {
+            float optionsPerUnitLength = 1 / quantized;
+            offset = (Mathf.RoundToInt(offset * optionsPerUnitLength)) / optionsPerUnitLength;
+        }
+        return offset;
     }
 }

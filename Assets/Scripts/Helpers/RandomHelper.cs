@@ -41,5 +41,9 @@ public static class RandomHelper {
 
         return points;
     }
+
+    public static float Pick(float[] list) {
+        return list[Random.Range(0, list.Length)];
+    }
 }
 

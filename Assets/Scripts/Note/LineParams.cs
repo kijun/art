@@ -24,9 +24,3 @@ public struct LineParams2 {
         }
     }
 }
-
-[System.Serializable]
-public struct MotionParams {
-    public Vector2 velocity;
-    // acceleration etc all that good stuff
-}

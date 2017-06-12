@@ -25,7 +25,7 @@ public class PhraseTeal : MonoBehaviour {
     public TimeSignature timeSignature;
 
     void Start() {
-//        StartCoroutine(RunTeal());
+        //StartCoroutine(RunTeal());
         StartCoroutine(RunLineIntro());
 //        StartCoroutine(RunBlue());
  //       StartCoroutine(RunRed());
@@ -38,7 +38,7 @@ public class PhraseTeal : MonoBehaviour {
 
     IEnumerator RunTeal() {
         foreach (var i in Times(10)) {
-            AnimateRect(Direction.Down, 1, Vector2.one*2, teal, CameraHelper.RandomXOffset(0.9f), level:0);
+            AnimateRect(Direction.Down, 1, Vector2.one*0.5f, teal, CameraHelper.RandomXOffset(0.9f), level:0);
             yield return Rest(1);
         }
 
@@ -49,7 +49,7 @@ public class PhraseTeal : MonoBehaviour {
 
             // Gradually add ornamentation
             var offset = CameraHelper.RandomXOffset(0.6f);
-            var scale = Vector2.one * Random.Range(2, 3); // the big one
+            var scale = Vector2.one * Random.Range(0.2f, 0.5f); // the big one
             var speed = 1;
 
             var boundingRect = CameraHelper.BoundingRectOnPerimeter(
@@ -79,14 +79,28 @@ public class PhraseTeal : MonoBehaviour {
     }
 
     IEnumerator RunLineIntro() {
+//   '       '    '        '    '    xx '    '    '
+//   4    8    12   16   20   24   28   32   36   40   44   48   52 (end)
         var score = @"
+0000 0001 0000 0000 0003 2001 0101 0002 3565 2000 0100 1000 0000 0000
+1000 1000 0005 0004 0000 0050 0000 0102 3565 2000 1010 1000 0000 0000
+0000 0010 0000 0002 2000 0101 0211 1102 3565 2333 0033 0101 0000 0000
+0000 0000 0000 0000 2000 0100 0001 0002 3565 2000 0000 0000 0000 0000
+";
+        score = @"
+5000 0001 0000 0000 0003 2001 0101 0002 3565 2000 0100 1000 0000 0000
+0500 0001 0000 0000 0003 2001 0101 0002 3565 2000 0100 1000 0000 0000
+0050 0010 0000 0002 2000 0101 0211 1102 3565 2333 0033 0101 0000 0000
+0005 0000 0000 0000 2000 0100 0001 0002 3565 2000 0000 0000 0000 0000
+";
+        var ornamentation = @"
 3020100010203040504
-0101011111111001001
+0101010101010101010
 0102030405040302010
-0003000030000303000
+1111111111111111111
 ";
         score = score.Trim();
-        var voicesInString = score.Split('\n');
+        var voicesInString = score.Split('\n').Select(str => str.Replace(" ", "")).ToArray();
 
         Debug.Log(voicesInString);
         int[,] voices = new int[voicesInString.Length, voicesInString[0].Length];
@@ -108,32 +122,6 @@ public class PhraseTeal : MonoBehaviour {
             _Lines(Direction.Left, voices[3, i]);
             yield return Rest();
         }
-        /*
-        // 16 measures for the first minute
-        // 4, 5, 2
-        _Lines(Direction.Up, 1);
-        yield return Rest(4);
-        _Lines(Direction.Up, 1);
-        yield return Rest(2);
-        _Lines(Direction.Left, 1);
-        yield return Rest(3);
-        yield return Rest(2);
-        _Lines(Direction.Up, 4);
-        yield return Rest(2);
-        _Lines(Direction.Up, 2);
-        yield return Rest(1);
-        _Lines(Direction.Right, 1);
-        yield return Rest(1);
-        _Lines(Direction.Down, 1);
-        yield return Rest(1);
-        _Lines(Direction.Down, 1);
-        yield return Rest(1);
-
-        _Lines(Direction.Up, 4);
-        yield return Rest(2);
-
-        _Lines(Direction.Up, 4);
-        */
     }
 
     IEnumerator RunHorizontal() {
@@ -143,19 +131,19 @@ public class PhraseTeal : MonoBehaviour {
     }
 
     void _Lines(Direction dir, int count) {
-        foreach (var i in Times(count)) {
+        foreach (var i in Times((int)(count))) {
             float offset = 0;
             if (dir == Direction.Left|| dir == Direction.Right) {
-                offset = CameraHelper.RandomYOffset(0.8f);
+                offset = CameraHelper.RandomYOffset(1f, 0.1f);
             } else {
-                offset = CameraHelper.RandomXOffset(0.8f);
+                offset = CameraHelper.RandomXOffset(1f, 0.1f);
             }
-            _Line(dir, defaultLineHeight, offset);
+            _Line(dir, defaultLineHeight, offset, -defaultLineSpeed*Random.value*0.1f);
         }
     }
 
     void _Line(Direction dir, float height, float offset, float deltaSpeed=0) {
-        var scale = dir.Align(new Vector2(defaultLineWidth, height));
+        var scale = dir.Align(new Vector2(defaultLineWidth, height*(Random.value*0.7f+0.65f)));
         var lp = new LineParams2 {
             position = CameraHelper.PerimeterPositionForMovingObject(dir, offset, scale, 0),
             color = lineColor,
@@ -164,7 +152,7 @@ public class PhraseTeal : MonoBehaviour {
             level = ShapeZLevel.Front};
         var mp = new MotionParams { velocity = dir.ToVelocity(defaultLineSpeed + deltaSpeed) };
 
-        MotionController.Animate(lp, mp);
+        NoteFactory.CreateLine(lp, mp);
     }
 
 
@@ -217,7 +205,7 @@ public class PhraseTeal : MonoBehaviour {
                                    level = level};
         var mp = new MotionParams { velocity = dir.ToVelocity(speed) };
 
-        MotionController.Animate(lp, mp);
+        NoteFactory.CreateLine(lp, mp);
     }
 
     void AnimateRect(Direction dir, float speed, Vector2 scale, Color color, Vector2 position, float rotation=0, float level=0) {
@@ -228,7 +216,7 @@ public class PhraseTeal : MonoBehaviour {
                                    level = level};
         var mp = new MotionParams { velocity = dir.ToVelocity(speed) };
 
-        MotionController.Animate(lp, mp);
+        NoteFactory.CreateLine(lp, mp);
     }
 
     /** helpers, to be extracted into another class */

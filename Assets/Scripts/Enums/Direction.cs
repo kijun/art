@@ -4,6 +4,14 @@ public enum Direction {
     None, Up, Right, Down, Left
 }
 
+public static class DirectionHelper {
+    public static Direction Random {
+        get {
+            return (Direction)UnityEngine.Random.Range(1, 5);
+        }
+    }
+}
+
 public static class DirectionMethods {
 
     public static Vector2 ToVelocity(this Direction dir, float speed)

@@ -6,10 +6,12 @@ public class Animatable2 : MonoBehaviour {
 
     Vector2 originalScale;
     float originalRotation;
+    float startTime;
 
     void Start() {
         originalScale = localScale;
         originalRotation = rotation;
+        startTime = Time.time;
     }
 
     void FixedUpdate() {
@@ -75,10 +77,18 @@ public class Animatable2 : MonoBehaviour {
 
     public Color color {
         set {
-            child.GetComponent<SpriteRenderer>().material.color = value;
+            material.color = value;
         }
     }
 
+    public float opacity {
+        get {
+            return material.GetOpacity();
+        }
+        set {
+            material.SetOpacity(value);
+        }
+    }
 
     public Vector2 pivot {
         get {
@@ -102,6 +112,12 @@ public class Animatable2 : MonoBehaviour {
     /*** PRIVATE ***/
     Transform child {
         get { return transform.GetChild(0); }
+    }
+
+    Material material {
+        get {
+            return child.GetComponent<SpriteRenderer>().material;
+        }
     }
 }
 

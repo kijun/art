@@ -1,14 +1,14 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class MotionController {
+public class NoteFactory : MonoBehaviour {
     /*
      * Interfaces with animatables
      */
     static Animatable2 _prefab;
 
-    public static void Animate(LineParams2 lp, MotionParams mp) {
+    public static void CreateLine(LineParams2 lp, MotionParams mp) {
         var p = CreatePlane(lp.scale, lp.rotation);
         p.localScale = lp.scale;
         p.position = lp.position;
@@ -30,6 +30,14 @@ public static class MotionController {
             return _prefab;
         }
     }
+
+	// Use this for initialization
+	void Start () {
+
+	}
+
+	// Update is called once per frame
+	void Update () {
+
+	}
 }
-
-

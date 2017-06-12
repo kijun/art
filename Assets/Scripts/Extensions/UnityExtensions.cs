@@ -68,9 +68,27 @@ public static class UnityExtensions {
     }
 
     public static void SetAlpha(this Material m, float val) {
-        var color = m.color;
-        color.a = val;
-        m.color = color;
+        // alpha = [0, 255]
+        if (!float.Equals(m.color.a, val)) {
+            var color = m.color;
+            color.a = val;
+            m.color = color;
+            Debug.Log(color);
+        }
+    }
+
+    public static float GetAlpha(this Material m) {
+        // alpha = [0, 255]
+        return m.color.a;
+    }
+
+    public static void SetOpacity(this Material m, float val) {
+        // opacity = [0, 1]
+        SetAlpha(m, val);
+    }
+
+    public static float GetOpacity(this Material m)  {
+        return GetAlpha(m);
     }
 
     public static Vector2 RandomPoint(this Bounds b) {
