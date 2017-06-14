@@ -48,6 +48,7 @@ public class Galuppi: MonoBehaviour {
         StartCoroutine(RunWhite());
         StartCoroutine(RunText());
         StartCoroutine(RunCamera());
+        StartCoroutine(RunCameraZoom());
 //        StartCoroutine(RunBoxes());
     }
 
@@ -61,18 +62,55 @@ public class Galuppi: MonoBehaviour {
         }
     }
 
-    IEnumerator RunText() {
-        var fontSize = new float[]{120, 180, 250, 270};
+    IEnumerator RunCameraZoom() {
+        var cameraZoomLevels = new float [] {2, 5, 13};
+        var restChoices = new float[]{2.4f, 3.4f};
         foreach (var i in Times(5000)) {
+            camera.orthographicSize = RandomHelper.Pick(cameraZoomLevels);
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+        }
+
+        /*
+        var cameraZoomLevels = new float [] {2, 5, 13};
+        var restChoices = new float[]{0.025f};
+        foreach (var i in Times(5000)) {
+            camera.orthographicSize += 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+            camera.orthographicSize += 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+            camera.orthographicSize += 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+            camera.orthographicSize += 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+            camera.orthographicSize -= 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+            camera.orthographicSize -= 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+            camera.orthographicSize -= 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+            camera.orthographicSize -= 0.2f;
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+        }
+        */
+    }
+
+    IEnumerator RunText() {
+        var fontSize = new float[]{170, 250, 350, 470};
+        foreach (var i in Times(5000)) {
+
+            textBox.fontSize = (int)RandomHelper.Pick(fontSize);
             var offsetMax = textBox.rectTransform.offsetMax;
             offsetMax = new Vector2(offsetMax.x + Random.Range(-200f, 200f), offsetMax.y);
             textBox.rectTransform.offsetMax = offsetMax;
-
-            var offsetMin = textBox.rectTransform.offsetMin;
-            //offsetMin = new Vector2(offsetMin.x + Random.Range(-10f, 10f), offsetMin.y);
-            textBox.rectTransform.offsetMin = offsetMin;
-            textBox.fontSize = (int)RandomHelper.Pick(fontSize);
-            yield return Rest(0, 3f);
+            if (Random.value < 0.5f) {
+                yield return Rest(0, 2f);
+                textBox.fontSize = (int)RandomHelper.Pick(fontSize);
+                offsetMax = new Vector2(offsetMax.x + Random.Range(-200f, 200f), offsetMax.y);
+                textBox.rectTransform.offsetMax = offsetMax;
+                yield return Rest(0, 1f);
+            } else {
+                yield return Rest(0, 3f);
+            }
         }
     }
 
