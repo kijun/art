@@ -150,4 +150,20 @@ static class CameraHelper {
     public static Vector2 ViewportToWorldScale(float width, float height) {
         return new Vector2(Width * width, Height * height);
     }
+
+    public static Vector2 RandomPositionNearCenter(float maxDistance = 0) {
+        var adjHalfWidth = HalfWidth - maxDistance;
+        var adjHalfHeight = HalfHeight - maxDistance;
+        return new Vector2(
+                Random.Range(-adjHalfWidth, adjHalfWidth),
+                Random.Range(-adjHalfHeight, adjHalfHeight));
+    }
+
+    public static Vector2 RandomPositionNearPerimiter(float maxDistance = 0) {
+        var x = Random.Range(HalfWidth - maxDistance, HalfWidth);
+        var y = Random.Range(HalfHeight - maxDistance, HalfHeight);
+        x *= Mathf.Sign(Random.Range(-1f, 1f));
+        y *= Mathf.Sign(Random.Range(-1f, 1f));
+        return new Vector2(x, y);
+    }
 }

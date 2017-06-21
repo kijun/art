@@ -111,16 +111,20 @@ public class Animatable2 : MonoBehaviour {
 
     public Color color {
         set {
-            material.color = value;
+            foreach (var rd in renderers) {
+                rd.material.color = value;
+            }
         }
     }
 
     public float opacity {
         get {
-            return material.GetOpacity();
+            return renderers[0].material.GetOpacity();
         }
         set {
-            material.SetOpacity(value);
+            foreach (var rd in renderers) {
+                rd.material.SetOpacity(value);
+            }
         }
     }
 
@@ -162,9 +166,9 @@ public class Animatable2 : MonoBehaviour {
         get { return transform.GetChild(0); }
     }
 
-    Material material {
+    Renderer[] renderers {
         get {
-            return child.GetComponent<SpriteRenderer>().material;
+            return GetComponentsInChildren<Renderer>();
         }
     }
 }

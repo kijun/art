@@ -4,13 +4,7 @@ using System.Linq;
 using UnityEngine;
 using PureShape;
 
-public static class ShapeZLevel {
-    public const float Back = -5;
-    public const float Default = 0;
-    public const float Front = 5;
-}
-
-public class Andata : MonoBehaviour {
+public class Circles : MonoBehaviour {
     /* For certain duration, */
 
     public Color orange;
@@ -29,7 +23,7 @@ public class Andata : MonoBehaviour {
     public Camera camera;
 
     void Start() {
-        NoteFactory.CreateCircle(new CircleProperty());
+//        NoteFactory.CreateCircle(new CircleProperty());
         StartCoroutine(RunLineIntro());
 //        StartCoroutine(RunShapes());
         StartCoroutine(RunShapes2());
@@ -39,7 +33,31 @@ public class Andata : MonoBehaviour {
         StartCoroutine(RunCamera());
         StartCoroutine(RunCameraZoom());
         //StartCoroutine(RunCameraPosition());
+        //
+        StartCoroutine(RunCircles());
     }
+
+    IEnumerator RunCircles() {
+        Color[] colors = {orange, red, purple};
+        // until measure 40
+        foreach (var rest in Loop(6, 0, 2, 0)) {
+            var randomColor = Color.Lerp(peach, blue, Random.Range(0.0f, 0.5f));
+            var diameter = CameraHelper.Height * Random.Range(0.7f, 0.8f);
+            var cp = new CircleProperty(color:randomColor, diameter:diameter, center: CameraHelper.RandomPositionNearCenter(diameter/2));
+            var anim = NoteFactory.CreateCircle(cp);
+            Keyframe[] kff = KeyframeHelper.CreateKeyframes(
+                0, 0,
+                Beat*4, 1,
+                Beat*6, 1,
+                Beat*8, 0
+            );
+
+            anim.DestroyIn(Beat*9);
+            anim.AddAnimationCurve(AnimationKeyPath.Opacity, new AnimationCurve(kff));
+            yield return rest;
+        }
+    }
+
     IEnumerator RunCamera() {
         var choices = new float[]{0, 90, 180, 270};
         var restChoices = new float[]{2, 3, 4, 6, 8};
@@ -363,8 +381,22 @@ public class Andata : MonoBehaviour {
         return Enumerable.Range(0, measures);
     }
 
+    IEnumerable<IEnumerator> Loop(float measuresToLoop, float beatsToLoop, float measuresPerRest, float beatsPerRest) {
+        var loopDuration = NoteValueToDuration(measuresToLoop, beatsToLoop);
+        var restDuration = NoteValueToDuration(measuresPerRest, beatsPerRest);
+        int loopCount = Mathf.RoundToInt(loopDuration / restDuration);
+
+        for (int i = 0; i < loopCount; i++) {
+            yield return Rest(measuresPerRest, beatsPerRest);
+        }
+    }
+
     IEnumerator Rest(float measures=1, float beats = 0) {
-        yield return new WaitForSeconds((measures * timeSignature.beatsPerMeasure + beats) * BeatDurationInSeconds);
+        yield return new WaitForSeconds(NoteValueToDuration(measures, beats));
+    }
+
+    float NoteValueToDuration(float measures, float beats) {
+        return (measures * timeSignature.beatsPerMeasure + beats) * BeatDurationInSeconds;
     }
 
     float BeatDurationInSeconds {

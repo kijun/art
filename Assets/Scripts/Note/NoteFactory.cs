@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PureShape;
 
 public class NoteFactory : MonoBehaviour {
     /*
@@ -35,6 +36,11 @@ public class NoteFactory : MonoBehaviour {
         };
 
         return CreateLine(lp, mp);
+    }
+
+    public static Animatable2 CreateCircle(CircleProperty cp) {
+        var p = ShapeGOFactory.InstantiateCircle(cp);
+        return p.gameObject.AddComponent<Animatable2>();
     }
 
     static Animatable2 CreatePlane(Vector2 localScale, float entryAngle) {
