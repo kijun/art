@@ -3,13 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public static class ShapeZLevel {
-    public const float Back = -5;
-    public const float Default = 0;
-    public const float Front = 5;
-}
-
-public class PhraseTeal : MonoBehaviour {
+public class AndataOld : MonoBehaviour {
     /* For certain duration, */
 
     public Color teal;

@@ -11,7 +11,7 @@ public static class ShapeZLevel {
 }
 */
 
-public class Galuppi: MonoBehaviour {
+public class StartedFromTheBottom: MonoBehaviour {
     /* For certain duration, */
 
     public Color black;
@@ -49,6 +49,7 @@ public class Galuppi: MonoBehaviour {
         StartCoroutine(RunText());
         StartCoroutine(RunCamera());
         StartCoroutine(RunCameraZoom());
+//        StartCoroutine(RunCameraPosition());
 //        StartCoroutine(RunBoxes());
     }
 
@@ -62,6 +63,30 @@ public class Galuppi: MonoBehaviour {
         }
     }
 
+    IEnumerator RunCameraPosition() {
+        var restChoices = new float[]{2.1f, 3.1f};
+        var deltaPos = new float[]{5f, -5f};
+        foreach (var i in Times(5000)) {
+            var pos = camera.transform.position;
+            var xd = RandomHelper.Pick(deltaPos);
+            var yd = RandomHelper.Pick(deltaPos);
+
+            if (Mathf.Abs(pos.x) > 15) {
+                xd = -Mathf.Sign(pos.x) * Mathf.Abs(xd);
+            }
+
+            if (Mathf.Abs(pos.y) > 15) {
+                yd = -Mathf.Sign(pos.y) * Mathf.Abs(yd);
+            }
+
+
+            camera.transform.position = camera.transform.position +
+                new Vector3(xd, yd);
+
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+        }
+    }
+
     IEnumerator RunCameraZoom() {
         var cameraZoomLevels = new float [] {2, 5, 13};
         var restChoices = new float[]{2.4f, 3.4f};
@@ -69,33 +94,10 @@ public class Galuppi: MonoBehaviour {
             camera.orthographicSize = RandomHelper.Pick(cameraZoomLevels);
             yield return Rest(0, RandomHelper.Pick(restChoices));
         }
-
-        /*
-        var cameraZoomLevels = new float [] {2, 5, 13};
-        var restChoices = new float[]{0.025f};
-        foreach (var i in Times(5000)) {
-            camera.orthographicSize += 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-            camera.orthographicSize += 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-            camera.orthographicSize += 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-            camera.orthographicSize += 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-            camera.orthographicSize -= 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-            camera.orthographicSize -= 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-            camera.orthographicSize -= 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-            camera.orthographicSize -= 0.2f;
-            yield return Rest(0, RandomHelper.Pick(restChoices));
-        }
-        */
     }
 
     IEnumerator RunText() {
-        var fontSize = new float[]{170, 250, 350, 470};
+        var fontSize = new float[]{220, 350, 450};
         foreach (var i in Times(5000)) {
 
             textBox.fontSize = (int)RandomHelper.Pick(fontSize);

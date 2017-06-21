@@ -134,4 +134,20 @@ static class CameraHelper {
         }
         return offset;
     }
+
+    public static float ViewportToWorldXPos(float x) {
+        return Camera.main.ViewportToWorldPoint(new Vector2(x, 0)).x;
+    }
+
+    public static float ViewportToWorldYPos(float y) {
+        return Camera.main.ViewportToWorldPoint(new Vector2(0, y)).y;
+    }
+
+    public static Vector2 ViewportToWorldPoint(float x, float y) {
+        return Camera.main.ViewportToWorldPoint(new Vector2(x, y));
+    }
+
+    public static Vector2 ViewportToWorldScale(float width, float height) {
+        return new Vector2(Width * width, Height * height);
+    }
 }

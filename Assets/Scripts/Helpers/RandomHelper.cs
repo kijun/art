@@ -45,5 +45,9 @@ public static class RandomHelper {
     public static float Pick(float[] list) {
         return list[Random.Range(0, list.Length)];
     }
+
+    public static T Pick<T>(params T[] choices) {
+        return choices[Random.Range(0, choices.Length)];
+    }
 }
 

@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Animatable2 : MonoBehaviour {
+    Dictionary<string, AnimationCurve> animationCurves = new Dictionary<string, AnimationCurve>();
 
     Vector2 originalScale;
     float originalRotation;
     float startTime;
+    float destroyAt = float.MaxValue;
+
+    /*** Lifecycle ***/
 
     void Start() {
         originalScale = localScale;
         originalRotation = rotation;
         startTime = Time.time;
+        UpdateAnimation();
     }
 
     void FixedUpdate() {
@@ -24,6 +29,35 @@ public class Animatable2 : MonoBehaviour {
             } else {
                 transform.localScale = newLocalScale;
             }
+        }
+
+        UpdateAnimation();
+
+        // apply animation curve
+        if (Time.time > destroyAt) {
+            Destroy(gameObject);
+        }
+    }
+
+    void UpdateAnimation() {
+        if (animationCurves.Count > 0) {
+            foreach (var kv in animationCurves) {
+                var val = kv.Value.Evaluate(Time.time);
+                switch (kv.Key) {
+                    case AnimationKeyPath.Opacity:
+                        opacity = val;
+                        break;
+                }
+            }
+        }
+        // not sure if this should be relative or absolute time
+    }
+
+    public void DestroyIn(float time, bool absolute = false) {
+        if (!absolute) {
+            destroyAt = time + Time.time;
+        } else {
+            destroyAt = time;
         }
     }
 
@@ -107,6 +141,20 @@ public class Animatable2 : MonoBehaviour {
         set {
             transform.position = transform.position.SwapZ(value * -1);
         }
+    }
+
+    /*** Animation ***/
+    public void AddAnimationCurve(string keyPath, AnimationCurve curve, bool relativeTime = true) {
+        if (relativeTime) {
+            var keyframes = curve.keys;
+            for (int i = 0; i < keyframes.Length; i++) {
+                var kf = keyframes[i];
+                kf.time += Time.time;
+                keyframes[i] = kf;
+            }
+            curve.keys = keyframes;
+        }
+        animationCurves.Add(keyPath, curve);
     }
 
     /*** PRIVATE ***/

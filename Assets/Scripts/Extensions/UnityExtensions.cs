@@ -73,7 +73,6 @@ public static class UnityExtensions {
             var color = m.color;
             color.a = val;
             m.color = color;
-            Debug.Log(color);
         }
     }
 
