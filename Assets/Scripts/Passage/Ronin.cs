@@ -4,12 +4,17 @@ using System.Linq;
 using UnityEngine;
 using PureShape;
 
-public class Circles : MonoBehaviour {
+public class Ronin : MonoBehaviour {
     /* For certain duration, */
 
     public Color orange;
     public Color red;
     public Color blue;
+
+    public Color lightBlue;
+    public Color darkBlue;
+    public Color lightBeige;
+
     public Color purple;
     public Color peach;
 
@@ -23,19 +28,81 @@ public class Circles : MonoBehaviour {
     public Camera camera;
 
     void Start() {
-//        NoteFactory.CreateCircle(new CircleProperty());
-        StartCoroutine(RunLineIntro());
-//        StartCoroutine(RunShapes());
-        StartCoroutine(RunSquareBeats());
-        StartCoroutine(RunHorizontalLines());
-        StartCoroutine(RunDiagonalLines());
-        StartCoroutine(RunRisingGraph());
+        StartCoroutine(RunBackground());
+        StartCoroutine(RunClock());
         StartCoroutine(RunCamera());
         StartCoroutine(RunCameraZoom());
+        StartCoroutine(RunDiagonalLines());
+        /*
+        StartCoroutine(RunLineIntro());
+        StartCoroutine(RunSquareBeats());
+        StartCoroutine(RunHorizontalLines());
+        StartCoroutine(RunRisingGraph());
         //StartCoroutine(RunCameraPosition());
-        //
         StartCoroutine(RunCircles());
+        */
     }
+
+    IEnumerator RunBackground() {
+        System.Action MakeShape = () => {
+            var randomColor = Color.Lerp(Color.white, lightBeige, Random.Range(0.8f, 1f));
+            var anim = NoteFactory.CreateRectInViewport(
+                x:Random.Range(0, 9)/10f+0.1f,
+                y:Random.Range(0, 9)/10f + 0.1f,
+                width:Random.Range(0.46f, 0.63f),
+                height: Random.Range(0.42f, 0.60f),
+                color: randomColor,
+                level: ShapeZLevel.Back/1000f);
+            Keyframe[] kff = KeyframeHelper.CreateKeyframes(
+                0, 0,
+                Beat*8, Random.Range(0.8f, 0.9f),
+                Beat*16, Random.Range(0.8f, 0.9f),
+                Beat*32, 0
+            );
+
+            anim.DestroyIn(Beat*33);
+            anim.AddAnimationCurve(AnimationKeyPath.Opacity, new AnimationCurve(kff));
+        };
+
+        // until measure 40
+        foreach (var rest in Loop(64, 0, 1, 0)) {
+            MakeShape();
+            yield return rest;
+        }
+    }
+
+    IEnumerator RunClock() {
+        System.Action MakeShape = () => {
+            var randomColor = Color.Lerp(lightBlue, darkBlue, Random.Range(0f, 1f));
+            var anim = NoteFactory.CreateRectInViewport(
+                x:Random.Range(0, 9)/10f+0.1f,
+                y:Random.Range(0, 9)/10f + 0.1f,
+                width: 0.02f,
+                height: 0.9f,
+                color: randomColor,
+                level: ShapeZLevel.Front);
+            Keyframe[] kff = KeyframeHelper.CreateKeyframes(
+                0, 0,
+                Beat*4, 1,
+                Beat*8, 1,
+                Beat*12, 0
+            );
+
+            anim.pivot = new Vector2(0, -1.5f);
+            //anim.velocity = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+            anim.angularVelocity = 15f;
+
+            anim.DestroyIn(Beat*13);
+            anim.AddAnimationCurve(AnimationKeyPath.Opacity, new AnimationCurve(kff));
+        };
+
+        // until measure 40
+        foreach (var rest in Loop(64, 0, 0, 8)) {
+            MakeShape();
+            yield return rest;
+        }
+    }
+
 
     IEnumerator RunCircles() {
         Color[] colors = {orange, red, purple};
@@ -63,19 +130,13 @@ public class Circles : MonoBehaviour {
     }
 
     IEnumerator RunCamera() {
-        var choices = new float[]{0, 45, 90, 180, 270};
-        var restChoices = new float[]{2, 3, 4, 6, 8};
-        var longRestChoices = new float[]{6, 8};
+        var choices = new float[]{0, 90, 180, 270};
+        //var restChoices = new float[]{2, 3, 4, 6, 8};
+        var restChoices = new float[]{6, 8};
         yield return Rest(0, 4f);
         foreach (var i in Times(5000)) {
-            var angle = Random.Range(0, 360);
-            if (Random.value > 0.85f) {
-                camera.transform.rotation = Quaternion.Euler(0, 0, angle);
-                yield return Rest(0, RandomHelper.Pick(longRestChoices));
-            } else {
-                camera.transform.rotation = Quaternion.Euler(0, 0, RandomHelper.Pick(choices));
-                yield return Rest(0, RandomHelper.Pick(restChoices));
-            }
+            camera.transform.rotation = Quaternion.Euler(0, 0, RandomHelper.Pick(choices));
+            yield return Rest(0, RandomHelper.Pick(restChoices));
         }
     }
 
@@ -105,7 +166,8 @@ public class Circles : MonoBehaviour {
 
     IEnumerator RunCameraZoom() {
         var cameraZoomLevels = new float [] {2, 5, 13};
-        var restChoices = new float[]{3.4f, 5.4f};
+        //var restChoices = new float[]{3.4f, 5.4f};
+        var restChoices = new float[]{6.4f, 8.4f};
         foreach (var i in Times(5000)) {
             camera.orthographicSize = RandomHelper.Pick(cameraZoomLevels);
             yield return Rest(0, RandomHelper.Pick(restChoices));
@@ -117,7 +179,7 @@ public class Circles : MonoBehaviour {
         System.Action MakeShape = () => {
             var randomColor = Color.Lerp(red, blue, Random.Range(0.5f, 1f));
             var anim = NoteFactory.CreateRectInViewport(
-                x:Random.Range(0, 9)/10f+0.1f, y:Random.Range(0, 9)/10f + 0.1f, width:Random.Range(0.125f, 0.125f), height: Random.Range(0.2f, 0.20f), color: randomColor, level: ShapeZLevel.Back/1000f);
+                x:Random.Range(0, 9)/10f+0.1f, y:Random.Range(0, 9)/10f + 0.1f, width:Random.Range(0.06f, 0.13f), height: Random.Range(0.12f, 0.20f), color: randomColor, level: ShapeZLevel.Back/1000f);
             Keyframe[] kff = KeyframeHelper.CreateKeyframes(
                 0, 0,
                 Beat, 1,
@@ -169,21 +231,19 @@ public class Circles : MonoBehaviour {
     }
 
     IEnumerator RunDiagonalLines() {
-        yield return Rest(24);
         System.Action MakeShape = () => {
-            var randomColor = Color.Lerp(orange, red, Random.value); // closer to red
+            var randomColor = Color.Lerp(darkBlue, blue, Random.value); // closer to red
             var anim = NoteFactory.CreateRectInViewport(
-                x:0.5f, y:Random.Range(0, 10)/10f, width:0.7f, height: 0.1f, color: randomColor, rotation: Random.value*360);
-            Debug.Log(anim.position);
+                x:Random.value, y:Random.value, width:Random.Range(0.2f, 0.5f), height: 0.001f, color: randomColor, rotation: Random.value*360);
             var maxOpacity = Random.Range(0.5f, 1f);
             Keyframe[] kff = KeyframeHelper.CreateKeyframes(
                 0, 0,
                 Beat, maxOpacity,
-                Beat*2, maxOpacity,
-                Beat*3, 0
+                Beat*20, maxOpacity,
+                Beat*30, 0
             );
 
-            anim.DestroyIn(Beat*4);
+            anim.DestroyIn(Beat*40);
             anim.AddAnimationCurve(AnimationKeyPath.Opacity, new AnimationCurve(kff));
         };
 

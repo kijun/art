@@ -87,8 +87,11 @@ public class PlayerController : MonoBehaviour {
                 float dx = xdir * stats.maxXSpeed * Time.deltaTime;
                 float dy = (ydir * yDeltaSpeed + yBaseSpeed) * Time.deltaTime;
 
-                newPos.x += dx;
-                newPos.y += dy;
+                var deltaPos = new Vector2(dx, dy);
+
+                deltaPos = Camera.main.transform.rotation * deltaPos;
+
+                newPos += deltaPos;
 
                 if (dx*dx + dy*dy > (yBaseSpeed * yBaseSpeed * Time.deltaTime * Time.deltaTime)) {
                     stroke1.angularVelocity = stroke1MaxAngularVelocity;
