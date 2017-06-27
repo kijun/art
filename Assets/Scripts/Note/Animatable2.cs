@@ -19,7 +19,7 @@ public class Animatable2 : MonoBehaviour {
         UpdateAnimation();
     }
 
-    void FixedUpdate() {
+    public virtual void FixedUpdate() {
         if (Mathf.Abs(scaleVelocity.sqrMagnitude) > float.Epsilon) {
             var newLocalScale = transform.localScale + (Vector3)scaleVelocity * Time.deltaTime;
             if (nonNegativeScale) {

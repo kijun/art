@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using PureShape;
 
-public class Circles : MonoBehaviour {
+public class StoryOfASound : MonoBehaviour {
     /* For certain duration, */
 
     public Color orange;
