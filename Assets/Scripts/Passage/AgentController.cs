@@ -27,7 +27,7 @@ public class AgentController : MonoBehaviour {
 
     void Start() {
         CreateAgents();
-//        StartCoroutine(Run());
+        StartCoroutine(Run());
     }
 
     void CreateAgents() {
@@ -37,11 +37,20 @@ public class AgentController : MonoBehaviour {
         board = Agent.CreateBoard(cols, rows, sideLength);
     }
 
-
-    /*
-    Agent RandomAgent() {
+    IEnumerator Run() {
+        // until measure 40
+        foreach (var rest in Loop(64, 0, 2, 0)) {
+            RandomAgent().ChangeColor(orange, new Note(), 0);
+            yield return rest;
+        }
     }
 
+
+    Agent RandomAgent() {
+        return (Agent)board.GetValue2(Random.Range(0, board.Length));
+    }
+
+    /*
     Agent[] Row(int row) {
     }
 

@@ -17,11 +17,19 @@ public class Agent : MonoBehaviour {
     public void ChangeColor(Color color, Note note, float virality) {
         // float delay =
         // run change,
+        //
+        animatable.color = color;
+        Debug.Log("changing colooor");
     }
 
     public void ChangeSize(Vector2 size, Note note, float virality) {
     }
 
+    public Animatable2 animatable {
+        get {
+            return GetComponent<Animatable2>();
+        }
+    }
 /*
  * behaviors?
  *
