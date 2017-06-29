@@ -4,8 +4,50 @@ using System.Linq;
 using UnityEngine;
 using PureShape;
 
-public class StoryOfASound : MonoBehaviour {
-    /* For certain duration, */
+public enum AgentState {
+}
+
+public struct Note {
+    public int measures;
+    public int beats;
+
+    public Note (int m=0, int b=0) {
+        measures = m;
+        beats = b;
+    }
+}
+
+
+public class AgentController : MonoBehaviour {
+
+    public Color baseColor;
+    public int rows; // automatically decides the rest of the game
+
+    Agent[,] board;
+
+    void Start() {
+        CreateAgents();
+//        StartCoroutine(Run());
+    }
+
+    void CreateAgents() {
+        var sideLength = CameraHelper.Height / (1.414f * rows + 0.414f);
+        int cols = (int)(CameraHelper.Width / (1.414f * sideLength));
+
+        board = Agent.CreateBoard(cols, rows, sideLength);
+    }
+
+
+    /*
+    Agent RandomAgent() {
+    }
+
+    Agent[] Row(int row) {
+    }
+
+    Agent[] Column(int column) {
+    }
+    */
 
     public Color orange;
     public Color red;
@@ -23,6 +65,7 @@ public class StoryOfASound : MonoBehaviour {
     public Camera camera;
     public CameraAnimatable cameraAnimatable;
 
+    /*
     void Start() {
 //        NoteFactory.CreateCircle(new CircleProperty());
         StartCoroutine(RunLineIntro());
@@ -37,6 +80,7 @@ public class StoryOfASound : MonoBehaviour {
         //
         StartCoroutine(RunCircles());
     }
+    */
 
     IEnumerator RunCircles() {
         Color[] colors = {orange, red, purple};
