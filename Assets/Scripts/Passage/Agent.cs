@@ -17,14 +17,13 @@ using PureShape;
 */
 
 public class Agent : MonoBehaviour {
-
-    public Dictionary<Location, Agent> adjacent = new Dictionary<Location, Agent>();
-    public Agent next;
-    public Agent prev;
     public int row;
     public int col;
 
     public AgentState state;
+
+    Dictionary<Location, Agent> adjacent = new Dictionary<Location, Agent>();
+    Location adjacentFlags = Location.None;
 
     public void RunAnimation(
             string keyPath,
@@ -36,9 +35,11 @@ public class Agent : MonoBehaviour {
         animatable.AddAnimationCurve(keyPath, curve);
         if (propProbability.IsNonZero() && Random.value < propProbability) {
             var next = AgentAtLocation(propLocation);
-            StartCoroutine(C.WithDelay(() => {
-                RunAnimation(keyPath, curve, propLocation, propProbability, propDelay);
-            }, propDelay));
+            if (next != null) {
+                StartCoroutine(C.WithDelay(() => {
+                    next.RunAnimation(keyPath, curve, propLocation, propProbability, propDelay);
+                }, propDelay));
+            }
         }
     }
 
@@ -69,7 +70,9 @@ public class Agent : MonoBehaviour {
     }
 
     public Agent AgentAtLocation(Location loc) {
-        return null;
+        var chosenLocation = loc.ChooseRandom(adjacentFlags);
+        if (chosenLocation == Location.None) return null;
+        return adjacent[chosenLocation];
     }
 
         /*
@@ -77,6 +80,13 @@ public class Agent : MonoBehaviour {
         Agent[] agents = adjacent.Values.ToArray();
     }
     */
+
+    public void AddAdjacentAgent (Location loc, Agent agent) {
+        if (agent != null) {
+            adjacentFlags |= loc;
+            adjacent.Add(loc, agent);
+        }
+    }
 
     public void ChangeSize(Vector2 size, Note note, float virality) {
     }
@@ -124,14 +134,14 @@ public class Agent : MonoBehaviour {
         for (int x = 0; x < cols; x++) {
             for (int y = 0; y < rows; y++) {
                 var agent = (Agent)board.GetValue2(x, y);
-                agent.adjacent.AddIfNotNull(Location.TopLeft,     (Agent)board.GetValue2(x-1, y-1));
-                agent.adjacent.AddIfNotNull(Location.Top,         (Agent)board.GetValue2(x,   y-1));
-                agent.adjacent.AddIfNotNull(Location.TopRight,    (Agent)board.GetValue2(x+1, y-1));
-                agent.adjacent.AddIfNotNull(Location.Left,        (Agent)board.GetValue2(x-1, y));
-                agent.adjacent.AddIfNotNull(Location.Right,       (Agent)board.GetValue2(x+1, y));
-                agent.adjacent.AddIfNotNull(Location.BottomLeft,  (Agent)board.GetValue2(x-1, y+1));
-                agent.adjacent.AddIfNotNull(Location.Bottom,      (Agent)board.GetValue2(x,   y+1));
-                agent.adjacent.AddIfNotNull(Location.BottomRight, (Agent)board.GetValue2(x+1, y+1));
+                agent.AddAdjacentAgent(Location.TopLeft,     (Agent)board.GetValue2(x-1, y-1));
+                agent.AddAdjacentAgent(Location.Top,         (Agent)board.GetValue2(x,   y-1));
+                agent.AddAdjacentAgent(Location.TopRight,    (Agent)board.GetValue2(x+1, y-1));
+                agent.AddAdjacentAgent(Location.Left,        (Agent)board.GetValue2(x-1, y));
+                agent.AddAdjacentAgent(Location.Right,       (Agent)board.GetValue2(x+1, y));
+                agent.AddAdjacentAgent(Location.BottomLeft,  (Agent)board.GetValue2(x-1, y+1));
+                agent.AddAdjacentAgent(Location.Bottom,      (Agent)board.GetValue2(x,   y+1));
+                agent.AddAdjacentAgent(Location.BottomRight, (Agent)board.GetValue2(x+1, y+1));
             }
         }
 

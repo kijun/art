@@ -153,16 +153,16 @@ public class Animatable2 : MonoBehaviour {
 
     /*** Animation ***/
     public void AddAnimationCurve(string keyPath, AnimationCurve curve, bool relativeTime = true) {
+        var keyframes = curve.keys;
         if (relativeTime) {
-            var keyframes = curve.keys;
             for (int i = 0; i < keyframes.Length; i++) {
                 var kf = keyframes[i];
                 kf.time += Time.time;
                 keyframes[i] = kf;
             }
-            curve.keys = keyframes;
         }
-        animationCurves.Add(keyPath, curve);
+        animationCurves.Remove(keyPath);
+        animationCurves.Add(keyPath, new AnimationCurve(keyframes));
     }
 
     /*** PRIVATE ***/

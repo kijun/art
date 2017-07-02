@@ -22,6 +22,7 @@ public class AgentController : MonoBehaviour {
 
     public Color baseColor;
     public int rows; // automatically decides the rest of the game
+    int cols;
 
     Agent[,] board;
 
@@ -32,13 +33,22 @@ public class AgentController : MonoBehaviour {
 
     void CreateAgents() {
         var sideLength = CameraHelper.Height / (1.414f * rows + 0.414f);
-        int cols = (int)(CameraHelper.Width / (1.414f * sideLength));
+        cols = (int)(CameraHelper.Width / (1.414f * sideLength));
 
         board = Agent.CreateBoard(cols, rows, sideLength);
     }
 
     IEnumerator Run() {
         // until measure 40
+        for (int i = 0; i < rows; i++) {
+            board[0,i].RunAnimation(
+                    AnimationKeyPath.Opacity,
+                    AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0.5f, NoteValueToDuration(2, 0), 0),
+                    Location.Right,
+                    0.95f,
+                    NoteValueToDuration(0, 1)
+            );
+        }
         yield return Rest(2);
         foreach (var rest in Loop(64, 0, 1, 0)) {
             StartCoroutine(RandomAgent().ChangeColor(orange, NoteValueToDuration(0, 2), 0));

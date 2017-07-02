@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class AnimationCurveUtil {
-    public static AnimationCurve FromPairs(params float pairs) {
-        new AnimationCurve(KeyframeHelper.CreateKeyframes(pairs));
+public static class AnimationCurveUtils {
+    public static AnimationCurve FromPairs(params float[] pairs) {
+        return new AnimationCurve(KeyframeHelper.CreateKeyframes(pairs));
     }
 }
