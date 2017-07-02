@@ -3,6 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using PureShape;
+/*
+ * Looks
+    * Adjacent cascading color
+    * Change of translucency
+    * Rect to circle
+    * Multiple shapes with translucency
+ * Transition
+    * Return to original
+    * Gradually change color
+    * Animation - KeyframeAnim - should have start time, end time
+    * Virality - percentage but also activation time
+*/
 
 public class Agent : MonoBehaviour {
 
@@ -14,13 +26,57 @@ public class Agent : MonoBehaviour {
 
     public AgentState state;
 
-    public void ChangeColor(Color color, Note note, float virality) {
-        // float delay =
-        // run change,
-        //
-        animatable.color = color;
-        Debug.Log("changing colooor");
+    public void RunAnimation(
+            string keyPath,
+            AnimationCurve curve,
+            // TODO create a new struct
+            Location propLocation = Location.None,
+            float propProbability = 0,
+            float propDelay = 0) {
+        animatable.AddAnimationCurve(keyPath, curve);
+        if (propProbability.IsNonZero() && Random.value < propProbability) {
+            var next = AgentAtLocation(propLocation);
+            StartCoroutine(C.WithDelay(() => {
+                RunAnimation(keyPath, curve, propLocation, propProbability, propDelay);
+            }, propDelay));
+        }
     }
+
+    public void RunAnimation(
+            string keyPath,
+            Keyframe[] keyframes,
+            Location propLocation = Location.None,
+            float propProbability = 0,
+            float propDelay = 0) {
+        RunAnimation(keyPath, new AnimationCurve(keyframes), propLocation, propProbability, propDelay);
+    }
+
+    //IEnumerator RunAnimationCoroutine
+
+    public IEnumerator ChangeColor(Color color, float note, float virality) {
+        if (animatable.color != color) {
+            animatable.color = color;
+            yield return new WaitForSeconds(note);
+            StartCoroutine(RandomHelper.Pick<Agent>(adjacent.Values.ToArray()).ChangeColor(color, note, virality));
+            //if (adjacent.ContainsKey(Location.Right)) {
+            //}
+        }
+    }
+
+    public Agent AgentFromDirection(Direction dir) {
+//        return adjacent[dir.CompareTo(
+          return null;
+    }
+
+    public Agent AgentAtLocation(Location loc) {
+        return null;
+    }
+
+        /*
+    public Agent RandomAdjacentAgent() {
+        Agent[] agents = adjacent.Values.ToArray();
+    }
+    */
 
     public void ChangeSize(Vector2 size, Note note, float virality) {
     }

@@ -39,8 +39,9 @@ public class AgentController : MonoBehaviour {
 
     IEnumerator Run() {
         // until measure 40
-        foreach (var rest in Loop(64, 0, 2, 0)) {
-            RandomAgent().ChangeColor(orange, new Note(), 0);
+        yield return Rest(2);
+        foreach (var rest in Loop(64, 0, 1, 0)) {
+            StartCoroutine(RandomAgent().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
             yield return rest;
         }
     }

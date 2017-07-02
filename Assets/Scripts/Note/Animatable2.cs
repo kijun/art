@@ -115,6 +115,10 @@ public class Animatable2 : MonoBehaviour {
                 rd.material.color = value;
             }
         }
+
+        get {
+            return renderers[0].material.color;
+        }
     }
 
     public float opacity {
