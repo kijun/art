@@ -40,6 +40,7 @@ public class AgentController : MonoBehaviour {
 
     IEnumerator Run() {
         // until measure 40
+        /*
         for (int i = 0; i < rows; i++) {
             board[0,i].RunAnimation(
                     AnimationKeyPath.Opacity,
@@ -48,10 +49,45 @@ public class AgentController : MonoBehaviour {
                     0.95f,
                     NoteValueToDuration(0, 1)
             );
+
+            board[0,i]
+
         }
+        */
         yield return Rest(2);
         foreach (var rest in Loop(64, 0, 1, 0)) {
             StartCoroutine(RandomAgent().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
+
+            RandomAgent().RunAnimation(
+                    AnimationKeyPath.Rotation,
+                    AnimationCurveUtils.FromPairs(0, 0, NoteValueToDuration(1, 0), 360),
+                    Location.Right,
+                    1f,
+                    NoteValueToDuration(0, 1)
+            );
+
+            RandomAgent().RunAnimation(
+                    AnimationKeyPath.Opacity,
+                    AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(0, 2), 0.0f, NoteValueToDuration(1, 0), 1),
+                    Location.Left,
+                    0.95f,
+                    NoteValueToDuration(0, 1)
+            );
+
+            RandomAgent().RunAnimation(
+                    AnimationKeyPath.RelScaleX,
+                    AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 5f, NoteValueToDuration(2, 0), 1),
+                    Location.Bottom,
+                    1f,
+                    NoteValueToDuration(0, 1)
+            );
+            RandomAgent().RunAnimation(
+                    AnimationKeyPath.RelScaleY,
+                    AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 5f, NoteValueToDuration(2, 0), 1),
+                    Location.Top,
+                    1f,
+                    NoteValueToDuration(0, 1)
+            );
             yield return rest;
         }
     }

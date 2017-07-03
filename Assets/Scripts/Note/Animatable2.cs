@@ -47,6 +47,35 @@ public class Animatable2 : MonoBehaviour {
                     case AnimationKeyPath.Opacity:
                         opacity = val;
                         break;
+                    case AnimationKeyPath.Rotation:
+                        rotation = val;
+                        break;
+                    case AnimationKeyPath.VelocityX:
+                        velocity = velocity.SwapX(val);
+                        break;
+                    case AnimationKeyPath.VelocityY:
+                        velocity = velocity.SwapY(val);
+                        break;
+                    case AnimationKeyPath.ScaleX:
+                        break;
+                    case AnimationKeyPath.ScaleY:
+                        break;
+                    case AnimationKeyPath.ColorR:
+                        break;
+                    case AnimationKeyPath.ColorG:
+                        break;
+                    case AnimationKeyPath.ColorB:
+                        break;
+                    case AnimationKeyPath.RelPosX:
+                        break;
+                    case AnimationKeyPath.RelPosY:
+                        break;
+                    case AnimationKeyPath.RelScaleX:
+                        localScale = originalScale.MultiplyEach(val, 1);
+                        break;
+                    case AnimationKeyPath.RelScaleY:
+                        localScale = originalScale.MultiplyEach(1, val);
+                        break;
                 }
             }
         }

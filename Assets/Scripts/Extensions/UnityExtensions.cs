@@ -34,6 +34,16 @@ public static class UnityExtensions {
     }
 
     /*** VECTOR2 ***/
+    public static Vector2 SwapX(this Vector2 v, float val) {
+        v.x = val;
+        return v;
+    }
+
+    public static Vector2 SwapY(this Vector2 v, float val) {
+        v.y = val;
+        return v;
+    }
+
     public static Vector2 MultiplyEach(this Vector2 v, float x, float y) {
         return new Vector2(v.x * x, v.y * y);
     }

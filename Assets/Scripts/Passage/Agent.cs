@@ -17,98 +17,16 @@ using PureShape;
 */
 
 public class Agent : MonoBehaviour {
+    /***** PUBLIC: Variable *****/
     public int row;
     public int col;
-
     public AgentState state;
 
+    /***** PRIVATE: Variable *****/
     Dictionary<Location, Agent> adjacent = new Dictionary<Location, Agent>();
     Location adjacentFlags = Location.None;
 
-    public void RunAnimation(
-            string keyPath,
-            AnimationCurve curve,
-            // TODO create a new struct
-            Location propLocation = Location.None,
-            float propProbability = 0,
-            float propDelay = 0) {
-        animatable.AddAnimationCurve(keyPath, curve);
-        if (propProbability.IsNonZero() && Random.value < propProbability) {
-            var next = AgentAtLocation(propLocation);
-            if (next != null) {
-                StartCoroutine(C.WithDelay(() => {
-                    next.RunAnimation(keyPath, curve, propLocation, propProbability, propDelay);
-                }, propDelay));
-            }
-        }
-    }
-
-    public void RunAnimation(
-            string keyPath,
-            Keyframe[] keyframes,
-            Location propLocation = Location.None,
-            float propProbability = 0,
-            float propDelay = 0) {
-        RunAnimation(keyPath, new AnimationCurve(keyframes), propLocation, propProbability, propDelay);
-    }
-
-    //IEnumerator RunAnimationCoroutine
-
-    public IEnumerator ChangeColor(Color color, float note, float virality) {
-        if (animatable.color != color) {
-            animatable.color = color;
-            yield return new WaitForSeconds(note);
-            StartCoroutine(RandomHelper.Pick<Agent>(adjacent.Values.ToArray()).ChangeColor(color, note, virality));
-            //if (adjacent.ContainsKey(Location.Right)) {
-            //}
-        }
-    }
-
-    public Agent AgentFromDirection(Direction dir) {
-//        return adjacent[dir.CompareTo(
-          return null;
-    }
-
-    public Agent AgentAtLocation(Location loc) {
-        var chosenLocation = loc.ChooseRandom(adjacentFlags);
-        if (chosenLocation == Location.None) return null;
-        return adjacent[chosenLocation];
-    }
-
-        /*
-    public Agent RandomAdjacentAgent() {
-        Agent[] agents = adjacent.Values.ToArray();
-    }
-    */
-
-    public void AddAdjacentAgent (Location loc, Agent agent) {
-        if (agent != null) {
-            adjacentFlags |= loc;
-            adjacent.Add(loc, agent);
-        }
-    }
-
-    public void ChangeSize(Vector2 size, Note note, float virality) {
-    }
-
-    public Animatable2 animatable {
-        get {
-            return GetComponent<Animatable2>();
-        }
-    }
-/*
- * behaviors?
- *
- * change color
- * disappear
- * enlarge (certain direction)
- * movement (permanent, temporary)
- * additional (max bill)
- * rotate
- * graphical (font, ikko tanaka)
- * turn to circle, or a particular shape
- *
- */
+    /***** PUBLIC STATIC METHOD *****/
     public static Agent[,] CreateBoard(int cols, int rows, float length) {
         Debug.Log("Creating board " + cols + " " + rows);
         var board = new Agent[cols, rows]; // x, y
@@ -147,5 +65,76 @@ public class Agent : MonoBehaviour {
 
         return board;
     }
+
+    public void RunAnimation(
+            string keyPath,
+            AnimationCurve curve,
+            // TODO create a new struct
+            Location propLocation = Location.None,
+            float propProbability = 0,
+            float propDelay = 0) {
+        animatable.AddAnimationCurve(keyPath, curve);
+        if (propProbability.IsNonZero() && Random.value < propProbability) {
+            var next = AgentAtLocation(propLocation);
+            if (next != null) {
+                StartCoroutine(C.WithDelay(() => {
+                    next.RunAnimation(keyPath, curve, propLocation, propProbability, propDelay);
+                }, propDelay));
+            }
+        }
+    }
+
+    public void RunAnimation(
+            string keyPath,
+            Keyframe[] keyframes,
+            Location propLocation = Location.None,
+            float propProbability = 0,
+            float propDelay = 0) {
+        RunAnimation(keyPath, new AnimationCurve(keyframes), propLocation, propProbability, propDelay);
+    }
+
+    public IEnumerator ChangeColor(Color color, float note, float virality) {
+        if (animatable.color != color) {
+            animatable.color = color;
+            yield return new WaitForSeconds(note);
+            StartCoroutine(AgentAtLocation(Location.Axis).ChangeColor(color, note, virality));
+            yield return new WaitForSeconds(note);
+            StartCoroutine(AgentAtLocation(Location.Axis).ChangeColor(color, note, virality));
+            //if (adjacent.ContainsKey(Location.Right)) {
+            //}
+        }
+    }
+
+    Agent AgentAtLocation(Location loc) {
+        var chosenLocation = loc.ChooseRandom(adjacentFlags);
+        if (chosenLocation == Location.None) return null;
+        return adjacent[chosenLocation];
+    }
+
+    public void AddAdjacentAgent (Location loc, Agent agent) {
+        if (agent != null) {
+            adjacentFlags |= loc;
+            adjacent.Add(loc, agent);
+        }
+    }
+
+    public Animatable2 animatable {
+        get {
+            return GetComponent<Animatable2>();
+        }
+    }
+/*
+ * behaviors?
+ *
+ * change color
+ * disappear
+ * enlarge (certain direction)
+ * movement (permanent, temporary)
+ * additional (max bill)
+ * rotate
+ * graphical (font, ikko tanaka)
+ * turn to circle, or a particular shape
+ *
+ */
 }
 
