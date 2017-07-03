@@ -16,20 +16,20 @@ using PureShape;
     * Virality - percentage but also activation time
 */
 
-public class Agent : MonoBehaviour {
+public class Tile : MonoBehaviour {
     /***** PUBLIC: Variable *****/
     public int row;
     public int col;
-    public AgentState state;
+    public TileMutexFlags mutex;
 
     /***** PRIVATE: Variable *****/
-    Dictionary<Location, Agent> adjacent = new Dictionary<Location, Agent>();
+    Dictionary<Location, Tile> adjacent = new Dictionary<Location, Tile>();
     Location adjacentFlags = Location.None;
 
     /***** PUBLIC STATIC METHOD *****/
-    public static Agent[,] CreateBoard(int cols, int rows, float length) {
+    public static Tile[,] CreateBoard(int cols, int rows, float length) {
         Debug.Log("Creating board " + cols + " " + rows);
-        var board = new Agent[cols, rows]; // x, y
+        var board = new Tile[cols, rows]; // x, y
         var diagonal = length * 1.414f;
         var xmin = -(diagonal*(cols-1))/2;
         var ymin = -(diagonal*(rows-1))/2;
@@ -44,22 +44,22 @@ public class Agent : MonoBehaviour {
                 };
 
                 var anim = NoteFactory.CreateRect(rp);
-                var agent = anim.gameObject.AddComponent<Agent>();
-                board[i, j] = agent;
+                var tile = anim.gameObject.AddComponent<Tile>();
+                board[i, j] = tile;
             }
         }
 
         for (int x = 0; x < cols; x++) {
             for (int y = 0; y < rows; y++) {
-                var agent = (Agent)board.GetValue2(x, y);
-                agent.AddAdjacentAgent(Location.TopLeft,     (Agent)board.GetValue2(x-1, y-1));
-                agent.AddAdjacentAgent(Location.Top,         (Agent)board.GetValue2(x,   y-1));
-                agent.AddAdjacentAgent(Location.TopRight,    (Agent)board.GetValue2(x+1, y-1));
-                agent.AddAdjacentAgent(Location.Left,        (Agent)board.GetValue2(x-1, y));
-                agent.AddAdjacentAgent(Location.Right,       (Agent)board.GetValue2(x+1, y));
-                agent.AddAdjacentAgent(Location.BottomLeft,  (Agent)board.GetValue2(x-1, y+1));
-                agent.AddAdjacentAgent(Location.Bottom,      (Agent)board.GetValue2(x,   y+1));
-                agent.AddAdjacentAgent(Location.BottomRight, (Agent)board.GetValue2(x+1, y+1));
+                var tile = (Tile)board.GetValue2(x, y);
+                tile.AddAdjacentTile(Location.TopLeft,     (Tile)board.GetValue2(x-1, y-1));
+                tile.AddAdjacentTile(Location.Top,         (Tile)board.GetValue2(x,   y-1));
+                tile.AddAdjacentTile(Location.TopRight,    (Tile)board.GetValue2(x+1, y-1));
+                tile.AddAdjacentTile(Location.Left,        (Tile)board.GetValue2(x-1, y));
+                tile.AddAdjacentTile(Location.Right,       (Tile)board.GetValue2(x+1, y));
+                tile.AddAdjacentTile(Location.BottomLeft,  (Tile)board.GetValue2(x-1, y+1));
+                tile.AddAdjacentTile(Location.Bottom,      (Tile)board.GetValue2(x,   y+1));
+                tile.AddAdjacentTile(Location.BottomRight, (Tile)board.GetValue2(x+1, y+1));
             }
         }
 
@@ -75,7 +75,7 @@ public class Agent : MonoBehaviour {
             float propDelay = 0) {
         animatable.AddAnimationCurve(keyPath, curve);
         if (propProbability.IsNonZero() && Random.value < propProbability) {
-            var next = AgentAtLocation(propLocation);
+            var next = TileAtLocation(propLocation);
             if (next != null) {
                 StartCoroutine(C.WithDelay(() => {
                     next.RunAnimation(keyPath, curve, propLocation, propProbability, propDelay);
@@ -93,28 +93,33 @@ public class Agent : MonoBehaviour {
         RunAnimation(keyPath, new AnimationCurve(keyframes), propLocation, propProbability, propDelay);
     }
 
+    // multiple shapes?
+    // changing shape?
+    //public void ChangeShape(shape param?)
+    //public void addshape
+
     public IEnumerator ChangeColor(Color color, float note, float virality) {
         if (animatable.color != color) {
             animatable.color = color;
             yield return new WaitForSeconds(note);
-            StartCoroutine(AgentAtLocation(Location.Axis).ChangeColor(color, note, virality));
+            StartCoroutine(TileAtLocation(Location.Axis).ChangeColor(color, note, virality));
             yield return new WaitForSeconds(note);
-            StartCoroutine(AgentAtLocation(Location.Axis).ChangeColor(color, note, virality));
+            StartCoroutine(TileAtLocation(Location.Axis).ChangeColor(color, note, virality));
             //if (adjacent.ContainsKey(Location.Right)) {
             //}
         }
     }
 
-    Agent AgentAtLocation(Location loc) {
+    Tile TileAtLocation(Location loc) {
         var chosenLocation = loc.ChooseRandom(adjacentFlags);
         if (chosenLocation == Location.None) return null;
         return adjacent[chosenLocation];
     }
 
-    public void AddAdjacentAgent (Location loc, Agent agent) {
-        if (agent != null) {
+    public void AddAdjacentTile (Location loc, Tile tile) {
+        if (tile != null) {
             adjacentFlags |= loc;
-            adjacent.Add(loc, agent);
+            adjacent.Add(loc, tile);
         }
     }
 

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class CollectionsHelper {
-    public static Agent GetValue2(this Agent[,] agents, int i, int j) {
+    public static Tile GetValue2(this Tile[,] agents, int i, int j) {
         if (i >= 0 && j >= 0 && agents.GetLength(0) > i && agents.GetLength(1) > j) {
             return agents[i,j];
         }
         return null;
     }
 
-    public static Agent GetValue2(this Agent[,] agents, int sum) {
+    public static Tile GetValue2(this Tile[,] agents, int sum) {
         int width = agents.GetLength(0);
         int i = sum % width;
         int j = sum / width;

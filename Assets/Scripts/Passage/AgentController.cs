@@ -4,9 +4,6 @@ using System.Linq;
 using UnityEngine;
 using PureShape;
 
-public enum AgentState {
-}
-
 public struct Note {
     public int measures;
     public int beats;
@@ -17,6 +14,18 @@ public struct Note {
     }
 }
 
+[System.Flags]
+public enum TileMutexFlags {
+    None        = 0,
+    Position    = 1 << 0,
+    Velocity    = 1 << 1,
+    Rotation    = 1 << 2,
+    Scale       = 1 << 3,
+    Opacity     = 1 << 4,
+    Color       = 1 << 5,
+    Shape       = 1 << 6,
+    EntityCount = 1 << 7,
+}
 
 public class AgentController : MonoBehaviour {
 
@@ -24,41 +33,46 @@ public class AgentController : MonoBehaviour {
     public int rows; // automatically decides the rest of the game
     int cols;
 
-    Agent[,] board;
+    Tile[,] board;
 
     void Start() {
-        CreateAgents();
+        CreateTiles();
         StartCoroutine(Run());
     }
 
-    void CreateAgents() {
+    void CreateTiles() {
         var sideLength = CameraHelper.Height / (1.414f * rows + 0.414f);
         cols = (int)(CameraHelper.Width / (1.414f * sideLength));
 
-        board = Agent.CreateBoard(cols, rows, sideLength);
+        board = Tile.CreateBoard(cols, rows, sideLength);
     }
 
     IEnumerator Run() {
         // until measure 40
-        /*
         for (int i = 0; i < rows; i++) {
-            board[0,i].RunAnimation(
+            var target = board[0,0];
+            if ((target.mutex & TileMutexFlags.Opacity) == 0) {
+                target.mutex |= TileMutexFlags.Opacity;
+                target.RunAnimation(
                     AnimationKeyPath.Opacity,
                     AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0.5f, NoteValueToDuration(2, 0), 0),
                     Location.Right,
                     0.95f,
                     NoteValueToDuration(0, 1)
-            );
-
-            board[0,i]
-
+                );
+                StartCoroutine(C.WithDelay(() => {
+                    target.mutex ^= TileMutexFlags.Opacity;
+                }, NoteValueToDuration(2, 0)));
+            } else {
+                Debug.Log("locked");
+            }
         }
-        */
+
         yield return Rest(2);
         foreach (var rest in Loop(64, 0, 1, 0)) {
-            StartCoroutine(RandomAgent().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
+            StartCoroutine(RandomTile().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
 
-            RandomAgent().RunAnimation(
+            RandomTile().RunAnimation(
                     AnimationKeyPath.Rotation,
                     AnimationCurveUtils.FromPairs(0, 0, NoteValueToDuration(1, 0), 360),
                     Location.Right,
@@ -66,7 +80,7 @@ public class AgentController : MonoBehaviour {
                     NoteValueToDuration(0, 1)
             );
 
-            RandomAgent().RunAnimation(
+            RandomTile().RunAnimation(
                     AnimationKeyPath.Opacity,
                     AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(0, 2), 0.0f, NoteValueToDuration(1, 0), 1),
                     Location.Left,
@@ -74,14 +88,14 @@ public class AgentController : MonoBehaviour {
                     NoteValueToDuration(0, 1)
             );
 
-            RandomAgent().RunAnimation(
+            RandomTile().RunAnimation(
                     AnimationKeyPath.RelScaleX,
                     AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 5f, NoteValueToDuration(2, 0), 1),
                     Location.Bottom,
                     1f,
                     NoteValueToDuration(0, 1)
             );
-            RandomAgent().RunAnimation(
+            RandomTile().RunAnimation(
                     AnimationKeyPath.RelScaleY,
                     AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 5f, NoteValueToDuration(2, 0), 1),
                     Location.Top,
@@ -93,15 +107,15 @@ public class AgentController : MonoBehaviour {
     }
 
 
-    Agent RandomAgent() {
-        return (Agent)board.GetValue2(Random.Range(0, board.Length));
+    Tile RandomTile() {
+        return (Tile)board.GetValue2(Random.Range(0, board.Length));
     }
 
     /*
-    Agent[] Row(int row) {
+    Tile[] Row(int row) {
     }
 
-    Agent[] Column(int column) {
+    Tile[] Column(int column) {
     }
     */
 
