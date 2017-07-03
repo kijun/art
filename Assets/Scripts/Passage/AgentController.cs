@@ -15,7 +15,7 @@ public struct Note {
 }
 
 [System.Flags]
-public enum TileMutexFlags {
+public enum TileMutexFlag {
     None        = 0,
     Position    = 1 << 0,
     Velocity    = 1 << 1,
@@ -49,22 +49,49 @@ public class AgentController : MonoBehaviour {
 
     IEnumerator Run() {
         // until measure 40
-        for (int i = 0; i < rows; i++) {
-            var target = board[0,0];
+        System.Action<Tile> f = (Tile target) => {};
+        f = (Tile target) => {
+            if (target == null) return;
             if ((target.mutex & TileMutexFlags.Opacity) == 0) {
                 target.mutex |= TileMutexFlags.Opacity;
                 target.RunAnimation(
                     AnimationKeyPath.Opacity,
-                    AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0.5f, NoteValueToDuration(2, 0), 0),
-                    Location.Right,
-                    0.95f,
-                    NoteValueToDuration(0, 1)
+                    AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0.5f, NoteValueToDuration(2, 0), 0)
                 );
                 StartCoroutine(C.WithDelay(() => {
                     target.mutex ^= TileMutexFlags.Opacity;
-                }, NoteValueToDuration(2, 0)));
-            } else {
-                Debug.Log("locked");
+                    f(target.TileAtLocation(Location.Right));
+                }, NoteValueToDuration(0, 1)));
+            }};
+
+        // findtarget
+        // lockProperty
+        // runanimation
+
+        // Find target
+        bool found = false;
+        int runCount = 0;
+        while (!found && runCount < 100) {
+            int x = Random.Range(0, cols);
+            int y = Random.Range(0, rows);
+            var tile = board[x, y];
+            if (!tile.IsLocked(TileMutexFlag.Opacity)) {
+                f(tile);
+            }
+        }
+
+        f = (Tile target) => {
+            if (!tile.IsLocked(TileMutexFlags.Opacity)) {
+                tile.Lock(TileMutexFlags.Opacity);
+                // can this automatically lock the target?
+                tile.RunAnimation(
+                    AnimationKeyPath.Opacity,
+                    AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0.5f, NoteValueToDuration(2, 0), 0),
+                    TileMutexFlags.Opacity
+                );
+                StartCoroutine(C.WithDelay(() => {
+                    tile.TileAtLocation(Location.Right, TileMutexFlags.Opacity)
+                }
             }
         }
 

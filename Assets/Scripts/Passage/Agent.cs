@@ -20,11 +20,11 @@ public class Tile : MonoBehaviour {
     /***** PUBLIC: Variable *****/
     public int row;
     public int col;
-    public TileMutexFlags mutex;
 
     /***** PRIVATE: Variable *****/
     Dictionary<Location, Tile> adjacent = new Dictionary<Location, Tile>();
     Location adjacentFlags = Location.None;
+    TileMutexFlags mutex = TileMutexFlags.None;
 
     /***** PUBLIC STATIC METHOD *****/
     public static Tile[,] CreateBoard(int cols, int rows, float length) {
@@ -73,7 +73,16 @@ public class Tile : MonoBehaviour {
             Location propLocation = Location.None,
             float propProbability = 0,
             float propDelay = 0) {
+        var lockFlag = AnimationKeyPath.ToTileMutexFlag(keyPath);
+        mutex |= lockFlag;
         animatable.AddAnimationCurve(keyPath, curve);
+        float animFinishTime = 0;
+        foreach (var k in curve.keys) {
+            animFinishTime = Mathf.Max(animFinishTime, k.time);
+        }
+
+        StartCoroutine(C.WithDelay(() => { mutex ^= lockFlag; }, animFinishTime));
+        /*
         if (propProbability.IsNonZero() && Random.value < propProbability) {
             var next = TileAtLocation(propLocation);
             if (next != null) {
@@ -82,6 +91,7 @@ public class Tile : MonoBehaviour {
                 }, propDelay));
             }
         }
+        */
     }
 
     public void RunAnimation(
@@ -110,10 +120,14 @@ public class Tile : MonoBehaviour {
         }
     }
 
-    Tile TileAtLocation(Location loc) {
+    public Tile TileAtLocation(Location loc) {
         var chosenLocation = loc.ChooseRandom(adjacentFlags);
         if (chosenLocation == Location.None) return null;
         return adjacent[chosenLocation];
+    }
+
+    public bool IsLocked(TileMutexFlag flag) {
+        return mutex & flag;
     }
 
     public void AddAdjacentTile (Location loc, Tile tile) {

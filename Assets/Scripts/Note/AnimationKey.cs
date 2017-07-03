@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public static class AnimationKeyPath {
     public const string Opacity   = "Opacity";
     public const string Rotation  = "Rotation";
@@ -12,4 +14,18 @@ public static class AnimationKeyPath {
     public const string RelPosY   = "RelPosY";
     public const string RelScaleX = "RelScaleX";
     public const string RelScaleY = "RelScaleY";
+
+    const Dictionary<string, TileMutexFlag> KEY_TO_TILE_MUTEX_FLAG = new Dictionary<string, TileMutexFlag> {
+        {Opacity,     TileMutexFlag.Opacity},
+        {Rotation,    TileMutexFlag.Rotation},
+        {VelocityX,   TileMutexFlag.Velocity},
+        {VelocityY,   TileMutexFlag.Velocity},
+    };
+
+    public static TileMutexFlag ToTileMutexFlag(string KeyPath) {
+        if (KEY_TO_TILE_MUTEX_FLAG.ContainsKey(KeyPath)) {
+            return KEY_TO_TILE_MUTEX_FLAG[KeyPath];
+        }
+        return TileMutexFlag.None;
+    }
 }
