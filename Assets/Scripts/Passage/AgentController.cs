@@ -49,53 +49,46 @@ public class AgentController : MonoBehaviour {
 
     IEnumerator Run() {
         // until measure 40
-        System.Action<Tile> f = (Tile target) => {};
-        f = (Tile target) => {
-            if (target == null) return;
-            if ((target.mutex & TileMutexFlags.Opacity) == 0) {
-                target.mutex |= TileMutexFlags.Opacity;
-                target.RunAnimation(
-                    AnimationKeyPath.Opacity,
-                    AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0.5f, NoteValueToDuration(2, 0), 0)
-                );
-                StartCoroutine(C.WithDelay(() => {
-                    target.mutex ^= TileMutexFlags.Opacity;
-                    f(target.TileAtLocation(Location.Right));
-                }, NoteValueToDuration(0, 1)));
-            }};
-
+        System.Action<Tile, Location> f = (Tile target, Location l) => {};
         // findtarget
         // lockProperty
         // runanimation
 
-        // Find target
-        bool found = false;
-        int runCount = 0;
-        while (!found && runCount < 100) {
-            int x = Random.Range(0, cols);
-            int y = Random.Range(0, rows);
-            var tile = board[x, y];
-            if (!tile.IsLocked(TileMutexFlag.Opacity)) {
-                f(tile);
-            }
-        }
-
-        f = (Tile target) => {
-            if (!tile.IsLocked(TileMutexFlags.Opacity)) {
-                tile.Lock(TileMutexFlags.Opacity);
-                // can this automatically lock the target?
-                tile.RunAnimation(
-                    AnimationKeyPath.Opacity,
-                    AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0.5f, NoteValueToDuration(2, 0), 0),
-                    TileMutexFlags.Opacity
-                );
-                StartCoroutine(C.WithDelay(() => {
-                    tile.TileAtLocation(Location.Right, TileMutexFlags.Opacity)
+        f = (Tile target, Location loc) => {
+            // can this automatically lock the target?
+            target.RunAnimation(
+                AnimationKeyPath.Opacity,
+                AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0f, NoteValueToDuration(2, 0), 0f, NoteValueToDuration(3,0), 1)
+            ); // this locks
+            StartCoroutine(C.WithDelay(() => {
+                var nextTarget = target.TileAtLocation(loc, TileMutexFlag.Opacity);
+                if (nextTarget != null) {
+                    f(nextTarget, loc);
                 }
-            }
-        }
+            }, NoteValueToDuration(0, 0.1f)));
+        };
 
-        yield return Rest(2);
+        foreach (var rest in Loop(64, 0, 0, 1)) {
+
+            // Find target
+            bool found = false;
+            int runCount = 0;
+            while (!found && runCount < 100) {
+                int x = Random.Range(0, cols);
+                int y = Random.Range(0, rows);
+                var tile = board[x, y];
+                if (!tile.IsLocked(TileMutexFlag.Opacity)) {
+                    var loc = Location.Bottom;
+                    if (Random.value > 0.5f) loc = Location.Right;
+                    f(tile, Location.Right|Location.Left);
+                    found = true;
+                }
+                runCount++;
+            }
+
+            yield return rest;
+        }
+        /*
         foreach (var rest in Loop(64, 0, 1, 0)) {
             StartCoroutine(RandomTile().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
 
@@ -131,6 +124,7 @@ public class AgentController : MonoBehaviour {
             );
             yield return rest;
         }
+        */
     }
 
 

@@ -24,7 +24,7 @@ public class Tile : MonoBehaviour {
     /***** PRIVATE: Variable *****/
     Dictionary<Location, Tile> adjacent = new Dictionary<Location, Tile>();
     Location adjacentFlags = Location.None;
-    TileMutexFlags mutex = TileMutexFlags.None;
+    TileMutexFlag mutex = TileMutexFlag.None;
 
     /***** PUBLIC STATIC METHOD *****/
     public static Tile[,] CreateBoard(int cols, int rows, float length) {
@@ -120,14 +120,23 @@ public class Tile : MonoBehaviour {
         }
     }
 
-    public Tile TileAtLocation(Location loc) {
-        var chosenLocation = loc.ChooseRandom(adjacentFlags);
+    public Tile TileAtLocation(Location loc, TileMutexFlag mutexFlag = TileMutexFlag.None) {
+        var targetTiles = adjacentFlags;
+        if (mutexFlag != TileMutexFlag.None) {
+            foreach (var kv in adjacent) {
+                if (kv.Value.IsLocked(mutexFlag)) {
+                    targetTiles ^= kv.Key;
+                }
+            }
+        }
+
+        var chosenLocation = loc.ChooseRandom(targetTiles);
         if (chosenLocation == Location.None) return null;
         return adjacent[chosenLocation];
     }
 
     public bool IsLocked(TileMutexFlag flag) {
-        return mutex & flag;
+        return (mutex & flag) != 0;
     }
 
     public void AddAdjacentTile (Location loc, Tile tile) {

@@ -15,7 +15,7 @@ public static class AnimationKeyPath {
     public const string RelScaleX = "RelScaleX";
     public const string RelScaleY = "RelScaleY";
 
-    const Dictionary<string, TileMutexFlag> KEY_TO_TILE_MUTEX_FLAG = new Dictionary<string, TileMutexFlag> {
+    static Dictionary<string, TileMutexFlag> KEY_TO_TILE_MUTEX_FLAG = new Dictionary<string, TileMutexFlag> {
         {Opacity,     TileMutexFlag.Opacity},
         {Rotation,    TileMutexFlag.Rotation},
         {VelocityX,   TileMutexFlag.Velocity},
