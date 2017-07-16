@@ -3,29 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using PureShape;
-
-public struct Note {
-    public int measures;
-    public int beats;
-
-    public Note (int m=0, int b=0) {
-        measures = m;
-        beats = b;
-    }
-}
-
-[System.Flags]
-public enum TileMutexFlag {
-    None        = 0,
-    Position    = 1 << 0,
-    Velocity    = 1 << 1,
-    Rotation    = 1 << 2,
-    Scale       = 1 << 3,
-    Opacity     = 1 << 4,
-    Color       = 1 << 5,
-    Shape       = 1 << 6,
-    EntityCount = 1 << 7,
-}
+using OscJack;
 
 public class AgentController : MonoBehaviour {
 
@@ -38,6 +16,26 @@ public class AgentController : MonoBehaviour {
     void Start() {
         CreateTiles();
         StartCoroutine(Run());
+        StartCoroutine(RunOrange());
+        StartCoroutine(RunRotation());
+        StartCoroutine(RunEnlarge());
+        StartCoroutine(RunEnlargeY());
+    }
+
+    void Update() {
+        Debug.Log(OscMaster.MasterDirectory.TotalMessageCount);
+        if (OscMaster.HasData("/Velocity1")) {
+            foreach (var x in OscMaster.GetData("/Velocity1")) {
+                Debug.Log(x);
+            }
+            OscMaster.ClearData("/Velocity1");
+        }
+        if (OscMaster.HasData("/Note1")) {
+            foreach (var x in OscMaster.GetData("/Note1")) {
+                Debug.Log(x);
+            }
+            OscMaster.ClearData("/Note1");
+        }
     }
 
     void CreateTiles() {
@@ -47,18 +45,85 @@ public class AgentController : MonoBehaviour {
         board = Tile.CreateBoard(cols, rows, sideLength);
     }
 
+    IEnumerator RunOrange() {
+        StartCoroutine(RandomTile().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
+        yield return Rest(2,1);
+        foreach (var rest in Loop(64, 0, 1, 3)) {
+            StartCoroutine(RandomTile().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
+            yield return rest;
+        }
+    }
+
+    IEnumerator RunRotation() {
+        yield return Rest(16);
+        foreach (var rest in Loop(32, 0, 2, 0)) {
+            var tile = RandomTile();
+            var rot = tile.animatable.rotation % 360;
+
+            RandomTile().RunAnimation(
+                    AnimationKeyPath.Rotation,
+                    AnimationCurveUtils.FromPairs(
+                        0, rot,
+                        NoteValueToDuration(0, 1), rot+Random.Range(360, 360)),
+                    Location.Axis,
+                    0.6f,
+                    NoteValueToDuration(0, 1)
+            );
+            yield return rest;
+        }
+        foreach (var rest in Loop(32, 0, 2, 0)) {
+            var tile = RandomTile();
+            var rot = tile.animatable.rotation % 360;
+
+            RandomTile().RunAnimation(
+                    AnimationKeyPath.Rotation,
+                    AnimationCurveUtils.FromPairs(
+                        0, rot,
+                        NoteValueToDuration(0, 1), rot+Random.Range(90, 360)),
+                    Location.Axis,
+                    0.6f,
+                    NoteValueToDuration(0, 1)
+            );
+            yield return rest;
+        }
+    }
+
+    IEnumerator RunEnlarge() {
+        yield return Rest(28);
+        foreach (var rest in Loop(64, 0, 1, 0)) {
+            RandomTile().RunAnimation(
+                    AnimationKeyPath.RelScaleX,
+                    AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 1.9f, NoteValueToDuration(2, 0), 1),
+                    Location.Bottom,
+                    0.8f,
+                    NoteValueToDuration(0, 1)
+            );
+            yield return rest;
+        }
+    }
+
+    IEnumerator RunEnlargeY() {
+        yield return Rest(40);
+        foreach (var rest in Loop(64, 0, 1, 0)) {
+            RandomTile().RunAnimation(
+                    AnimationKeyPath.RelScaleY,
+                    AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 5f, NoteValueToDuration(2, 0), 1),
+                    Location.Top,
+                    1f,
+                    NoteValueToDuration(0, 1)
+            );
+            yield return rest;
+        }
+    }
+
     IEnumerator Run() {
-        // until measure 40
         System.Action<Tile, Location> f = (Tile target, Location l) => {};
-        // findtarget
-        // lockProperty
-        // runanimation
 
         f = (Tile target, Location loc) => {
             // can this automatically lock the target?
             target.RunAnimation(
                 AnimationKeyPath.Opacity,
-                AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(1, 0), 0f, NoteValueToDuration(2, 0), 0f, NoteValueToDuration(3,0), 1)
+                AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(0, 1), 0f, NoteValueToDuration(0, 6.9f), 0f, NoteValueToDuration(0,7.85f), 1)
             ); // this locks
             StartCoroutine(C.WithDelay(() => {
                 var nextTarget = target.TileAtLocation(loc, TileMutexFlag.Opacity);
@@ -67,8 +132,13 @@ public class AgentController : MonoBehaviour {
                 }
             }, NoteValueToDuration(0, 0.1f)));
         };
+        // max length
 
-        foreach (var rest in Loop(64, 0, 0, 1)) {
+        yield return Rest(2);
+
+        foreach (var rest in Loop(6, 0, 1, 0)) {
+
+
 
             // Find target
             bool found = false;
@@ -78,9 +148,14 @@ public class AgentController : MonoBehaviour {
                 int y = Random.Range(0, rows);
                 var tile = board[x, y];
                 if (!tile.IsLocked(TileMutexFlag.Opacity)) {
-                    var loc = Location.Bottom;
-                    if (Random.value > 0.5f) loc = Location.Right;
-                    f(tile, Location.Right|Location.Left);
+                    var randomAxis = Location.None;
+                    /*
+                    if (Random.value < 0.45f) randomAxis |= Location.Left;
+                    if (Random.value < 0.45f) randomAxis |= Location.Right;
+                    if (Random.value < 0.45f) randomAxis |= Location.Top;
+                    if (Random.value < 0.45f) randomAxis |= Location.Bottom;
+                    */
+                    f(tile, randomAxis);
                     found = true;
                 }
                 runCount++;
@@ -88,17 +163,35 @@ public class AgentController : MonoBehaviour {
 
             yield return rest;
         }
-        /*
         foreach (var rest in Loop(64, 0, 1, 0)) {
-            StartCoroutine(RandomTile().ChangeColor(orange, NoteValueToDuration(0, 2), 0));
 
-            RandomTile().RunAnimation(
-                    AnimationKeyPath.Rotation,
-                    AnimationCurveUtils.FromPairs(0, 0, NoteValueToDuration(1, 0), 360),
-                    Location.Right,
-                    1f,
-                    NoteValueToDuration(0, 1)
-            );
+
+
+            // Find target
+            bool found = false;
+            int runCount = 0;
+            while (!found && runCount < 100) {
+                int x = Random.Range(0, cols);
+                int y = Random.Range(0, rows);
+                var tile = board[x, y];
+                if (!tile.IsLocked(TileMutexFlag.Opacity)) {
+                    var randomAxis = Location.None;
+                    if (Random.value < 0.30f) randomAxis |= Location.Left;
+                    if (Random.value < 0.30f) randomAxis |= Location.Right;
+                    if (Random.value < 0.30f) randomAxis |= Location.Top;
+                    if (Random.value < 0.30f) randomAxis |= Location.Bottom;
+                    if (randomAxis == Location.None && Random.value > 0.5f) {
+                        randomAxis |= Location.Bottom;
+                    }
+                    f(tile, randomAxis);
+                    found = true;
+                }
+                runCount++;
+            }
+
+            yield return rest;
+        }
+            /*
 
             RandomTile().RunAnimation(
                     AnimationKeyPath.Opacity,
@@ -109,22 +202,13 @@ public class AgentController : MonoBehaviour {
             );
 
             RandomTile().RunAnimation(
-                    AnimationKeyPath.RelScaleX,
-                    AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 5f, NoteValueToDuration(2, 0), 1),
-                    Location.Bottom,
-                    1f,
-                    NoteValueToDuration(0, 1)
-            );
-            RandomTile().RunAnimation(
                     AnimationKeyPath.RelScaleY,
                     AnimationCurveUtils.FromPairs(0, 1f, NoteValueToDuration(1, 0), 5f, NoteValueToDuration(2, 0), 1),
                     Location.Top,
                     1f,
                     NoteValueToDuration(0, 1)
             );
-            yield return rest;
-        }
-        */
+            */
     }
 
 
@@ -356,7 +440,7 @@ public class AgentController : MonoBehaviour {
     }
 
 
-    IEnumerator RunOrange() {
+    IEnumerator RunOorange() {
         foreach (var i in Times(10)) {
             AnimateRect(Direction.Down, 1, Vector2.one*0.5f, orange, CameraHelper.RandomXOffset(0.9f), level:0);
             yield return Rest(1);

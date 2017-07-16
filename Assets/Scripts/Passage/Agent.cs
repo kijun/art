@@ -82,7 +82,6 @@ public class Tile : MonoBehaviour {
         }
 
         StartCoroutine(C.WithDelay(() => { mutex ^= lockFlag; }, animFinishTime));
-        /*
         if (propProbability.IsNonZero() && Random.value < propProbability) {
             var next = TileAtLocation(propLocation);
             if (next != null) {
@@ -91,7 +90,6 @@ public class Tile : MonoBehaviour {
                 }, propDelay));
             }
         }
-        */
     }
 
     public void RunAnimation(
@@ -112,9 +110,9 @@ public class Tile : MonoBehaviour {
         if (animatable.color != color) {
             animatable.color = color;
             yield return new WaitForSeconds(note);
-            StartCoroutine(TileAtLocation(Location.Axis).ChangeColor(color, note, virality));
-            yield return new WaitForSeconds(note);
-            StartCoroutine(TileAtLocation(Location.Axis).ChangeColor(color, note, virality));
+            //StartCoroutine(TileAtLocation(Location.Axis).ChangeColor(color, note, virality));
+            //yield return new WaitForSeconds(note);
+            //StartCoroutine(TileAtLocation(Location.Axis).ChangeColor(color, note, virality));
             //if (adjacent.ContainsKey(Location.Right)) {
             //}
         }
