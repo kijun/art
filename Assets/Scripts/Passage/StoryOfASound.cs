@@ -5,138 +5,6 @@ using UnityEngine;
 using PureShape;
 using OscJack;
 
-/***
- * wrapper for animation, customized for each scene/level
- */
-public enum GraphicEntityMutexFlag {
-    None           = 0,
-    Position       = 1 << 0,
-    Velocity       = 1 << 1,
-    Rotation       = 1 << 2,
-    Scale          = 1 << 3,
-    Opacity        = 1 << 4,
-    Color          = 1 << 5,
-    Representation = 1 << 7,
-}
-
-public class GraphicEntity1 : MonoBehaviour {
-    Board board;
-
-    // how do i create an entity?
-    // large row:
-    // beat finds empty row
-    // we
-    public GraphicEntity1 New(GridRect gr, Board board, Color color) {
-        this.board = board;
-        board.LockTiles(gr);
-        // display status hidden
-        rp = GridRectToRectParams(gr, rp);
-        NoteFactory.CreateRect(rp);
-    }
-
-    RectParams RectParamsFromGridRect(GridRect gr, RectParams rp = null) {
-        if (rp != null) {
-        }
-    }
-
-    public void Move(int x, int y) {
-        // moves square by (x, y)
-    }
-
-    public void Transform(GridRect gr) {
-        // moves and resizes square
-    }
-
-    public void RemoveOverlap(GridRect gr) {
-        // create multiple GE and delete itself
-    }
-
-    public void Split(int width, int height) {
-        // splits existing x to this as much as it can
-    }
-
-    void RunAnimation(string keyPath, AnimationCurve curve)
-        var lockFlag = AnimationKeyPath.ToTileMutexFlag(keyPath);
-        mutex |= lockFlag;
-        animatable.AddAnimationCurve(keyPath, curve);
-        float animFinishTime = 0;
-        foreach (var k in curve.keys) {
-            animFinishTime = Mathf.Max(animFinishTime, k.time);
-        }
-
-        StartCoroutine(C.WithDelay(() => { mutex ^= lockFlag; }, animFinishTime));
-        if (propProbability.IsNonZero() && Random.value < propProbability) {
-            var next = TileAtLocation(propLocation);
-            if (next != null) {
-                StartCoroutine(C.WithDelay(() => {
-                    next.RunAnimation(keyPath, curve, propLocation, propProbability, propDelay);
-                }, propDelay));
-            }
-        }
-    }
-
-}
-
-public class Board {
-    GraphicEntity1[,] graphicEntities;
-    int width;
-    int height;
-
-    public Board(int width, int height) {
-        this.width = width;
-        this.height = height;
-
-        graphicEntities = new GraphicEntity1[width, height];
-    }
-
-    public void LockTile(int x, int y, GraphicEntity1 ge) {
-        graphicEntities[x,y] = ge;
-    }
-
-    public void LockTiles(GridRect gr) {
-        graphicEntities[x,y] = ge;
-    }
-
-    public void FreeTile(int x, int y) {
-        graphicEntities[x,y] = null;
-    }
-
-    public GraphicEntity1 GraphicEntityAt(int x, int y) {
-        return graphicEntities[x, y];
-    }
-
-    public IEnumerable GraphicEntities {
-        get {
-            return graphicEntities;
-        }
-    }
-
-    public GridRect FindEmptyRow() {
-        // returns -1 if such row could not be found
-        return FindEmptyRect(width, 1);
-    }
-
-    public GridRect FindEmptyRect(int rectWidth, int rectHeight) {
-        var emptyRects = new List<GridRect>();
-        for (int x = 0; x < width - rectWidth; x++) {
-            for (int y = 0; y < height - rectHeight; y++) {
-                if (graphicEntities.GetRect(x, y, rectWidth, rectHeight).Count(ge => (ge == null)) > rectWidth * rectHeight) {
-                    emptyRects.Add(new GridRect(x, y, rectWidth, rectHeight));
-                }
-            }
-        }
-
-        if (emptyRects.Count > 0) {
-            return emptyRects.GetRandom();
-        }
-
-        return null;
-    }
-
-    public GridRect FindEmptyColumn() {
-        return FindEmptyRect(1, height);
-    }
-}
 
 public class StoryOfASound : MonoBehaviour {
 
@@ -169,8 +37,15 @@ public class StoryOfASound : MonoBehaviour {
     }
     */
 
-    void PlaceRow() {
+    void Dispatch() {
+        // action
+        // but how do you know whether an action is capable or not?
+        // random - return
+    }
+
+    bool AddRow() {
         // search for vacant spots
+        // MUTEX
         GridRect emptyRow = board.FindEmptyRow();
         if (emptyRow == null) {
             emptyRow = new GridRect(0, Random.Range(0, rows), cols, 1);
@@ -178,25 +53,72 @@ public class StoryOfASound : MonoBehaviour {
                 ge.DeleteRect(randomRow, Beat(1));
             }
         }
+
         var ge = GraphicEntity.New(randomRow);
         ge.color = red;
         ge.FadeIn(Beat(1));
     }
 
-    void BreakRect() {
-        board.FindGraphicEntityWithSize();
-
+    bool BreakRect() {
+        // MUTEX
+        var g = board.FindGraphicWithSizeGreaterThan(1, 1);
+        if (g != null) {
+            g.Subdivide();
+            // to smallest?
+        }
     }
 
-    void Rotate() {
-        // search for vacant spots
-        GridRect emptyRow = board.FindEmptyRow();
-        if (emptyRow != null) {
-            // gradually
-            var ge = GraphicEntity.New(emptyRow);
-        } else {
+    bool HideAndReveal() {
+        // MUTEX
+        var g = board.FindGraphicWithSizeGreaterThan(0, 0);
+        g.FadeOutAndIn(Beat(1), Beat(1));
+    }
 
+    bool Rotate() {
+        // search for vacant spots
+        var g = board.FindSquareGraphicWithSideGreaterThan(0);
+        g.Rotate(360, Beat(1));
+    }
+
+    bool MoveToAdjacent() {
+        // search for vacant spots
+        foreach (var g in board.graphicEntities) {
+            var target = board.FindAdjacentEmptyRect(g.rect);
+            if (target != null) {
+                g.MoveAndResize(emptyRect);
+                return true;
+            }
         }
+        return false;
+    }
+
+    bool Shrink() {
+        var g = board.FindGraphicWithSizeGreaterThan(1, 1);
+        if (g != null) {
+            g.MoveAndResize(g.rect.Subrect());
+            return true;
+        }
+        return false;
+    }
+
+    bool Expand() {
+        foreach (var g in board.graphicEntities) {
+            var target = board.FindExpandedRect(g.rect);
+            if (target != null) {
+                g.MoveAndResize(emptyRect);
+                break;
+            }
+        }
+        return false;
+    }
+
+    bool Remove() {
+        var g = board.RandomGraphicEntity();
+        if (g != null) {
+            g.Remove();
+            return true;
+        }
+        return false;
     }
 
     IEnumerator Run() {
