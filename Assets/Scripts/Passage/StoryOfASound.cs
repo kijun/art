@@ -32,7 +32,6 @@ public class StoryOfASound : MonoBehaviour {
 
     /*
     void CreateTiles() {
-
         board = Tile2.CreateBoard(cols, rows);
     }
     */
@@ -43,41 +42,56 @@ public class StoryOfASound : MonoBehaviour {
         // random - return
     }
 
-    bool AddRow() {
+    bool AddRow(bool force=false) {
         // search for vacant spots
         // MUTEX
         GridRect emptyRow = board.FindEmptyRow();
         if (emptyRow == null) {
             emptyRow = new GridRect(0, Random.Range(0, rows), cols, 1);
             foreach (var ge in board.graphicEntities) {
-                ge.DeleteRect(randomRow, Beat(1));
+                ge.DeleteRect(emptyRow, Beat(1));
             }
         }
 
-        var ge = GraphicEntity.New(randomRow);
-        ge.color = red;
-        ge.FadeIn(Beat(1));
+        var newGe = GraphicEntity1.New(emptyRow, board);
+        newGe.SetColor(red);
+        newGe.SetOpacity(Beat(1));
+        return true;
+    }
+
+    bool AddRect(int width, int height) {
+        GridRect emptyRect = board.FindEmptyRectWithSize(width, height);
+        if (emptyRect != null) {
+            var ge = GraphicEntity1.New(emptyRect, board);
+            ge.SetColor(red);
+            ge.SetOpacity(Beat(1));
+            return true;
+        }
+        return false;
     }
 
     bool BreakRect() {
         // MUTEX
         var g = board.FindGraphicWithSizeGreaterThan(1, 1);
         if (g != null) {
-            g.Subdivide();
+            //g.Subdivide();
             // to smallest?
         }
+        return false;
     }
 
     bool HideAndReveal() {
         // MUTEX
         var g = board.FindGraphicWithSizeGreaterThan(0, 0);
-        g.FadeOutAndIn(Beat(1), Beat(1));
+        //g.FadeOutAndIn(Beat(1), Beat(1));
+        return false;
     }
 
     bool Rotate() {
         // search for vacant spots
         var g = board.FindSquareGraphicWithSideGreaterThan(0);
-        g.Rotate(360, Beat(1));
+        //g.Rotate(360, Beat(1));
+        return false;
     }
 
     bool MoveToAdjacent() {
@@ -85,7 +99,7 @@ public class StoryOfASound : MonoBehaviour {
         foreach (var g in board.graphicEntities) {
             var target = board.FindAdjacentEmptyRect(g.rect);
             if (target != null) {
-                g.MoveAndResize(emptyRect);
+                //g.MoveAndResize(emptyRect);
                 return true;
             }
         }
@@ -95,7 +109,7 @@ public class StoryOfASound : MonoBehaviour {
     bool Shrink() {
         var g = board.FindGraphicWithSizeGreaterThan(1, 1);
         if (g != null) {
-            g.MoveAndResize(g.rect.Subrect());
+            //g.MoveAndResize(g.rect.Subrect());
             return true;
         }
         return false;
@@ -105,7 +119,7 @@ public class StoryOfASound : MonoBehaviour {
         foreach (var g in board.graphicEntities) {
             var target = board.FindExpandedRect(g.rect);
             if (target != null) {
-                g.MoveAndResize(emptyRect);
+                //g.MoveAndResize(emptyRect);
                 break;
             }
         }
@@ -115,39 +129,15 @@ public class StoryOfASound : MonoBehaviour {
     bool Remove() {
         var g = board.RandomGraphicEntity();
         if (g != null) {
-            g.Remove();
+            //g.Remove();
             return true;
         }
         return false;
     }
 
     IEnumerator Run() {
-        // on every update,
-        System.Action<Tile2, Location> f = (Tile2 target, Location l) => {};
-
-        // find all lines empty
-        bool[] emptyLines = new bool[cols + rows];
-        for (int i = 0; i < rows + cols; i++) {
-            Tile2[] line;
-            if (i < cols) {
-                // check if col is empty
-                line = board.GetCol(i);
-            } else {
-                line = board.GetRow(i - col);
-            }
-            if (line.Count(t => t.IsLocked()) == 0) {
-                emptyLines[i] = true;
-            }
-        }
-
-        // if we have lines that are empty, pick a random line and fill it up
-        if (emptyLines.Count(b => b) > 0) {
-        }
-
-        // else, pick any line
-        // and chop off obj that crosses those cells
-
-
+        yield return null;
+        /*
         f = (Tile2 target, Location loc) => {
             // can this automatically lock the target?
             target.RunAnimation(
@@ -183,11 +173,8 @@ public class StoryOfASound : MonoBehaviour {
 
             yield return rest;
         }
+        */
 
-    }
-
-    Tile2 RandomTile() {
-        return (Tile2)board.GetValue2(Random.Range(0, board.Length));
     }
 
     IEnumerable<int> Times(int measures) {
@@ -218,9 +205,8 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
-    float Beat {
-        get {
-            return 60f / timeSignature.beatsPerMinute;
-        }
+    float Beat(float beats) {
+        //return beats * BeatDurationInSeconds;
+        return beats * 60f / timeSignature.beatsPerMinute;
     }
 }

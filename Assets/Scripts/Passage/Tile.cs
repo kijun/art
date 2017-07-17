@@ -33,7 +33,7 @@ public class Tile2 {
 
     /***** PUBLIC STATIC METHOD *****/
     public static Tile2[,] CreateBoard(int cols, int rows) {
-        Debug.Log("Creating board " + cols + " " + rows);
+        //Debug.Log("Creating board " + cols + " " + rows);
         var board = new Tile2[cols, rows]; // x, y
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
@@ -41,6 +41,7 @@ public class Tile2 {
             }
         }
 
+        /*
         for (int x = 0; x < cols; x++) {
             for (int y = 0; y < rows; y++) {
                 var tile = (Tile2)board.GetValue2(x, y);
@@ -54,6 +55,7 @@ public class Tile2 {
                 tile.AddAdjacentTile(Location.BottomRight, (Tile2)board.GetValue2(x+1, y+1));
             }
         }
+        */
 
         return board;
     }

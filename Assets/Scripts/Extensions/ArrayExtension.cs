@@ -21,12 +21,11 @@ public static class ArrayExtension {
 		return array;
 	}
 
-	public static IEnumerator<T> GetRect<T>(this T[,] matrix, int x, int y, int width, int height) {
+	public static IEnumerable<T> GetRect<T>(this T[,] matrix, int x, int y, int width, int height) {
         for (int i = x; i < x + width; i++) {
             for (int j = y; j < y + height; j++) {
                 yield return matrix[i, j];
             }
         }
 	}
-
 }
