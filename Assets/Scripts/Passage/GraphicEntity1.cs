@@ -53,19 +53,25 @@ public class GraphicEntity1 : MonoBehaviour {
         // unlock origin tiles
         var origin = new GridRect(rect);
         var target = rect.Translate(x, y);
+        var targetPosition = board.GridRectToRectParams(target).position;
         // if target
         _LockProperty(GraphicEntityMutexFlag.Translation);
         board.LockTiles(target, this);
         if (duration.IsZero()) {
-            animatable.position += new Vector2(x, y);
+            animatable.position = targetPosition;
         } else {
         _RunAnimation(AnimationKeyPath.RelPosX,
                 AnimationCurveUtils.FromPairs(
+                    0, animatable.position.x,
+                    duration, targetPosition.x
+
                     // start position
                     // end position
                 ));
         _RunAnimation(AnimationKeyPath.RelPosY,
                 AnimationCurveUtils.FromPairs(
+                    0, animatable.position.y,
+                    duration, targetPosition.y
                     // start position
                     // end position
                 ));
@@ -90,11 +96,22 @@ public class GraphicEntity1 : MonoBehaviour {
     }
 
     public void SetColor(Color color, float duration = 0) {
-        //
+        animatable.color = color;
+        // TODO color animation
     }
 
     public void SetOpacity(float opacity, float duration = 0) {
-        //
+        _RunAnimation(AnimationKeyPath.Opacity, 0, animatable.opacity, duration, opacity);
+    }
+
+    public void Rotate(float rotation, float duration = 0) {
+        _RunAnimation(AnimationKeyPath.Rotation, 0, animatable.rotation, duration, rotation);
+    }
+
+    void _RunAnimation(string keyPath,
+                       float startTime, float startValue,
+                       float endTime, float endValue) {
+        animatable.AddAnimationCurve(keyPath, AnimationCurveUtils.FromPairs(startTime, startValue, endTime, endValue));
     }
 
     void _RunAnimation(string keyPath, AnimationCurve curve) {

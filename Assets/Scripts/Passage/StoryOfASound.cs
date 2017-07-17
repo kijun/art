@@ -12,6 +12,7 @@ public class StoryOfASound : MonoBehaviour {
     public Color red;
     public Color blue;
     public Color yellow;
+    public Color white;
 
     public TimeSignature timeSignature;
     public Camera camera;
@@ -89,7 +90,7 @@ public class StoryOfASound : MonoBehaviour {
         Debug.Log("Found empty row" + emptyRow);
         if (emptyRow == null) {
             emptyRow = new GridRect(0, Random.Range(0, rows), cols, 1);
-            foreach (var ge in board.graphicEntities) {
+            foreach (var ge in board.GraphicEntities()) {
                 ge.DeleteRect(emptyRow, Beat(1));
             }
         }
@@ -100,13 +101,13 @@ public class StoryOfASound : MonoBehaviour {
         return true;
     }
 
-    bool AddRect(int width, int height) {
+    bool AddRect(int width, int height, Color color) {
         Debug.Log("adding rect");
         GridRect emptyRect = board.FindEmptyRectWithSize(width, height);
         if (emptyRect != null) {
             var ge = GraphicEntity1.New(emptyRect, board);
-            ge.SetColor(red);
-            ge.SetOpacity(Beat(1));
+            ge.SetColor(color);
+            ge.SetOpacity(1, Beat(1));
             return true;
         }
         return false;
@@ -138,7 +139,7 @@ public class StoryOfASound : MonoBehaviour {
 
     bool MoveToAdjacent() {
         // search for vacant spots
-        foreach (var g in board.graphicEntities) {
+        foreach (var g in board.GraphicEntities()) {
             var target = board.FindAdjacentEmptyRect(g.rect);
             if (target != null) {
                 //g.MoveAndResize(emptyRect);
@@ -158,7 +159,7 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     bool Expand() {
-        foreach (var g in board.graphicEntities) {
+        foreach (var g in board.GraphicEntities()) {
             var target = board.FindExpandedRect(g.rect);
             if (target != null) {
                 //g.MoveAndResize(emptyRect);
@@ -178,29 +179,44 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     IEnumerator Run() {
+        AddRect(1, 1, red);
         yield return Rest(0, 1);
-        AddRect(1, 1);
+        AddRect(1, 2, blue);
         yield return Rest(0, 1);
-        AddRect(1, 2);
+        AddRect(2, 2, red);
         yield return Rest(0, 1);
-        AddRect(2, 2);
+        AddRect(3, 1, blue);
         yield return Rest(0, 1);
-        AddRect(3, 1);
+        AddRect(2, 2, white);
         yield return Rest(0, 1);
-        AddRect(2, 2);
+        AddRect(1, 1, red);
         yield return Rest(0, 1);
-        AddRect(1, 1);
-        yield return Rest(0, 1);
-        foreach (GraphicEntity1 g in board.graphicEntities) {
-            if (g != null) {
-                if (g.rect.min.y < 2) {
-                    g.Move(0, 1);
-                } else {
-                    g.Move(0, -1);
-                }
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            if (g.rect.min.y < 2) {
+                g.Move(0, 1, Beat(1));
+            } else {
+                g.Move(0, -1, Beat(2));
             }
         }
-        yield return null;
+        yield return Rest(0, 1);
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            g.SetOpacity(0.5f, Beat(2));
+        }
+        yield return Rest(0, 1);
+        // TODO find all graphic with size
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            if (g.rect.width == 1 && g.rect.height == 1) {
+                g.Rotate(225, Beat(3));
+            }
+        }
+        yield return Rest(0, 3);
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            g.Rotate(360, Beat(3));
+        }
+        yield return Rest(0, 4);
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            g.Transform(1, 1, Beat(4));
+        }
         /*
         f = (Tile2 target, Location loc) => {
             // can this automatically lock the target?

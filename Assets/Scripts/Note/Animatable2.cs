@@ -67,8 +67,10 @@ public class Animatable2 : MonoBehaviour {
                     case AnimationKeyPath.ColorB:
                         break;
                     case AnimationKeyPath.RelPosX:
+                        position = position.SwapX(val);
                         break;
                     case AnimationKeyPath.RelPosY:
+                        position = position.SwapY(val);
                         break;
                     case AnimationKeyPath.RelScaleX:
                         localScale = originalScale.MultiplyEach(val, 1);

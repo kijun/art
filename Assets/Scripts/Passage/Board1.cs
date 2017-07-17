@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Board1 {
     /* MUTEEEEXXXX */
-    public GraphicEntity1[,] graphicEntities;
+    GraphicEntity1[,] graphicEntities;
     int width;
     int height;
     float tileLength;
@@ -43,11 +43,11 @@ public class Board1 {
 
         if (emptyRects.Count > 0) {
             var rect = emptyRects.GetRandom();
-            Debug.Log($"Board: Found empty rect {rect}");
+            //Debug.Log($"Board: Found empty rect {rect}");
             return rect;
         }
 
-        Debug.Log($"Board: Could not find empty rect");
+        //Debug.Log($"Board: Could not find empty rect");
         return null;
     }
 
@@ -118,9 +118,9 @@ public class Board1 {
         return new RectParams { x=center.x, y=center.y, width=size.x, height=size.y, color= Color.black};
     }
 
-    public IEnumerable GraphicEntities {
-        get {
-            return graphicEntities;
+    public IEnumerable<GraphicEntity1> GraphicEntities() {
+        foreach (var g in graphicEntities) {
+            if (g != null) yield return g;
         }
     }
 }
