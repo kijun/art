@@ -26,13 +26,13 @@ public class AgentController : MonoBehaviour {
         Debug.Log(OscMaster.MasterDirectory.TotalMessageCount);
         if (OscMaster.HasData("/Velocity1")) {
             foreach (var x in OscMaster.GetData("/Velocity1")) {
-                Debug.Log(x);
+            //    Debug.Log(x);
             }
             OscMaster.ClearData("/Velocity1");
         }
         if (OscMaster.HasData("/Note1")) {
             foreach (var x in OscMaster.GetData("/Note1")) {
-                Debug.Log(x);
+                //Debug.Log(x);
             }
             OscMaster.ClearData("/Note1");
         }

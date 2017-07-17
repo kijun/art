@@ -53,7 +53,7 @@ namespace OscJack
                 if (data.Length > 0)
                     text += data[data.Length - 1];
 
-                EditorGUILayout.LabelField(item.Key, text);
+                if (text != "0") EditorGUILayout.LabelField(item.Key, text);
             }
 
             EditorGUILayout.EndVertical();

@@ -101,7 +101,6 @@ namespace OscJack
                     var message = server.PopMessage();
                     _dataStore[message.address] = message.data;
                     _totalMessageCount++;
-                    UnityEngine.Debug.Log(message.address);
                 }
             }
         }

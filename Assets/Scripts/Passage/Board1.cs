@@ -8,16 +8,24 @@ public class Board1 {
     public GraphicEntity1[,] graphicEntities;
     int width;
     int height;
+    float tileLength;
+    float gapLength;
+    Vector2 bottomLeftAnchor;
 
-    public Board1(int width, int height) {
+    public Board1(int width, int height, float tileLength, float gapLength) {
         this.width = width;
         this.height = height;
+        this.tileLength = tileLength;
+        this.gapLength = gapLength;
+        this.bottomLeftAnchor = new Vector2(
+                width * tileLength + (width-1)*gapLength,
+                height * tileLength + (height - 1)*gapLength)/-2f;
 
         graphicEntities = new GraphicEntity1[width, height];
     }
 
     /*** GRID QUERY ***/
-    public GridRect FindEmptyRect(int rectWidth, int rectHeight) {
+    public GridRect FindEmptyRectWithSize(int rectWidth, int rectHeight) {
         var emptyRects = new List<GridRect>();
         for (int x = 0; x <= width - rectWidth; x++) {
             for (int y = 0; y <= height - rectHeight; y++) {
@@ -35,26 +43,22 @@ public class Board1 {
 
         if (emptyRects.Count > 0) {
             var rect = emptyRects.GetRandom();
-            Debug.Log($"Board: Found empty row {rect}");
+            Debug.Log($"Board: Found empty rect {rect}");
             return rect;
         }
 
-        Debug.Log($"Board: Could not find empty row");
+        Debug.Log($"Board: Could not find empty rect");
         return null;
     }
 
     public GridRect FindEmptyRow() {
         // returns -1 if such row could not be found
-        return FindEmptyRect(width, 1);
+        return FindEmptyRectWithSize(width, 1);
     }
 
 
     public GridRect FindEmptyColumn() {
-        return FindEmptyRect(1, height);
-    }
-
-    public GridRect FindEmptyRectWithSize(int width, int height) {
-        return null;
+        return FindEmptyRectWithSize(1, height);
     }
 
     public GridRect FindAdjacentEmptyRect(GridRect gr, bool canOverlap = true) {
@@ -106,7 +110,12 @@ public class Board1 {
 
     /*** Display ***/
     public RectParams GridRectToRectParams(GridRect grid) {
-        return new RectParams { x=grid.min.x, y=grid.min.y, width=grid.width, height=grid.height, color= Color.black};
+        var minPos = bottomLeftAnchor + new Vector2(grid.min.x * (tileLength + gapLength), grid.min.y * (tileLength + gapLength));
+        var size = new Vector2(grid.width * tileLength + (grid.width - 1) * gapLength,
+                               grid.height * tileLength + (grid.height - 1) * gapLength);
+
+        var center = minPos + size/2f;
+        return new RectParams { x=center.x, y=center.y, width=size.x, height=size.y, color= Color.black};
     }
 
     public IEnumerable GraphicEntities {

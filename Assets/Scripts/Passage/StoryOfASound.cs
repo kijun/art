@@ -27,10 +27,46 @@ public class StoryOfASound : MonoBehaviour {
         var sideLength = CameraHelper.Height / (1.414f * rows + 0.414f);
         cols = (int)(CameraHelper.Width / (1.414f * sideLength));
         Debug.Log($"Creating {rows} rows, {cols} cols");
-        board = new Board1(cols, rows);
-        //StartCoroutine(Run());
-        AddRow();
+        board = new Board1(cols, rows, sideLength, 0.414f * sideLength);
         StartCoroutine(Run());
+        //AddRow();
+        //StartCoroutine(Run());
+    }
+
+    void FFixedUpdate() {
+        if (OscMaster.HasData("/Velocity1")) {
+            foreach (var x in OscMaster.GetData("/Velocity1")) {
+                var val = float.Parse(x+"");
+                if (val.IsNonZero()) {
+                    Debug.Log(val);
+                    //AddRect(1,1);
+                }
+            }
+            OscMaster.ClearData("/Velocity1");
+        }
+        if (OscMaster.HasData("/Note1")) {
+            foreach (var x in OscMaster.GetData("/Note1")) {
+            }
+            OscMaster.ClearData("/Note1");
+        }
+    }
+
+    void UUpdate() {
+        if (OscMaster.HasData("/Velocity1")) {
+            foreach (var x in OscMaster.GetData("/Velocity1")) {
+                var val = float.Parse(x+"");
+                if (val.IsNonZero()) {
+                    Debug.Log(val);
+                    //AddRect(1,1);
+                }
+            }
+            OscMaster.ClearData("/Velocity1");
+        }
+        if (OscMaster.HasData("/Note1")) {
+            foreach (var x in OscMaster.GetData("/Note1")) {
+            }
+            OscMaster.ClearData("/Note1");
+        }
     }
 
     /*
@@ -65,6 +101,7 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     bool AddRect(int width, int height) {
+        Debug.Log("adding rect");
         GridRect emptyRect = board.FindEmptyRectWithSize(width, height);
         if (emptyRect != null) {
             var ge = GraphicEntity1.New(emptyRect, board);
@@ -142,8 +179,26 @@ public class StoryOfASound : MonoBehaviour {
 
     IEnumerator Run() {
         yield return Rest(0, 1);
-        foreach (var g in board.graphicEntities) {
-            g.Move(0, 1);
+        AddRect(1, 1);
+        yield return Rest(0, 1);
+        AddRect(1, 2);
+        yield return Rest(0, 1);
+        AddRect(2, 2);
+        yield return Rest(0, 1);
+        AddRect(3, 1);
+        yield return Rest(0, 1);
+        AddRect(2, 2);
+        yield return Rest(0, 1);
+        AddRect(1, 1);
+        yield return Rest(0, 1);
+        foreach (GraphicEntity1 g in board.graphicEntities) {
+            if (g != null) {
+                if (g.rect.min.y < 2) {
+                    g.Move(0, 1);
+                } else {
+                    g.Move(0, -1);
+                }
+            }
         }
         yield return null;
         /*
