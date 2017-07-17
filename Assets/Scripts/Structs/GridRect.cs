@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class GridRect {
@@ -26,6 +27,19 @@ public class GridRect {
         return new GridRect(min.x + x, min.y + y, width, height);
     }
 
+    public GridRect Merge(GridRect rect2) {
+        return new GridRect(Coord.Min(min, rect2.min), Coord.Max(max, rect2.max));
+    }
+
+    /*** HEL **/
+    public IEnumerable<GridRect> SplitToUnitSquares() {
+        for (int i = min.x; i < max.x; i++) {
+            for (int j = min.y; j < max.y; j++) {
+                yield return new GridRect(i, j, 1, 1);
+            }
+        }
+    }
+
     /*
     public GridRect Subtract(GridRect rect) {
         if
@@ -42,6 +56,12 @@ public class GridRect {
     public int height {
         get {
             return max.y - min.y;
+        }
+    }
+
+    public int area {
+        get {
+            return width * height;
         }
     }
 

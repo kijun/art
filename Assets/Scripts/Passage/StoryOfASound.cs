@@ -101,16 +101,26 @@ public class StoryOfASound : MonoBehaviour {
         return true;
     }
 
-    bool AddRect(int width, int height, Color color) {
-        Debug.Log("adding rect");
+    GraphicEntity1 AddRect(int width, int height, Color color) {
         GridRect emptyRect = board.FindEmptyRectWithSize(width, height);
         if (emptyRect != null) {
             var ge = GraphicEntity1.New(emptyRect, board);
             ge.SetColor(color);
             ge.SetOpacity(1, Beat(1));
-            return true;
+            return ge;
         }
-        return false;
+        return null;
+    }
+
+    GraphicEntity1 AddRectAtPosition(int minX, int minY, int width, int height, Color color) {
+        GridRect emptyRect = new GridRect(minX, minY, width, height);
+        if (emptyRect != null) {
+            var ge = GraphicEntity1.New(emptyRect, board);
+            ge.SetColor(color);
+            ge.SetOpacity(1, Beat(1));
+            return ge;
+        }
+        return null;
     }
 
     bool BreakRect() {
@@ -215,8 +225,28 @@ public class StoryOfASound : MonoBehaviour {
         }
         yield return Rest(0, 4);
         foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            g.Transform(1, 1, Beat(4));
+            var target = new GridRect(g.rect);
+            target.max = new Coord(target.min).Move(1, 1);
+            g.Transform(target, Beat(4));
         }
+        yield return Rest(0, 5);
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            g.Remove();
+        }
+        yield return Rest(0, 1);
+        var r1 = AddRectAtPosition(0, 0, 1, 1, red);
+        yield return Rest(0, 1);
+        var r2 = AddRectAtPosition(1, 0, 1, 1, yellow);
+        yield return Rest(0, 1);
+        r1.Merge(r2, Beat(2));
+        yield return Rest(0, 3);
+        r1.Remove();
+        yield return Rest(0, 1);
+        var rbig = AddRectAtPosition(0, 0, 4, 4, blue);
+        yield return Rest(0, 1);
+        rbig.BreakToUnitSquares();
+        yield return Rest(0, 1);
+
         /*
         f = (Tile2 target, Location loc) => {
             // can this automatically lock the target?

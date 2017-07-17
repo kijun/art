@@ -71,23 +71,42 @@ public class Board1 {
 
     /*** GRAPHIC ENTITY QUERY ***/
     public GraphicEntity1 FindGraphicWithSize(int width, int height) {
+        foreach (var g in GraphicEntities()) {
+            if (g.width == width && g.height == height) return g;
+        }
         return null;
     }
 
     public GraphicEntity1 FindGraphicWithSizeGreaterThan(int width, int height) {
+        foreach (var g in GraphicEntities()) {
+            if ((g.width > width && g.height >= height) ||
+                (g.width >= width && g.height > height)) {
+                return g;
+            }
+        }
         return null;
     }
 
     public GraphicEntity1 FindGraphicWithSizeLessThan(int width, int height) {
+        foreach (var g in GraphicEntities()) {
+            if ((g.width < width && g.height <= height) ||
+                (g.width <= width && g.height < height)) {
+                return g;
+            }
+        }
         return null;
     }
 
     public GraphicEntity1 FindSquareGraphicWithSideGreaterThan(int sideLength) {
+        foreach (var g in GraphicEntities()) {
+            if (g.width == sideLength && g.height == sideLength) return g;
+        }
         return null;
     }
 
     public GraphicEntity1 RandomGraphicEntity() {
-        return null;
+        // TODO make random
+        return GraphicEntities().First();
     }
 
     /*** ACCESS ***/

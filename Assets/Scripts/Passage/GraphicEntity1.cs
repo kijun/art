@@ -51,47 +51,50 @@ public class GraphicEntity1 : MonoBehaviour {
         // apply move
         // unlock properties
         // unlock origin tiles
-        var origin = new GridRect(rect);
-        var target = rect.Translate(x, y);
-        var targetPosition = board.GridRectToRectParams(target).position;
+        Transform(rect.Translate(x, y), duration);
+    }
+
+    public void Transform(GridRect targetRect, float duration=0) {
+        // moves and resizes square
+        var origin = rect;
+        Debug.Log($"GraphicEntity1: Transform {origin} -> {targetRect}");
+        var target = board.GridRectToRectParams(targetRect);
         // if target
         _LockProperty(GraphicEntityMutexFlag.Translation);
-        board.LockTiles(target, this);
-        if (duration.IsZero()) {
-            animatable.position = targetPosition;
-        } else {
-        _RunAnimation(AnimationKeyPath.RelPosX,
-                AnimationCurveUtils.FromPairs(
-                    0, animatable.position.x,
-                    duration, targetPosition.x
 
-                    // start position
-                    // end position
-                ));
-        _RunAnimation(AnimationKeyPath.RelPosY,
-                AnimationCurveUtils.FromPairs(
-                    0, animatable.position.y,
-                    duration, targetPosition.y
-                    // start position
-                    // end position
-                ));
-        }
+        board.LockTiles(targetRect, this);
+        // if (duration.IsZero()) {
+        //    animatable.position = targetPosition;
+        //} else {
+            _RunAnimation(AnimationKeyPath.RelPosX, 0, animatable.position.x, duration, target.x);
+            _RunAnimation(AnimationKeyPath.RelPosY, 0, animatable.position.y, duration, target.y);
+            _RunAnimation(AnimationKeyPath.RelScaleX, 0, animatable.localScale.x, duration, target.width);
+            _RunAnimation(AnimationKeyPath.RelScaleY, 0, animatable.localScale.y, duration, target.height);
+        //}
         _UnlockProperty(GraphicEntityMutexFlag.Translation);
         board.UnlockTiles(origin);
         // relock in case we have overlap
-        board.LockTiles(target, this);
-        rect = target;
+        board.LockTiles(targetRect, this);
+        rect = targetRect;
     }
 
-    public void Transform(GridRect gr) {
-        // moves and resizes square
+    public void Merge(GraphicEntity1 another, float duration = 0) {
+        // TODO race condition!!
+        var target = rect.Merge(another.rect);
+        another.Remove(duration);
+        Transform(target, duration);
     }
 
     public void DeleteRect(GridRect gr, float duration = 0) {
         // create multiple GE and delete itself
     }
 
-    public void Split(int width, int height) {
+    public void BreakToUnitSquares(float duration =0) {
+        foreach (var gridRect in rect.SplitToUnitSquares()) {
+            var g = GraphicEntity1.New(gridRect, board);
+            g.SetColor(animatable.color);
+        }
+        Remove(duration);
         // splits existing x to this as much as it can
     }
 
@@ -106,6 +109,27 @@ public class GraphicEntity1 : MonoBehaviour {
 
     public void Rotate(float rotation, float duration = 0) {
         _RunAnimation(AnimationKeyPath.Rotation, 0, animatable.rotation, duration, rotation);
+    }
+
+    public void Remove(float duration = 0) {
+        // TODO opacity
+        board.UnlockTiles(rect);
+        Destroy(animatable.gameObject);
+        Destroy(gameObject);
+    }
+
+    /* VALS */
+
+    public int width {
+        get {
+            return rect.width;
+        }
+    }
+
+    public int height {
+        get {
+            return rect.height;
+        }
     }
 
     void _RunAnimation(string keyPath,
