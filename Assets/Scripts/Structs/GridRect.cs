@@ -13,7 +13,7 @@ public class GridRect {
 
     public GridRect (int xmin, int ymin, int width, int height) {
         this.min = new Coord(xmin, ymin);
-        this.max = new Coord(xmin+width, ymin);
+        this.max = new Coord(xmin+width, ymin+height);
     }
 
     public GridRect (GridRect gr) {
@@ -23,7 +23,7 @@ public class GridRect {
 
     /*** TRANSFORMERS ***/
     public GridRect Translate(int x, int y) {
-        return new GridRect(minX + x, minY + y, width, height);
+        return new GridRect(min.x + x, min.y + y, width, height);
     }
 
     /*
@@ -45,27 +45,7 @@ public class GridRect {
         }
     }
 
-    public int minX {
-        get {
-            return max.y - min.y;
-        }
-    }
-
-    public int maxX {
-        get {
-            return max.y - min.y;
-        }
-    }
-
-    public int minY {
-        get {
-            return max.y - min.y;
-        }
-    }
-
-    public int maxY {
-        get {
-            return max.y - min.y;
-        }
+    public override string ToString() {
+        return $"GridRect: {min} - {max}";
     }
 }

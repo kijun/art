@@ -26,7 +26,10 @@ public class StoryOfASound : MonoBehaviour {
         //CreateTiles();
         var sideLength = CameraHelper.Height / (1.414f * rows + 0.414f);
         cols = (int)(CameraHelper.Width / (1.414f * sideLength));
+        Debug.Log($"Creating {rows} rows, {cols} cols");
         board = new Board1(cols, rows);
+        //StartCoroutine(Run());
+        AddRow();
         StartCoroutine(Run());
     }
 
@@ -45,7 +48,9 @@ public class StoryOfASound : MonoBehaviour {
     bool AddRow(bool force=false) {
         // search for vacant spots
         // MUTEX
+        Debug.Log("StoryOfASound: Looking for empty row");
         GridRect emptyRow = board.FindEmptyRow();
+        Debug.Log("Found empty row" + emptyRow);
         if (emptyRow == null) {
             emptyRow = new GridRect(0, Random.Range(0, rows), cols, 1);
             foreach (var ge in board.graphicEntities) {
@@ -136,6 +141,10 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     IEnumerator Run() {
+        yield return Rest(0, 1);
+        foreach (var g in board.graphicEntities) {
+            g.Move(0, 1);
+        }
         yield return null;
         /*
         f = (Tile2 target, Location loc) => {

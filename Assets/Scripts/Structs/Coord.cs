@@ -14,4 +14,8 @@ public class Coord {
     public Vector2 ToVector2() {
         return new Vector2(x, y);
     }
+
+    public override string ToString() {
+        return $"({x}, {y})";
+    }
 }

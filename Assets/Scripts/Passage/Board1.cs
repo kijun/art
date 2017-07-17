@@ -19,8 +19,8 @@ public class Board1 {
     /*** GRID QUERY ***/
     public GridRect FindEmptyRect(int rectWidth, int rectHeight) {
         var emptyRects = new List<GridRect>();
-        for (int x = 0; x < width - rectWidth; x++) {
-            for (int y = 0; y < height - rectHeight; y++) {
+        for (int x = 0; x <= width - rectWidth; x++) {
+            for (int y = 0; y <= height - rectHeight; y++) {
                 IEnumerable<GraphicEntity1> entities = graphicEntities.GetRect<GraphicEntity1>(x, y, rectWidth, rectHeight);
                 var count = rectWidth * rectHeight;
                 foreach (var entity in entities) {
@@ -34,9 +34,12 @@ public class Board1 {
         }
 
         if (emptyRects.Count > 0) {
-            return emptyRects.GetRandom();
+            var rect = emptyRects.GetRandom();
+            Debug.Log($"Board: Found empty row {rect}");
+            return rect;
         }
 
+        Debug.Log($"Board: Could not find empty row");
         return null;
     }
 
@@ -85,16 +88,17 @@ public class Board1 {
 
     /*** ACCESS ***/
     public void LockTiles(GridRect rect, GraphicEntity1 ge) {
-        for (int x = rect.minX; x <= rect.maxX; x++) {
-            for (int y = rect.minY; y <= rect.maxY; y++) {
+        Debug.Log($"Board1: Lock {rect}");
+        for (int x = rect.min.x; x < rect.max.x; x++) {
+            for (int y = rect.min.y; y < rect.max.y; y++) {
                 graphicEntities[x, y] = ge;
             }
         }
     }
 
     public void UnlockTiles(GridRect rect) {
-        for (int x = rect.minX; x <= rect.maxX; x++) {
-            for (int y = rect.minY; y <= rect.maxY; y++) {
+        for (int x = rect.min.x; x < rect.max.x; x++) {
+            for (int y = rect.min.y; y < rect.max.y; y++) {
                 graphicEntities[x, y] = null;
             }
         }
@@ -102,7 +106,7 @@ public class Board1 {
 
     /*** Display ***/
     public RectParams GridRectToRectParams(GridRect grid) {
-        return new RectParams { x=grid.minX, y=grid.minY, width=grid.width, height=grid.height, color= Color.black};
+        return new RectParams { x=grid.min.x, y=grid.min.y, width=grid.width, height=grid.height, color= Color.black};
     }
 
     public IEnumerable GraphicEntities {

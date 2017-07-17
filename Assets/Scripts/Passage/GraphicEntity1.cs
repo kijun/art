@@ -34,6 +34,7 @@ public class GraphicEntity1 : MonoBehaviour {
     }
 
     public void Initialize(GridRect rect, Board1 board) {
+        Debug.Log($"Creating GraphicEntity: {rect}");
         this.board = board;
         this.rect = rect;
         board.LockTiles(rect, this);
@@ -42,7 +43,7 @@ public class GraphicEntity1 : MonoBehaviour {
     }
 
     //public void SetColor(Color color);
-    public void Move(int x, int y, float duration) {
+    public void Move(int x, int y, float duration = 0) {
         // moves square by (x, y) tile units
         //
         // lock properties: Translation, Existence (automatic)
@@ -55,11 +56,20 @@ public class GraphicEntity1 : MonoBehaviour {
         // if target
         _LockProperty(GraphicEntityMutexFlag.Translation);
         board.LockTiles(target, this);
+        if (duration.IsZero()) {
+            animatable.position += new Vector2(x, y);
+        } else {
         _RunAnimation(AnimationKeyPath.RelPosX,
                 AnimationCurveUtils.FromPairs(
                     // start position
                     // end position
                 ));
+        _RunAnimation(AnimationKeyPath.RelPosY,
+                AnimationCurveUtils.FromPairs(
+                    // start position
+                    // end position
+                ));
+        }
         _UnlockProperty(GraphicEntityMutexFlag.Translation);
         board.UnlockTiles(origin);
         // relock in case we have overlap
