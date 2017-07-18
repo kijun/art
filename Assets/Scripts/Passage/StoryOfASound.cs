@@ -82,7 +82,7 @@ public class StoryOfASound : MonoBehaviour {
         // random - return
     }
 
-    bool AddRow(bool force=false) {
+    bool AddRow(Color color, bool force=false) {
         // search for vacant spots
         // MUTEX
         Debug.Log("StoryOfASound: Looking for empty row");
@@ -96,8 +96,8 @@ public class StoryOfASound : MonoBehaviour {
         }
 
         var newGe = GraphicEntity1.New(emptyRow, board);
-        newGe.SetColor(red);
-        newGe.SetOpacity(Beat(1));
+        newGe.SetColor(color);
+        //newGe.SetOpacity(1, Beat(1));
         return true;
     }
 
@@ -189,17 +189,24 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     IEnumerator Run() {
-        AddRect(1, 1, red);
-        yield return Rest(0, 1);
-        AddRect(1, 2, blue);
-        yield return Rest(0, 1);
-        AddRect(2, 2, red);
-        yield return Rest(0, 1);
-        AddRect(3, 1, blue);
-        yield return Rest(0, 1);
+        AddRow(white);
+        /*
+        AddRect(1, 1, white);
+        AddRect(3, 3, white);
         AddRect(2, 2, white);
+        AddRect(2, 2, white);
+        AddRect(1, 1, white);
+        AddRect(1, 2, white);
+        AddRect(2, 1, white);
+        */
+        yield return Rest(0, 1);
+        AddRect(1, 1, blue);
         yield return Rest(0, 1);
         AddRect(1, 1, red);
+        yield return Rest(0, 1);
+        AddRect(1, 1, blue);
+        yield return Rest(0, 1);
+        AddRect(1, 1, white);
         yield return Rest(0, 1);
         foreach (GraphicEntity1 g in board.GraphicEntities()) {
             if (g.rect.min.y < 2) {
@@ -212,7 +219,10 @@ public class StoryOfASound : MonoBehaviour {
         foreach (GraphicEntity1 g in board.GraphicEntities()) {
             g.SetOpacity(0.5f, Beat(2));
         }
-        yield return Rest(0, 1);
+        yield return Rest(0, 2);
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            g.SetOpacity(1, Beat(2));
+        }
         // TODO find all graphic with size
         foreach (GraphicEntity1 g in board.GraphicEntities()) {
             if (g.rect.width == 1 && g.rect.height == 1) {
@@ -246,6 +256,10 @@ public class StoryOfASound : MonoBehaviour {
         yield return Rest(0, 1);
         rbig.BreakToUnitSquares();
         yield return Rest(0, 1);
+
+        foreach (GraphicEntity1 g in board.GraphicEntities()) {
+            g.Transform(new GridRect(0, 0, 1, 1), Beat(2));
+        }
 
         /*
         f = (Tile2 target, Location loc) => {
