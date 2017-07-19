@@ -126,10 +126,19 @@ public class GraphicEntity1 : MonoBehaviour {
     }
 
     public void Remove(float duration = 0, bool DONTUNLOCK=false) {
-        // TODO opacity
-        if (!DONTUNLOCK) board.UnlockTiles(rect);
-        Destroy(animatable.gameObject);
-        Destroy(gameObject);
+        if (duration.IsNonZero()) {
+            SetOpacity(0, duration);
+            StartCoroutine(C.WithDelay(() => {
+                if (!DONTUNLOCK) board.UnlockTiles(rect);
+                Destroy(animatable.gameObject);
+                Destroy(gameObject);
+            }, duration+0.5f));
+        } else {
+            // TODO opacity
+            if (!DONTUNLOCK) board.UnlockTiles(rect);
+            Destroy(animatable.gameObject);
+            Destroy(gameObject);
+        }
     }
 
     /* VALS */

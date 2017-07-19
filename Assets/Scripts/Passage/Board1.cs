@@ -113,7 +113,8 @@ public class Board1 {
     }
 
     public GraphicEntity1 FindGraphicWithSizeGreaterThan(int width, int height) {
-        foreach (var g in GraphicEntities()) {
+        // TODO HAX
+        foreach (var g in GraphicEntities().ToArray().Shuffle()) {
             if ((g.width > width && g.height >= height) ||
                 (g.width >= width && g.height > height)) {
                 return g;
@@ -151,6 +152,11 @@ public class Board1 {
         return GraphicEntities().First();
     }
 
+    public GraphicEntity1 FindRandomGraphic() {
+        // TODO performance!!
+        return GraphicEntities().ToArray().Shuffle().First();
+    }
+
 
     public GraphicEntity1 FindGraphicAtPosition(int x, int y) {
         if (x >= 0 && y >= 0 && x < width && y < height) {
@@ -177,7 +183,11 @@ public class Board1 {
         //Debug.Log($"Board1: Lock {rect}");
         for (int x = rect.min.x; x <= rect.max.x; x++) {
             for (int y = rect.min.y; y <= rect.max.y; y++) {
-                graphicEntities[x, y] = ge;
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    graphicEntities[x, y] = ge;
+                } else {
+                    Debug.Log("lock failed {x} {y}");
+                }
             }
         }
     }
@@ -185,7 +195,11 @@ public class Board1 {
     public void UnlockTiles(GridRect rect) {
         for (int x = rect.min.x; x <= rect.max.x; x++) {
             for (int y = rect.min.y; y <= rect.max.y; y++) {
-                graphicEntities[x, y] = null;
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    graphicEntities[x, y] = null;
+                } else {
+                    Debug.Log("unlock failed {x} {y}");
+                }
             }
         }
     }
