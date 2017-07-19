@@ -31,6 +31,10 @@ public class GridRect {
         return new GridRect(Coord.Min(min, rect2.min), Coord.Max(max, rect2.max));
     }
 
+    public GridRect Resize(int width, int height) {
+        return new GridRect(min, new Coord(min.x + width - 1, min.y + height - 1));
+    }
+
     /*** HEL **/
     public IEnumerable<GridRect> SplitToUnitSquares() {
         for (int i = min.x; i <= max.x; i++) {

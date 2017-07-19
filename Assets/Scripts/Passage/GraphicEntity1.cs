@@ -57,6 +57,7 @@ public class GraphicEntity1 : MonoBehaviour {
         // apply move
         // unlock properties
         // unlock origin tiles
+        // TODO fix larger rect problem hax
         Transform(rect.Translate(x, y), duration);
     }
 
