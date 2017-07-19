@@ -104,7 +104,7 @@ public class GraphicEntity1 : MonoBehaviour {
         // splits existing x to this as much as it can
     }
 
-    public void SetColor(Color color, float duration = 0) {
+    public void SetColor(Color color, float duration = 0.1f) {
         animatable.color = color;
         // TODO color animation
     }
@@ -141,6 +141,12 @@ public class GraphicEntity1 : MonoBehaviour {
     public float opacity {
         get {
             return animatable.opacity;
+        }
+    }
+
+    public Color color {
+        get {
+            return animatable.color;
         }
     }
 

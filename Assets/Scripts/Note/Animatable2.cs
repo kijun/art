@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Animatable2 : MonoBehaviour {
@@ -81,6 +82,20 @@ public class Animatable2 : MonoBehaviour {
                 }
             }
         }
+
+        // remove completed animations
+        var finishedAnimations = new List<string>();
+        foreach (var pair in animationCurves) {
+            if (pair.Value.IsDone(Time.time))
+            {
+                finishedAnimations.Add(pair.Key);
+            }
+        }
+
+        foreach (var anim in finishedAnimations) {
+            animationCurves.Remove(anim);
+        }
+
         // not sure if this should be relative or absolute time
     }
 

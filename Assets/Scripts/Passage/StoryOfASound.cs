@@ -36,14 +36,14 @@ public class StoryOfASound : MonoBehaviour {
         board = new Board1(cols, rows, sideLength, 0.414f * sideLength);
         boardRect = new GridRect(0, 0, cols, rows);
         blues = new Color[9];
-        blues[0] = blue.SwapA(0);
-        blues[1] = blue.SwapA(0.125f);
-        blues[2] = blue.SwapA(0.125f*2);
-        blues[3] = blue.SwapA(0.125f*3);
-        blues[4] = blue.SwapA(0.125f*4);
-        blues[5] = blue.SwapA(0.125f*5);
-        blues[6] = blue.SwapA(0.125f*6);
-        blues[7] = blue.SwapA(0.125f*7);
+        blues[0] = blue.WithAlpha(0);
+        blues[1] = blue.WithAlpha(0.125f);
+        blues[2] = blue.WithAlpha(0.125f*2);
+        blues[3] = blue.WithAlpha(0.125f*3);
+        blues[4] = blue.WithAlpha(0.125f*4);
+        blues[5] = blue.WithAlpha(0.125f*5);
+        blues[6] = blue.WithAlpha(0.125f*6);
+        blues[7] = blue.WithAlpha(0.125f*7);
         blues[8] = blue;
         //StartCoroutine(Run());
         //StartCoroutine(Run2());
@@ -215,25 +215,43 @@ public class StoryOfASound : MonoBehaviour {
 
     IEnumerator Section1Orange() {
         yield return Rest(8, 0);
+        foreach (var rest in Loop(16, 0, 2, 0)) {
+            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(1).ForEach(g => g.SetColor(orange));
+            yield return rest;
+        }
+    }
+
+    IEnumerator Section1Fade() {
+        yield return Rest(12, 0);
         foreach (var rest in Loop(20, 0, 2, 0)) {
-            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(5).ForEach(g => g.SetColor(orange));
+            int index = 0;
+            foreach (var g in board.FindGraphicsForRow(Random.Range(0, rows))) {
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(1, Beat(0.5f));
+                }, Beat(index * 0.3f)));
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(0, Beat(1));
+                }, Beat(index * 0.3f + 2f)));
+                index++;
+            };
             yield return rest;
         }
     }
 
     IEnumerator Section1() {
         StartCoroutine(Section1Orange());
+        StartCoroutine(Section1Fade());
         var rect = AddRect(cols, rows, blues[0]);
         rect.BreakToUnitSquares();
         yield return Rest(2, 0);
-        foreach (var rest in Loop(22, 0, 4, 0)) {
+        foreach (var rest in Loop(18, 0, 4, 0)) {
             var g = board.FindRandomGraphicWithSize(1, 1);
             //g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
 
             //g = board.FindRandomGraphicWithSize(1, 1);
             List<GraphicEntity1> ge = new List<GraphicEntity1>();
             ge.Add(g);
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < 6; i++) {
                 foreach (var nextGE in board.FindAdjacentGraphics(g.rect)) {
                     if (!ge.Contains(nextGE)) {
                         ge.Add(nextGE);
@@ -247,17 +265,15 @@ public class StoryOfASound : MonoBehaviour {
             int ij = 0;
             foreach (var gr in ge) {
                 StartCoroutine(C.WithDelay(() => {
-                    gr.SetOpacity(gr.opacity + 0.33f, 0);
-                }, Beat(ij)));
+                    var currOpacity = gr.opacity;
+                    if (gr.color.RGBEquals(orange)) {
+                        gr.SetColor(blue.WithAlpha(1f/3f));
+                    } else {
+                        gr.SetOpacity(Mathf.Min(1, currOpacity + 1f/3f));
+                    }
+                    // what i want - start with new opacity, fade down
+                }, Beat(ij*2)));
                 ij++;
-            }
-            yield return rest;
-        }
-        foreach (var rest in Loop(12, 0, 1, 0)) {
-            if (Random.value > 0.5f) {
-                // left to right
-            } else {
-                // right to left
             }
             yield return rest;
         }

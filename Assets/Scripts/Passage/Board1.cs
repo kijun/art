@@ -81,6 +81,22 @@ public class Board1 {
         return null;
     }
 
+    public IEnumerable<GraphicEntity1> FindGraphicsForRow(int rowNum) {
+        if (rowNum >= 0 && rowNum < height) {
+            foreach (var g in graphicEntities.GetRow(rowNum)) {
+                if (g != null) yield return g;
+            }
+        }
+    }
+
+    public IEnumerable<GraphicEntity1> FindGraphicsForColumn(int colNum) {
+        if (colNum >= 0 && colNum < height) {
+            foreach (var g in graphicEntities.GetCol(colNum)) {
+                if (g != null) yield return g;
+            }
+        }
+    }
+
     public IEnumerable<GraphicEntity1> FindAllGraphicsWithSize(int width, int height, GridRect rect = null) {
         foreach (var g in GraphicEntities(rect)) {
             if (g.width == width && g.height == height) yield return g;
