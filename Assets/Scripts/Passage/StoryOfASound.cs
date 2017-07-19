@@ -215,7 +215,7 @@ public class StoryOfASound : MonoBehaviour {
 
     IEnumerator Section1Orange() {
         yield return Rest(8, 0);
-        foreach (var rest in Loop(16, 0, 2, 0)) {
+        foreach (var rest in Loop(16, 0, 2, 1)) {
             board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(1).ForEach(g => g.SetColor(orange));
             yield return rest;
         }
@@ -244,14 +244,14 @@ public class StoryOfASound : MonoBehaviour {
         var rect = AddRect(cols, rows, blues[0]);
         rect.BreakToUnitSquares();
         yield return Rest(2, 0);
-        foreach (var rest in Loop(18, 0, 4, 0)) {
+        foreach (var rest in Loop(24, 0, 4, 0)) {
             var g = board.FindRandomGraphicWithSize(1, 1);
             //g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
 
             //g = board.FindRandomGraphicWithSize(1, 1);
             List<GraphicEntity1> ge = new List<GraphicEntity1>();
             ge.Add(g);
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 7; i++) { // beats - 1
                 foreach (var nextGE in board.FindAdjacentGraphics(g.rect)) {
                     if (!ge.Contains(nextGE)) {
                         ge.Add(nextGE);
