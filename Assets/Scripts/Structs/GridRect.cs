@@ -33,8 +33,8 @@ public class GridRect {
 
     /*** HEL **/
     public IEnumerable<GridRect> SplitToUnitSquares() {
-        for (int i = min.x; i < max.x; i++) {
-            for (int j = min.y; j < max.y; j++) {
+        for (int i = min.x; i <= max.x; i++) {
+            for (int j = min.y; j <= max.y; j++) {
                 yield return new GridRect(i, j, 1, 1);
             }
         }

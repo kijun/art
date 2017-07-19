@@ -81,6 +81,12 @@ public class Board1 {
         return null;
     }
 
+    public IEnumerable<GraphicEntity1> FindAllGraphicsWithSize(int width, int height, GridRect rect = null) {
+        foreach (var g in GraphicEntities(rect)) {
+            if (g.width == width && g.height == height) yield return g;
+        }
+    }
+
     public GraphicEntity1 FindRandomGraphicWithSize(int width, int height, GridRect rect = null) {
         List<GraphicEntity1> targets = new List<GraphicEntity1>();
         foreach (var g in GraphicEntities(rect)) {

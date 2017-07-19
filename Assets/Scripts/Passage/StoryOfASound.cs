@@ -48,6 +48,8 @@ public class StoryOfASound : MonoBehaviour {
         //StartCoroutine(Run());
         //StartCoroutine(Run2());
         StartCoroutine(Section1());
+        StartCoroutine(Section2());
+        StartCoroutine(Section3());
 
         //AddRow();
         //StartCoroutine(Run());
@@ -202,42 +204,60 @@ public class StoryOfASound : MonoBehaviour {
         return false;
     }
 
+    IEnumerator Section3() {
+        yield return null;
+    }
+
+    IEnumerator Section2() {
+        yield return Rest(24, 0);
+        board.FindAllGraphicsWithSize(1, 1).ForEach(g => g.SetColor(blue));
+    }
+
+    IEnumerator Section1Orange() {
+        yield return Rest(8, 0);
+        foreach (var rest in Loop(20, 0, 2, 0)) {
+            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(5).ForEach(g => g.SetColor(orange));
+            yield return rest;
+        }
+    }
+
     IEnumerator Section1() {
+        StartCoroutine(Section1Orange());
         var rect = AddRect(cols, rows, blues[0]);
         rect.BreakToUnitSquares();
         yield return Rest(2, 0);
-        foreach (var rest in Loop(10, 0, 1, 0)) {
+        foreach (var rest in Loop(22, 0, 4, 0)) {
             var g = board.FindRandomGraphicWithSize(1, 1);
-            g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
+            //g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
 
-            g = board.FindRandomGraphicWithSize(1, 1);
+            //g = board.FindRandomGraphicWithSize(1, 1);
             List<GraphicEntity1> ge = new List<GraphicEntity1>();
-            for (int i = 0; i < 8; i++) {
-                ge.Add(g);
-                g = board.FindAdjacentGraphics(g.rect).First();
+            ge.Add(g);
+            for (int i = 0; i < 16; i++) {
+                foreach (var nextGE in board.FindAdjacentGraphics(g.rect)) {
+                    if (!ge.Contains(nextGE)) {
+                        ge.Add(nextGE);
+                        g = nextGE;
+                        break;
+                    }
+                }
                 Debug.Log(g);
             }
 
             int ij = 0;
             foreach (var gr in ge) {
                 StartCoroutine(C.WithDelay(() => {
-                    gr.SetOpacity(gr.opacity + 0.5f, Beat(0.4f));
+                    gr.SetOpacity(gr.opacity + 0.33f, 0);
                 }, Beat(ij)));
                 ij++;
             }
             yield return rest;
         }
         foreach (var rest in Loop(12, 0, 1, 0)) {
-            var g = board.FindRandomGraphicWithSize(1, 1);
-            g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
-
-            g = board.FindRandomGraphicWithSize(1, 1);
-            for (int i = 0; i < 8; i++) {
-                StartCoroutine(C.WithDelay(() => {
-                    g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
-                }, Beat(1)));
-                g = board.FindAdjacentGraphics(g.rect).First();
-                Debug.Log(g);
+            if (Random.value > 0.5f) {
+                // left to right
+            } else {
+                // right to left
             }
             yield return rest;
         }
