@@ -14,7 +14,7 @@ public class GridRect {
 
     public GridRect (int xmin, int ymin, int width, int height) {
         this.min = new Coord(xmin, ymin);
-        this.max = new Coord(xmin+width, ymin+height);
+        this.max = new Coord(xmin+width-1, ymin+height-1);
     }
 
     public GridRect (GridRect gr) {
@@ -40,6 +40,17 @@ public class GridRect {
         }
     }
 
+    /*** COMPARATORS ***/
+    public bool Contains(GridRect other) {
+        if (other.min.x >= min.x &&
+            other.min.y >= min.y &&
+            other.max.x <= max.x &&
+            other.max.y <= min.y) {
+            return true;
+        }
+        return false;
+    }
+
     /*
     public GridRect Subtract(GridRect rect) {
         if
@@ -49,13 +60,13 @@ public class GridRect {
     /*** PROPERTIES ***/
     public int width {
         get {
-            return max.x - min.x;
+            return max.x - min.x + 1;
         }
     }
 
     public int height {
         get {
-            return max.y - min.y;
+            return max.y - min.y + 1;
         }
     }
 
@@ -66,6 +77,9 @@ public class GridRect {
     }
 
     public override string ToString() {
+        if (min.Equals(max)) {
+            return $"GridRect: {min}";
+        }
         return $"GridRect: {min} - {max}";
     }
 }

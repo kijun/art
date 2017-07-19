@@ -5,11 +5,13 @@ using UnityEngine;
 
 public class Board1 {
     /* MUTEEEEXXXX */
+    // TODO multiple entities
     GraphicEntity1[,] graphicEntities;
     int width;
     int height;
     float tileLength;
     float gapLength;
+    GridRect boardRect;
     Vector2 bottomLeftAnchor;
 
     public Board1(int width, int height, float tileLength, float gapLength) {
@@ -20,6 +22,7 @@ public class Board1 {
         this.bottomLeftAnchor = new Vector2(
                 width * tileLength + (width-1)*gapLength,
                 height * tileLength + (height - 1)*gapLength)/-2f;
+        this.boardRect = new GridRect(0, 0, width, height);
 
         graphicEntities = new GraphicEntity1[width, height];
     }
@@ -65,15 +68,25 @@ public class Board1 {
         return null;
     }
 
+
     public GridRect FindExpandedRect(GridRect gr) {
         return null;
     }
 
     /*** GRAPHIC ENTITY QUERY ***/
-    public GraphicEntity1 FindGraphicWithSize(int width, int height) {
+    public GraphicEntity1 FindFirstGraphicWithSize(int width, int height) {
         foreach (var g in GraphicEntities()) {
             if (g.width == width && g.height == height) return g;
         }
+        return null;
+    }
+
+    public GraphicEntity1 FindRandomGraphicWithSize(int width, int height, GridRect rect = null) {
+        List<GraphicEntity1> targets = new List<GraphicEntity1>();
+        foreach (var g in GraphicEntities(rect)) {
+            if (g.width == width && g.height == height) targets.Add(g);
+        }
+        if (targets.Count > 0) { return targets[Random.Range(0, targets.Count)]; }
         return null;
     }
 
@@ -104,24 +117,52 @@ public class Board1 {
         return null;
     }
 
+    /*
+    public List<GraphicEntity1> FindGraphicEntitiesInside(GridRect rect) {
+        var list = new List<GraphicEntity1>();
+        foreach (
+    }
+    */
+
     public GraphicEntity1 RandomGraphicEntity() {
         // TODO make random
         return GraphicEntities().First();
     }
 
+
+    public GraphicEntity1 FindGraphicAtPosition(int x, int y) {
+        if (x >= 0 && y >= 0 && x < width && y < height) {
+            return graphicEntities[x, y];
+        }
+        return null;
+    }
+
+    public IEnumerable<GraphicEntity1> FindAdjacentGraphics(GridRect gr, bool canOverlap = true) {
+        var rects = new GridRect[4] {
+            gr.Translate(0, 1),
+            gr.Translate(0, -1),
+            gr.Translate(-1, 0),
+            gr.Translate(1, 0)}.Shuffle();
+        foreach (var rect in rects) {
+            // TODO yield overlap, remove current rect
+            var g = FindGraphicAtPosition(rect.min.x, rect.min.y);
+            if (g != null) yield return g;
+        }
+    }
+
     /*** ACCESS ***/
     public void LockTiles(GridRect rect, GraphicEntity1 ge) {
-        Debug.Log($"Board1: Lock {rect}");
-        for (int x = rect.min.x; x < rect.max.x; x++) {
-            for (int y = rect.min.y; y < rect.max.y; y++) {
+        //Debug.Log($"Board1: Lock {rect}");
+        for (int x = rect.min.x; x <= rect.max.x; x++) {
+            for (int y = rect.min.y; y <= rect.max.y; y++) {
                 graphicEntities[x, y] = ge;
             }
         }
     }
 
     public void UnlockTiles(GridRect rect) {
-        for (int x = rect.min.x; x < rect.max.x; x++) {
-            for (int y = rect.min.y; y < rect.max.y; y++) {
+        for (int x = rect.min.x; x <= rect.max.x; x++) {
+            for (int y = rect.min.y; y <= rect.max.y; y++) {
                 graphicEntities[x, y] = null;
             }
         }
@@ -137,9 +178,18 @@ public class Board1 {
         return new RectParams { x=center.x, y=center.y, width=size.x, height=size.y, color= Color.black};
     }
 
-    public IEnumerable<GraphicEntity1> GraphicEntities() {
-        foreach (var g in graphicEntities) {
-            if (g != null) yield return g;
+    public IEnumerable<GraphicEntity1> GraphicEntities(GridRect rect = null) {
+        if (rect == null) {
+            foreach (var g in graphicEntities) {
+                if (g != null) yield return g;
+            }
+        } else {
+            for (int x = 0; x < rect.width; x++) {
+                for (int y = 0; y < rect.height; y++) {
+                    var g = graphicEntities[x+rect.min.x, y+rect.min.y];
+                    if (g != null) yield return g;
+                }
+            }
         }
     }
 }

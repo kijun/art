@@ -34,13 +34,19 @@ public class GraphicEntity1 : MonoBehaviour {
     }
 
     public void Initialize(GridRect rect, Board1 board) {
-        Debug.Log($"Creating GraphicEntity: {rect}");
+        //Debug.Log($"Creating GraphicEntity: {rect}");
         this.board = board;
         this.rect = rect;
         board.LockTiles(rect, this);
         var rectParams = board.GridRectToRectParams(rect);
         animatable = NoteFactory.CreateRect(rectParams);
     }
+    // 2 note
+    // 12 papapapa
+    // 24 beat
+    // 32 no beat
+    // 36 beat again
+    // 52 no beat : 2m
 
     //public void SetColor(Color color);
     public void Move(int x, int y, float duration = 0) {
@@ -94,7 +100,7 @@ public class GraphicEntity1 : MonoBehaviour {
             var g = GraphicEntity1.New(gridRect, board);
             g.SetColor(animatable.color);
         }
-        Remove(duration);
+        Remove(duration, DONTUNLOCK:true);
         // splits existing x to this as much as it can
     }
 
@@ -111,9 +117,9 @@ public class GraphicEntity1 : MonoBehaviour {
         _RunAnimation(AnimationKeyPath.Rotation, 0, animatable.rotation, duration, rotation);
     }
 
-    public void Remove(float duration = 0) {
+    public void Remove(float duration = 0, bool DONTUNLOCK=false) {
         // TODO opacity
-        board.UnlockTiles(rect);
+        if (!DONTUNLOCK) board.UnlockTiles(rect);
         Destroy(animatable.gameObject);
         Destroy(gameObject);
     }
@@ -129,6 +135,12 @@ public class GraphicEntity1 : MonoBehaviour {
     public int height {
         get {
             return rect.height;
+        }
+    }
+
+    public float opacity {
+        get {
+            return animatable.opacity;
         }
     }
 
@@ -170,6 +182,10 @@ public class GraphicEntity1 : MonoBehaviour {
         if (mutex == GraphicEntityMutexFlag.Existence) {
             mutex = GraphicEntityMutexFlag.None;
         }
+    }
+
+    public override string ToString() {
+        return $"Graphic: {rect}";
     }
 }
 

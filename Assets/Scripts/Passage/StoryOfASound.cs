@@ -12,7 +12,10 @@ public class StoryOfASound : MonoBehaviour {
     public Color red;
     public Color blue;
     public Color yellow;
+    public Color orange;
     public Color white;
+
+    Color[] blues;
 
     public TimeSignature timeSignature;
     public Camera camera;
@@ -21,15 +24,31 @@ public class StoryOfASound : MonoBehaviour {
     public int rows; // automatically decides the rest of the game
     int cols;
 
+    GridRect boardRect;
+
     Board1 board;
 
     void Start() {
         //CreateTiles();
         var sideLength = CameraHelper.Height / (1.414f * rows + 0.414f);
         cols = (int)(CameraHelper.Width / (1.414f * sideLength));
-        Debug.Log($"Creating {rows} rows, {cols} cols");
+        //Debug.Log($"Creating {rows} rows, {cols} cols");
         board = new Board1(cols, rows, sideLength, 0.414f * sideLength);
-        StartCoroutine(Run());
+        boardRect = new GridRect(0, 0, cols, rows);
+        blues = new Color[9];
+        blues[0] = blue.SwapA(0);
+        blues[1] = blue.SwapA(0.125f);
+        blues[2] = blue.SwapA(0.125f*2);
+        blues[3] = blue.SwapA(0.125f*3);
+        blues[4] = blue.SwapA(0.125f*4);
+        blues[5] = blue.SwapA(0.125f*5);
+        blues[6] = blue.SwapA(0.125f*6);
+        blues[7] = blue.SwapA(0.125f*7);
+        blues[8] = blue;
+        //StartCoroutine(Run());
+        //StartCoroutine(Run2());
+        StartCoroutine(Section1());
+
         //AddRow();
         //StartCoroutine(Run());
     }
@@ -70,11 +89,6 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
-    /*
-    void CreateTiles() {
-        board = Tile2.CreateBoard(cols, rows);
-    }
-    */
 
     void Dispatch() {
         // action
@@ -188,17 +202,80 @@ public class StoryOfASound : MonoBehaviour {
         return false;
     }
 
+    IEnumerator Section1() {
+        var rect = AddRect(cols, rows, blues[0]);
+        rect.BreakToUnitSquares();
+        yield return Rest(2, 0);
+        foreach (var rest in Loop(10, 0, 1, 0)) {
+            var g = board.FindRandomGraphicWithSize(1, 1);
+            g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
+
+            g = board.FindRandomGraphicWithSize(1, 1);
+            List<GraphicEntity1> ge = new List<GraphicEntity1>();
+            for (int i = 0; i < 8; i++) {
+                ge.Add(g);
+                g = board.FindAdjacentGraphics(g.rect).First();
+                Debug.Log(g);
+            }
+
+            int ij = 0;
+            foreach (var gr in ge) {
+                StartCoroutine(C.WithDelay(() => {
+                    gr.SetOpacity(gr.opacity + 0.5f, Beat(0.4f));
+                }, Beat(ij)));
+                ij++;
+            }
+            yield return rest;
+        }
+        foreach (var rest in Loop(12, 0, 1, 0)) {
+            var g = board.FindRandomGraphicWithSize(1, 1);
+            g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
+
+            g = board.FindRandomGraphicWithSize(1, 1);
+            for (int i = 0; i < 8; i++) {
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
+                }, Beat(1)));
+                g = board.FindAdjacentGraphics(g.rect).First();
+                Debug.Log(g);
+            }
+            yield return rest;
+        }
+    }
+
+    IEnumerator Run2() {
+        yield return Rest(60);
+        foreach (var rest in Loop(32, 0, 1, 0)) {
+            yield return rest;
+        }
+    }
+
     IEnumerator Run() {
-        AddRow(white);
+        //var rect = AddRect(cols, rows, blue);
+        //rect.BreakToUnitSquares();
+        //yield return Rest(2, 0);
+        //foreach (var rest in Loop(16, 0, 1, 0)) {
+            //board.FindRandomGraphicWithSize(1, 1).SetColor(orange);
+        //    board.FindRandomGraphicWithSize(1, 1).SetOpacity(0, Beat(1));
+            /*
+            var g = board.FindRandomGraphicWithSize(1, 1);
+            if (g.rect.min.x > 0) {
+                g.Move(-1, 0, Beat(4));
+            }
+            */
+        //    yield return rest;
+        //}
+        foreach (var rest in Loop(32, 0, 1, 0)) {
+            AddRect(Random.Range(1, 4), Random.Range(1, 4), blue);
+            yield return rest;
+        }
         /*
-        AddRect(1, 1, white);
         AddRect(3, 3, white);
         AddRect(2, 2, white);
         AddRect(2, 2, white);
         AddRect(1, 1, white);
         AddRect(1, 2, white);
         AddRect(2, 1, white);
-        */
         yield return Rest(0, 1);
         AddRect(1, 1, blue);
         yield return Rest(0, 1);

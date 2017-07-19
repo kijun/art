@@ -28,4 +28,17 @@ public static class ArrayExtension {
             }
         }
 	}
+
+    public static T[] Shuffle<T>(this T[] toShuffle) {
+        // Knuth shuffle algorithm :: courtesy of Wikipedia :)
+        for (int t = 0; t < toShuffle.Length; t++ )
+        {
+            T tmp = toShuffle[t];
+            int r = Random.Range(t, toShuffle.Length);
+            toShuffle[t] = toShuffle[r];
+            toShuffle[r] = tmp;
+        }
+
+        return toShuffle;
+    }
 }
