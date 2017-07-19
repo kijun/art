@@ -90,7 +90,7 @@ public class Board1 {
     }
 
     public IEnumerable<GraphicEntity1> FindGraphicsForColumn(int colNum) {
-        if (colNum >= 0 && colNum < height) {
+        if (colNum >= 0 && colNum < width) {
             foreach (var g in graphicEntities.GetCol(colNum)) {
                 if (g != null) yield return g;
             }
@@ -208,6 +208,7 @@ public class Board1 {
         } else {
             for (int x = 0; x < rect.width; x++) {
                 for (int y = 0; y < rect.height; y++) {
+                    Debug.Log($"GraphicEntities: x={x} y={y} {rect}");
                     var g = graphicEntities[x+rect.min.x, y+rect.min.y];
                     if (g != null) yield return g;
                 }

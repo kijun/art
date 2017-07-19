@@ -204,26 +204,141 @@ public class StoryOfASound : MonoBehaviour {
         return false;
     }
 
+    /***** SECTION 3 *****/
+
     IEnumerator Section3() {
-        yield return null;
+        yield return Rest(48, 0);
+        board.FindAllGraphicsWithSize(1, 1).ForEach(g => g.SetOpacity(0.65f, Beat(1)));
+        yield return Rest(1, 0);
+        foreach (var rest in Loop(24, 0, 0, 2)) {
+            var g = board.FindRandomGraphicWithSize(1, 1, new GridRect(boardRect.min.Move(1, 1), boardRect.max.Move(-1, -1)));
+
+            var rand = Random.value;
+            if (rand < 0.25f) {
+                g.Move(1, 0, Beat(1.5f));
+            } else if (rand < 0.50f) {
+                g.Move(-1, 0, Beat(1.5f));
+            } else if (rand < 0.75f) {
+                g.Move(0, 1, Beat(1.5f));
+            } else {
+                g.Move(0, -1, Beat(1.5f));
+            }
+
+            yield return rest;
+        }
     }
 
+    /***** SECTION 2 *****/
+    // 0 refresh
+    // 1 rotation effect, color change
+    // 2 composition
+    // 3 refresh
     IEnumerator Section2() {
+        StartCoroutine(Section2Rotation());
+        StartCoroutine(Section2Cascade());
+        StartCoroutine(Section2Shape());
         yield return Rest(24, 0);
-        board.FindAllGraphicsWithSize(1, 1).ForEach(g => g.SetColor(blue));
+        board.FindAllGraphicsWithSize(1, 1).ForEach(g => g.SetOpacity(1, Beat(1)));
+        yield return Rest(0, 3);
+    }
+
+    IEnumerator Section2Cascade() {
+        yield return Rest(24, 3);
+        float beatsRested = 0;
+        while (beatsRested < 4*22) {
+            var rand = Random.value;
+            if (rand < 0.33f) {
+                CascadeLeft();
+            } else if (rand < 0.67f) {
+                CascadeRight();
+            } else {
+                CascadeTop();
+            }
+            //var beatsToRest = Random.Range(4*2, 4*2.8f);
+            var beatsToRest = 8;//Random.Range(4*2, 4*2.8f);
+            yield return Rest(0, beatsToRest);
+            beatsRested += beatsToRest;
+        }
+    }
+
+    IEnumerator Section2Shape() {
+        yield return Rest(24, 2);
+        foreach (var rest in Loop(22, 3, 2, 0)) {
+            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(30).ForEach(g => g.SetOpacity(0, Beat(0.3f)));
+            yield return rest;
+        }
+    }
+
+    void CascadeRight() {
+        for (int i = 0; i < rows; i++) {
+            int index = 1;
+            foreach (var g in board.FindGraphicsForRow(i)) {
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(0, Beat(0.2f));
+                }, Beat(index * 0.3f)));
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(1, Beat(1f));
+                }, Beat(index * 0.3f+0.3f)));
+                index++;
+            };
+        }
+    }
+
+    void CascadeLeft() {
+        for (int i = 0; i < rows; i++) {
+            int index = 1;
+            foreach (var g in board.FindGraphicsForRow(i).Reverse()) {
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(0, Beat(0.2f));
+                }, Beat(index * 0.3f)));
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(1, Beat(1f));
+                }, Beat(index * 0.3f+0.3f)));
+                index++;
+            };
+        }
+    }
+
+    void CascadeTop() {
+        for (int i = 0; i < cols; i++) {
+            int index = 1;
+            foreach (var g in board.FindGraphicsForColumn(i)) {
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(0, Beat(0.2f));
+                }, Beat(index * 0.3f)));
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(1, Beat(1f));
+                }, Beat(index * 0.3f+0.3f)));
+                index++;
+            };
+        }
+    }
+
+    IEnumerator Section2Rotation() {
+        yield return Rest(24, 1);
+        int beatsRested = 0;
+        while (beatsRested < 4*24-1) {
+            board.FindRandomGraphicWithSize(1, 1).RotateTo(360, Beat(2));
+            var beatsToRest = Random.Range(4, 4);
+            beatsRested += beatsToRest;
+            yield return Rest(0, beatsToRest);
+        }
     }
 
     IEnumerator Section1Orange() {
         yield return Rest(8, 0);
-        foreach (var rest in Loop(16, 0, 2, 1)) {
-            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(1).ForEach(g => g.SetColor(orange));
-            yield return rest;
+        int beatsRested = 0;
+        while (beatsRested < 4*16) {
+            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(Random.Range(1, 2)).ForEach(g => g.SetColor(orange));
+            var beatsToRest = Random.Range(5, 7);
+            beatsRested += beatsToRest;
+            yield return Rest(0, beatsToRest);
         }
     }
 
     IEnumerator Section1Fade() {
         yield return Rest(12, 0);
-        foreach (var rest in Loop(20, 0, 2, 0)) {
+        foreach (var rest in Loop(12, 0, 2, 0)) {
             int index = 0;
             foreach (var g in board.FindGraphicsForRow(Random.Range(0, rows))) {
                 StartCoroutine(C.WithDelay(() => {
@@ -251,7 +366,7 @@ public class StoryOfASound : MonoBehaviour {
             //g = board.FindRandomGraphicWithSize(1, 1);
             List<GraphicEntity1> ge = new List<GraphicEntity1>();
             ge.Add(g);
-            for (int i = 0; i < 7; i++) { // beats - 1
+            for (int i = 0; i < 9; i++) { // beats - 1
                 foreach (var nextGE in board.FindAdjacentGraphics(g.rect)) {
                     if (!ge.Contains(nextGE)) {
                         ge.Add(nextGE);
@@ -267,9 +382,9 @@ public class StoryOfASound : MonoBehaviour {
                 StartCoroutine(C.WithDelay(() => {
                     var currOpacity = gr.opacity;
                     if (gr.color.RGBEquals(orange)) {
-                        gr.SetColor(blue.WithAlpha(1f/3f));
+                        gr.SetColor(blue.WithAlpha(1f/2f));
                     } else {
-                        gr.SetOpacity(Mathf.Min(1, currOpacity + 1f/3f));
+                        gr.SetOpacity(Mathf.Min(1, currOpacity + 1f/2f));
                     }
                     // what i want - start with new opacity, fade down
                 }, Beat(ij*2)));

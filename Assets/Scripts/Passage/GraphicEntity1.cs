@@ -104,17 +104,25 @@ public class GraphicEntity1 : MonoBehaviour {
         // splits existing x to this as much as it can
     }
 
-    public void SetColor(Color color, float duration = 0.1f) {
+    public void SetColor(Color color, float duration = 0) {
         animatable.color = color;
         // TODO color animation
     }
 
     public void SetOpacity(float opacity, float duration = 0) {
-        _RunAnimation(AnimationKeyPath.Opacity, 0, animatable.opacity, duration, opacity);
+        if (duration.IsZero()) {
+            animatable.opacity = opacity;
+        } else {
+            _RunAnimation(AnimationKeyPath.Opacity, 0, animatable.opacity, duration, opacity);
+        }
     }
 
-    public void Rotate(float rotation, float duration = 0) {
+    public void RotateTo(float rotation, float duration = 0) {
         _RunAnimation(AnimationKeyPath.Rotation, 0, animatable.rotation, duration, rotation);
+    }
+
+    public void RotateFor(float dr, float duration = 0) {
+        _RunAnimation(AnimationKeyPath.Rotation, 0, animatable.rotation, duration, animatable.rotation + dr);
     }
 
     public void Remove(float duration = 0, bool DONTUNLOCK=false) {

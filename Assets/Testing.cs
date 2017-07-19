@@ -11,7 +11,7 @@ public class Testing : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         if (startTime > float.Epsilon) {
-            Time.timeScale = 25;
+            Time.timeScale = 40;
 
             fastForward = true;
             if (mainAudioSource != null) {

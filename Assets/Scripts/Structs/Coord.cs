@@ -17,9 +17,7 @@ public class Coord {
     }
 
     public Coord Move (int dx, int dy) {
-        this.x += dx;
-        this.y += dy;
-        return this;
+        return new Coord(x+dx, y+dy);
     }
 
     public Vector2 ToVector2() {
