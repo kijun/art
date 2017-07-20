@@ -294,18 +294,14 @@ public class StoryOfASound : MonoBehaviour {
     // 2 composition
     // 3 refresh
     IEnumerator Section2() {
-        StartCoroutine(Section2Rotation());
-        StartCoroutine(Section2Cascade());
-        StartCoroutine(Section2Shape());
-        yield return Rest(24, 0);
-        board.FindAllGraphicsWithSize(1, 1).ForEach(g => g.SetOpacity(1, Beat(1)));
-        yield return Rest(0, 3);
+        Run(Rest(24, 3), Section2Cascade(Loop(22, 0, 2, 0)));
+        Run(Rest(24, 1), Section2Rotation(Loop(23, 3, 1, 0)));
+        Run(Rest(24, 2), Section2Shape(Loop(23, 1, 2, 0)));
+        yield return null;
     }
 
-    IEnumerator Section2Cascade() {
-        yield return Rest(24, 3);
-        float beatsRested = 0;
-        while (beatsRested <= 4*22) {
+    IEnumerator Section2Cascade(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             var rand = Random.value;
             if (rand < 0.33f) {
                 CascadeLeft();
@@ -314,17 +310,20 @@ public class StoryOfASound : MonoBehaviour {
             } else {
                 CascadeTop();
             }
-            //var beatsToRest = Random.Range(4*2, 4*2.8f);
-            var beatsToRest = 8;//Random.Range(4*2, 4*2.8f);
-            yield return Rest(0, beatsToRest);
-            beatsRested += beatsToRest;
+            yield return rest;
         }
     }
 
-    IEnumerator Section2Shape() {
-        yield return Rest(24, 2);
-        foreach (var rest in Loop(23, 1, 2, 0)) {
+    IEnumerator Section2Shape(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(30).ForEach(g => g.SetOpacity(0, Beat(0.3f)));
+            yield return rest;
+        }
+    }
+
+    IEnumerator Section2Rotation(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
+            board.FindRandomGraphicWithSize(1, 1).RotateTo(360, Beat(2));
             yield return rest;
         }
     }
@@ -374,41 +373,30 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
-    IEnumerator Section2Rotation() {
-        yield return Rest(24, 1);
-        int beatsRested = 0;
-        while (beatsRested < 4*24-1) {
-            board.FindRandomGraphicWithSize(1, 1).RotateTo(360, Beat(2));
-            var beatsToRest = Random.Range(4, 4);
-            beatsRested += beatsToRest;
-            yield return Rest(0, beatsToRest);
-        }
-    }
-
     /***** SECTION 1 *****/
     IEnumerator Section1() {
-        Run(Rest(8), Section1Orange());
-        Run(Rest(12), Section1Fade());
-        Run(Rest(2), Section1Snake(Loop(24, 0, 4, 0)));
         var rect = AddRect(cols, rows, blues[0]);
         rect.BreakToUnitSquares();
+
+        Run(Rest(2),  Section1Snake(Loop(24, 0, 4, 0)));
+        Run(Rest(8),  Section1Orange(MeasureToBeats(16), 5, 7));
+        Run(Rest(12), Section1Fade(Loop(12, 0, 2, 0)));
+
         yield return null;
     }
 
-    IEnumerator Section1Orange() {
-        //yield return Rest(8, 0);
+    IEnumerator Section1Orange(int durationInBeats, int minRest, int maxRest) {
         int beatsRested = 0;
-        while (beatsRested < 4*16) {
+        while (beatsRested < durationInBeats) {
             board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(Random.Range(1, 2)).ForEach(g => g.SetColor(orange));
-            var beatsToRest = Random.Range(5, 7);
+            var beatsToRest = Random.Range(minRest, maxRest);
             beatsRested += beatsToRest;
             yield return Rest(0, beatsToRest);
         }
     }
 
-    IEnumerator Section1Fade() {
-        //yield return Rest(12, 0);
-        foreach (var rest in Loop(12, 0, 2, 0)) {
+    IEnumerator Section1Fade(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             int index = 0;
             foreach (var g in board.FindGraphicsForRow(Random.Range(0, rows))) {
                 StartCoroutine(C.WithDelay(() => {
@@ -486,6 +474,10 @@ public class StoryOfASound : MonoBehaviour {
         get {
             return 60f / timeSignature.beatsPerMinute;
         }
+    }
+
+    int MeasureToBeats(int measures, int beats = 0) {
+        return measures * timeSignature.beatsPerMeasure + beats;
     }
 
     float Beat(float beats) {
