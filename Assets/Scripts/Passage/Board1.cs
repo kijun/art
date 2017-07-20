@@ -73,6 +73,10 @@ public class Board1 {
         return null;
     }
 
+    public GridRect FindRandomRectWithSize(int rectWidth, int rectHeight) {
+        return new GridRect(Random.Range(-1, width - rectWidth), Random.Range(0, height - rectHeight), rectWidth, rectHeight);
+    }
+
     /*** GRAPHIC ENTITY QUERY ***/
     public GraphicEntity1 FindFirstGraphicWithSize(int width, int height) {
         foreach (var g in GraphicEntities()) {
@@ -186,7 +190,7 @@ public class Board1 {
                 if (x >= 0 && x < width && y >= 0 && y < height) {
                     graphicEntities[x, y] = ge;
                 } else {
-                    Debug.Log("lock failed {x} {y}");
+                    //Debug.Log($"lock failed {x} {y}");
                 }
             }
         }
@@ -198,7 +202,7 @@ public class Board1 {
                 if (x >= 0 && x < width && y >= 0 && y < height) {
                     graphicEntities[x, y] = null;
                 } else {
-                    Debug.Log("unlock failed {x} {y}");
+                    //Debug.Log("unlock failed {x} {y}");
                 }
             }
         }

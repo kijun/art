@@ -118,12 +118,15 @@ public class StoryOfASound : MonoBehaviour {
         return true;
     }
 
-    GraphicEntity1 AddRect(int width, int height, Color color, float opacity = 1) {
+    GraphicEntity1 AddRect(int width, int height, Color color, float opacity = 1, bool allowStacking = false) {
         GridRect emptyRect = board.FindEmptyRectWithSize(width, height);
+        if (emptyRect == null && allowStacking) {
+            emptyRect = board.FindRandomRectWithSize(width, height);
+        }
         if (emptyRect != null) {
             var ge = GraphicEntity1.New(emptyRect, board);
             ge.SetColor(color);
-            ge.SetOpacity(opacity, Beat(1));
+            //ge.SetOpacity(opacity, Beat(1));
             return ge;
         }
         return null;
@@ -139,82 +142,18 @@ public class StoryOfASound : MonoBehaviour {
         }
         return null;
     }
-
-    bool BreakRect() {
-        // MUTEX
-        var g = board.FindGraphicWithSizeGreaterThan(1, 1);
-        if (g != null) {
-            //g.Subdivide();
-            // to smallest?
-        }
-        return false;
-    }
-
-    bool HideAndReveal() {
-        // MUTEX
-        var g = board.FindGraphicWithSizeGreaterThan(0, 0);
-        //g.FadeOutAndIn(Beat(1), Beat(1));
-        return false;
-    }
-
-    bool Rotate() {
-        // search for vacant spots
-        var g = board.FindSquareGraphicWithSideGreaterThan(0);
-        //g.Rotate(360, Beat(1));
-        return false;
-    }
-
-    bool MoveToAdjacent() {
-        // search for vacant spots
-        foreach (var g in board.GraphicEntities()) {
-            var target = board.FindAdjacentEmptyRect(g.rect);
-            if (target != null) {
-                //g.MoveAndResize(emptyRect);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool Shrink() {
-        var g = board.FindGraphicWithSizeGreaterThan(1, 1);
-        if (g != null) {
-            //g.MoveAndResize(g.rect.Subrect());
-            return true;
-        }
-        return false;
-    }
-
-    bool Expand() {
-        foreach (var g in board.GraphicEntities()) {
-            var target = board.FindExpandedRect(g.rect);
-            if (target != null) {
-                //g.MoveAndResize(emptyRect);
-                break;
-            }
-        }
-        return false;
-    }
-
-    bool Remove() {
-        var g = board.RandomGraphicEntity();
-        if (g != null) {
-            //g.Remove();
-            return true;
-        }
-        return false;
-    }
-
     /***** SECTION 4 FINAL *****/
     IEnumerator Section4() {
         yield return Rest(73, 0);
-        board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
+        GameObject.FindObjectsOfType<GraphicEntity1>().ForEach(g => g.Remove(Beat(2f)));
+        //board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
         yield return Rest(1, 0);
         StartCoroutine(Section4Movement());
         StartCoroutine(Section4AddShapes());
         StartCoroutine(Section4Transform());
-        StartCoroutine(Section3Shatter());
-        StartCoroutine(Section3Delete());
+        //StartCoroutine(Section4Shatter(Loop(20, 0, 4, 0), Rest(2)));
+        StartCoroutine(Section4Delete());
+        StartCoroutine(Section3Orange());
         //board.FindAllGraphicsWithSize(1, 1).ForEach(g => .SetOpacity(0.65f, Beat(1)));
     }
 
@@ -222,28 +161,57 @@ public class StoryOfASound : MonoBehaviour {
         yield return Rest(1);
         foreach (var rest in Loop(22, 0, 1, 0)) {
             // TODO fix
-            board.GraphicEntities().ToArray().Take(2).ForEach(g => g.Move(0, 1, Beat(1)));
+            //board.GraphicEntities().ToArray().Take(2).ForEach(g => g.Move(0, 1, Beat(1)));
             yield return rest;
         }
         yield return null;
     }
 
     IEnumerator Section4Transform() {
-        yield return Rest(1);
-        foreach (var rest in Loop(22, 0, 1, 1)) {
-            board.GraphicEntities().ToArray().Take(2).ForEach(g => g.Transform(g.rect.Resize(4, 3).Translate(-1, 0), Beat(2)));
+        yield return Rest(1, 1);
+        foreach (var rest in Loop(22, 0, 0, 2)) {
+            var gs = board.GraphicEntities().ToArray().Shuffle().Take(Random.Range(1, 3));
+            //GraphicWithSizeLessThan(4, 4);
+            foreach (var g in gs) {
+                if (g != null) {
+                    var newRect = g.rect.Resize(g.width*2, g.height*2).Translate(-g.width/2, -g.height/2);
+                    g.Transform(newRect, Beat(2));
+                    g.SetOpacity(g.opacity - 0.1f, Beat(2));
+                            //.ForEach(g => g.Transform(g.rect.Resize(7, 10).Translate(-1, 0), Beat(2)));
+                    //board.GraphicEntities().ToArray().Take(2).ForEach(g => g.Transform(g.rect.Resize(7, 10).Translate(-1, 0), Beat(2)));
+                }
+            }
             yield return rest;
         }
         yield return null;
     }
 
     IEnumerator Section4AddShapes() {
-        foreach (var rest in Loop(22, 0, 1, 0)) {
-            AddRect(Random.Range(1, 4), Random.Range(1, 4), blues[4], blues[4].a);
+        foreach (var rest in Loop(22, 0, 0, 2)) {
+            AddRect(Random.Range(1, 4), Random.Range(1, 4), blue, 1, allowStacking:true);
             yield return rest;
         }
     }
 
+    // Naming things
+    IEnumerator Section4Shatter(IEnumerable<IEnumerator> loop, IEnumerator rest = null ) {
+        if (rest != null) yield return rest;
+        foreach (var pulse in loop) {
+            var g = board.FindGraphicWithSizeGreaterThan(1, 1);
+            if (g != null) g.BreakToUnitSquares();
+            yield return pulse;
+        }
+    }
+
+    IEnumerator Section4Delete() {
+        yield return Rest(4);
+        foreach (var rest in Loop(22, 0, 1, 1)) {
+            var g = board.FindGraphicWithSizeGreaterThan(5, 5);
+            if (g != null) {
+                g.Remove(Beat(2));
+            }
+        }
+    }
 
 
     /*
@@ -263,7 +231,7 @@ public class StoryOfASound : MonoBehaviour {
         StartCoroutine(Section3Delete());
         StartCoroutine(Section3Movement());
         //board.FindAllGraphicsWithSize(1, 1).ForEach(g => .SetOpacity(0.65f, Beat(1)));
-        foreach (var rest in Loop(22, 0, 1, 0)) {
+        foreach (var rest in Loop(20, 0, 1, 0)) {
             AddRect(Random.Range(1, 4), Random.Range(1, 4), blue);
             yield return rest;
         }
@@ -314,7 +282,7 @@ public class StoryOfASound : MonoBehaviour {
         int beatsRested = 0;
         while (beatsRested < 4*16) {
             board.RandomGraphicEntity().SetColor(orange);
-            var beatsToRest = Random.Range(6, 9);
+            var beatsToRest = Random.Range(4, 7);
             beatsRested += beatsToRest;
             yield return Rest(0, beatsToRest);
         }
@@ -417,8 +385,18 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
+    /***** SECTION 1 *****/
+    IEnumerator Section1() {
+        Run(Rest(8), Section1Orange());
+        Run(Rest(12), Section1Fade());
+        Run(Rest(2), Section1Snake(Loop(24, 0, 4, 0)));
+        var rect = AddRect(cols, rows, blues[0]);
+        rect.BreakToUnitSquares();
+        yield return null;
+    }
+
     IEnumerator Section1Orange() {
-        yield return Rest(8, 0);
+        //yield return Rest(8, 0);
         int beatsRested = 0;
         while (beatsRested < 4*16) {
             board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(Random.Range(1, 2)).ForEach(g => g.SetColor(orange));
@@ -429,7 +407,7 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     IEnumerator Section1Fade() {
-        yield return Rest(12, 0);
+        //yield return Rest(12, 0);
         foreach (var rest in Loop(12, 0, 2, 0)) {
             int index = 0;
             foreach (var g in board.FindGraphicsForRow(Random.Range(0, rows))) {
@@ -445,13 +423,8 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
-    IEnumerator Section1() {
-        StartCoroutine(Section1Orange());
-        StartCoroutine(Section1Fade());
-        var rect = AddRect(cols, rows, blues[0]);
-        rect.BreakToUnitSquares();
-        yield return Rest(2, 0);
-        foreach (var rest in Loop(24, 0, 4, 0)) {
+    IEnumerator Section1Snake(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             var g = board.FindRandomGraphicWithSize(1, 1);
             //g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
 
@@ -486,140 +459,6 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
-    IEnumerator Run2() {
-        yield return Rest(60);
-        foreach (var rest in Loop(32, 0, 1, 0)) {
-            yield return rest;
-        }
-    }
-
-    IEnumerator Run() {
-        //var rect = AddRect(cols, rows, blue);
-        //rect.BreakToUnitSquares();
-        //yield return Rest(2, 0);
-        //foreach (var rest in Loop(16, 0, 1, 0)) {
-            //board.FindRandomGraphicWithSize(1, 1).SetColor(orange);
-        //    board.FindRandomGraphicWithSize(1, 1).SetOpacity(0, Beat(1));
-            /*
-            var g = board.FindRandomGraphicWithSize(1, 1);
-            if (g.rect.min.x > 0) {
-                g.Move(-1, 0, Beat(4));
-            }
-            */
-        //    yield return rest;
-        //}
-        foreach (var rest in Loop(32, 0, 1, 0)) {
-            AddRect(Random.Range(1, 4), Random.Range(1, 4), blue);
-            yield return rest;
-        }
-        /*
-        AddRect(3, 3, white);
-        AddRect(2, 2, white);
-        AddRect(2, 2, white);
-        AddRect(1, 1, white);
-        AddRect(1, 2, white);
-        AddRect(2, 1, white);
-        yield return Rest(0, 1);
-        AddRect(1, 1, blue);
-        yield return Rest(0, 1);
-        AddRect(1, 1, red);
-        yield return Rest(0, 1);
-        AddRect(1, 1, blue);
-        yield return Rest(0, 1);
-        AddRect(1, 1, white);
-        yield return Rest(0, 1);
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            if (g.rect.min.y < 2) {
-                g.Move(0, 1, Beat(1));
-            } else {
-                g.Move(0, -1, Beat(2));
-            }
-        }
-        yield return Rest(0, 1);
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            g.SetOpacity(0.5f, Beat(2));
-        }
-        yield return Rest(0, 2);
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            g.SetOpacity(1, Beat(2));
-        }
-        // TODO find all graphic with size
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            if (g.rect.width == 1 && g.rect.height == 1) {
-                g.Rotate(225, Beat(3));
-            }
-        }
-        yield return Rest(0, 3);
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            g.Rotate(360, Beat(3));
-        }
-        yield return Rest(0, 4);
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            var target = new GridRect(g.rect);
-            target.max = new Coord(target.min).Move(1, 1);
-            g.Transform(target, Beat(4));
-        }
-        yield return Rest(0, 5);
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            g.Remove();
-        }
-        yield return Rest(0, 1);
-        var r1 = AddRectAtPosition(0, 0, 1, 1, red);
-        yield return Rest(0, 1);
-        var r2 = AddRectAtPosition(1, 0, 1, 1, yellow);
-        yield return Rest(0, 1);
-        r1.Merge(r2, Beat(2));
-        yield return Rest(0, 3);
-        r1.Remove();
-        yield return Rest(0, 1);
-        var rbig = AddRectAtPosition(0, 0, 4, 4, blue);
-        yield return Rest(0, 1);
-        rbig.BreakToUnitSquares();
-        yield return Rest(0, 1);
-
-        foreach (GraphicEntity1 g in board.GraphicEntities()) {
-            g.Transform(new GridRect(0, 0, 1, 1), Beat(2));
-        }
-
-        /*
-        f = (Tile2 target, Location loc) => {
-            // can this automatically lock the target?
-            target.RunAnimation(
-                AnimationKeyPath.Opacity,
-                AnimationCurveUtils.FromPairs(0, 1, NoteValueToDuration(0, 1), 0f, NoteValueToDuration(0, 6.9f), 0f, NoteValueToDuration(0,7.85f), 1)
-            ); // this locks
-            StartCoroutine(C.WithDelay(() => {
-                var nextTarget = target.TileAtLocation(loc, TileMutexFlag.Opacity);
-                if (nextTarget != null) {
-                    f(nextTarget, loc);
-                }
-            }, NoteValueToDuration(0, 0.1f)));
-        };
-        // max length
-
-        yield return Rest(2);
-
-        foreach (var rest in Loop(6, 0, 1, 0)) {
-            // Find target
-            bool found = false;
-            int runCount = 0;
-            while (!found && runCount < 100) {
-                int x = Random.Range(0, cols);
-                int y = Random.Range(0, rows);
-                var tile = board[x, y];
-                if (!tile.IsLocked(TileMutexFlag.Opacity)) {
-                    var randomAxis = Location.None;
-                    f(tile, randomAxis);
-                    found = true;
-                }
-                runCount++;
-            }
-
-            yield return rest;
-        }
-        */
-
-    }
 
     IEnumerable<int> Times(int measures) {
         return Enumerable.Range(0, measures);
@@ -653,4 +492,81 @@ public class StoryOfASound : MonoBehaviour {
         //return beats * BeatDurationInSeconds;
         return beats * 60f / timeSignature.beatsPerMinute;
     }
+
+    void Run(IEnumerator rest, IEnumerator function) {
+        StartCoroutine(WithRest(rest, function));
+    }
+
+    IEnumerator WithRest(IEnumerator rest, IEnumerator function) {
+        yield return rest;
+        yield return function;
+    }
+
+
+    /***** PARKING LOT *****/
+    bool BreakRect() {
+        // MUTEX
+        var g = board.FindGraphicWithSizeGreaterThan(1, 1);
+        if (g != null) {
+            //g.Subdivide();
+            // to smallest?
+        }
+        return false;
+    }
+
+    bool HideAndReveal() {
+        // MUTEX
+        var g = board.FindGraphicWithSizeGreaterThan(0, 0);
+        //g.FadeOutAndIn(Beat(1), Beat(1));
+        return false;
+    }
+
+    bool Rotate() {
+        // search for vacant spots
+        var g = board.FindSquareGraphicWithSideGreaterThan(0);
+        //g.Rotate(360, Beat(1));
+        return false;
+    }
+
+    bool MoveToAdjacent() {
+        // search for vacant spots
+        foreach (var g in board.GraphicEntities()) {
+            var target = board.FindAdjacentEmptyRect(g.rect);
+            if (target != null) {
+                //g.MoveAndResize(emptyRect);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool Shrink() {
+        var g = board.FindGraphicWithSizeGreaterThan(1, 1);
+        if (g != null) {
+            //g.MoveAndResize(g.rect.Subrect());
+            return true;
+        }
+        return false;
+    }
+
+    bool Expand() {
+        foreach (var g in board.GraphicEntities()) {
+            var target = board.FindExpandedRect(g.rect);
+            if (target != null) {
+                //g.MoveAndResize(emptyRect);
+                break;
+            }
+        }
+        return false;
+    }
+
+    bool Remove() {
+        var g = board.RandomGraphicEntity();
+        if (g != null) {
+            //g.Remove();
+            return true;
+        }
+        return false;
+    }
+
 }
