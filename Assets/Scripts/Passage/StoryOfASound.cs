@@ -148,15 +148,29 @@ public class StoryOfASound : MonoBehaviour {
         GameObject.FindObjectsOfType<GraphicEntity1>().ForEach(g => g.Remove(Beat(2f)));
         //board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
         yield return Rest(1, 0);
+        Run(Rest(1, 0), Section3AddRect(Loop(20, 0, 1, 0)));
+        Run(Rest(3, 1), Section3Shatter(Loop(19, 3, 2, 0)));
+        Run(Rest(4, 2), Section1Orange(MeasureToBeats(16), 4, 7));
+        Run(Rest(5, 1), Section3Movement(Loop(18, 0, 1, 0)));
+        Run(Rest(6, 0), Section3Delete(Loop(19, 3, 0, 3)));
+        Run(Rest(0, 1), Section2Rotation(Loop(23, 3, 1, 0)));
+        Run(Rest(0, 2), Section2Shape(Loop(23, 1, 2, 0)));
+        Run(Rest(0, 3), Section2Cascade(Loop(22, 0, 2, 0)));
+        Run(Rest(2),  Section1Snake(Loop(24, 0, 4, 0)));
+        Run(Rest(8),  Section1Orange(MeasureToBeats(16), 5, 7));
+        Run(Rest(12), Section1Fade(Loop(12, 0, 2, 0)));
+        /*
         StartCoroutine(Section4Movement());
         StartCoroutine(Section4AddShapes());
         StartCoroutine(Section4Transform());
         //StartCoroutine(Section4Shatter(Loop(20, 0, 4, 0), Rest(2)));
         StartCoroutine(Section4Delete());
-        StartCoroutine(Section3Orange());
+        StartCoroutine(Section1Orange());
+        */
         //board.FindAllGraphicsWithSize(1, 1).ForEach(g => .SetOpacity(0.65f, Beat(1)));
     }
 
+    /*
     IEnumerator Section4Movement() {
         yield return Rest(1);
         foreach (var rest in Loop(22, 0, 1, 0)) {
@@ -212,6 +226,7 @@ public class StoryOfASound : MonoBehaviour {
             }
         }
     }
+    */
 
 
     /*
@@ -224,24 +239,23 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section3() {
         yield return Rest(49, 0);
         board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
-        yield return Rest(1, 0);
-        // TODO maybe cadence should be a parameter (maybe -> should)
-        StartCoroutine(Section3Orange());
-        StartCoroutine(Section3Shatter());
-        StartCoroutine(Section3Delete());
-        StartCoroutine(Section3Movement());
-        //board.FindAllGraphicsWithSize(1, 1).ForEach(g => .SetOpacity(0.65f, Beat(1)));
-        foreach (var rest in Loop(20, 0, 1, 0)) {
+
+        Run(Rest(1, 0), Section3AddRect(Loop(20, 0, 1, 0)));
+        Run(Rest(3, 1), Section3Shatter(Loop(19, 3, 2, 0)));
+        Run(Rest(4, 2), Section1Orange(MeasureToBeats(16), 4, 7));
+        Run(Rest(5, 1), Section3Movement(Loop(18, 0, 1, 0)));
+        Run(Rest(6, 0), Section3Delete(Loop(19, 3, 0, 3)));
+    }
+
+    IEnumerator Section3AddRect(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             AddRect(Random.Range(1, 4), Random.Range(1, 4), blue);
             yield return rest;
         }
     }
 
-    IEnumerator Section3Movement() {
-        yield return Rest(4, 1);
-        foreach (var rest in Loop(18, 0, 1, 0)) {
-
-            //
+    IEnumerator Section3Movement(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             var g = board.FindRandomGraphicWithSize(1, 1);
 
             var rand = Random.value;
@@ -259,32 +273,19 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
-    IEnumerator Section3Shatter() {
-        yield return Rest(2, 1);
-        foreach (var rest in Loop(19, 3, 2, 0)) {
+    IEnumerator Section3Shatter(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             var g = board.FindGraphicWithSizeGreaterThan(1, 1);
             if (g != null) g.BreakToUnitSquares();
             yield return rest;
         }
     }
 
-    IEnumerator Section3Delete() {
-        yield return Rest(5, 0);
-        foreach (var rest in Loop(19, 3, 0, 3)) {
+    IEnumerator Section3Delete(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
             var g = board.FindRandomGraphicWithSize(1, 1);
             if (g != null) g.Remove(Beat(2));
             yield return rest;
-        }
-    }
-
-    IEnumerator Section3Orange() {
-        yield return Rest(3, 2);
-        int beatsRested = 0;
-        while (beatsRested < 4*16) {
-            board.RandomGraphicEntity().SetColor(orange);
-            var beatsToRest = Random.Range(4, 7);
-            beatsRested += beatsToRest;
-            yield return Rest(0, beatsToRest);
         }
     }
 
@@ -294,10 +295,10 @@ public class StoryOfASound : MonoBehaviour {
     // 2 composition
     // 3 refresh
     IEnumerator Section2() {
-        Run(Rest(24, 3), Section2Cascade(Loop(22, 0, 2, 0)));
-        Run(Rest(24, 1), Section2Rotation(Loop(23, 3, 1, 0)));
-        Run(Rest(24, 2), Section2Shape(Loop(23, 1, 2, 0)));
-        yield return null;
+        yield return Rest(24);
+        Run(Rest(0, 1), Section2Rotation(Loop(23, 3, 1, 0)));
+        Run(Rest(0, 2), Section2Shape(Loop(23, 1, 2, 0)));
+        Run(Rest(0, 3), Section2Cascade(Loop(22, 0, 2, 0)));
     }
 
     IEnumerator Section2Cascade(IEnumerable<IEnumerator> loop) {
@@ -388,7 +389,7 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section1Orange(int durationInBeats, int minRest, int maxRest) {
         int beatsRested = 0;
         while (beatsRested < durationInBeats) {
-            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(Random.Range(1, 2)).ForEach(g => g.SetColor(orange));
+            board.RandomGraphicEntity().SetColor(orange);
             var beatsToRest = Random.Range(minRest, maxRest);
             beatsRested += beatsToRest;
             yield return Rest(0, beatsToRest);
@@ -487,6 +488,10 @@ public class StoryOfASound : MonoBehaviour {
 
     void Run(IEnumerator rest, IEnumerator function) {
         StartCoroutine(WithRest(rest, function));
+    }
+
+    void Run(IEnumerator function) {
+        StartCoroutine(function);
     }
 
     IEnumerator WithRest(IEnumerator rest, IEnumerator function) {
