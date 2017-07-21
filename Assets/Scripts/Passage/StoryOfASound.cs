@@ -154,10 +154,15 @@ public class StoryOfASound : MonoBehaviour {
         yield return Rest(73, 0);
         GameObject.FindObjectsOfType<GraphicEntity1>().ForEach(g => g.Remove(Beat(1.9f)));
         yield return Rest(1, 0);
+        //StartCoroutine(Section4StoryOfASound());
+        foreach (var rest in Loop(24, 0, 0, 3)) {
+            StartCoroutine(Section4StoryOfASound());
+            yield return rest;
+        }
         //var rect = AddRect(2, 2, blues[7]);
         //rect.BreakToUnitSquares();
-        StartCoroutine(Section4AddShapes());
         /*
+        StartCoroutine(Section4AddShapes());
         //board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
         yield return Rest(1, 0);
         Run(Rest(1, 0), Section3AddRect(Loop(20, 0, 1, 0)));
@@ -170,17 +175,58 @@ public class StoryOfASound : MonoBehaviour {
         Run(Rest(2),  Section1Snake(Loop(24, 0, 4, 0)));
         Run(Rest(8),  Section1Orange(MeasureToBeats(16), 5, 7));
         Run(Rest(12), Section1Fade(Loop(12, 0, 2, 0)));
-        */
         Run(Rest(3, 1), Section4Movement(Loop(18, 0, 1, 0)));
         StartCoroutine(Section4Rotation());
         Run(Rest(2), Section4Delete());
         Run(Rest(1, 2), FnChangeColor(MeasureToBeats(16), 3, 6, orange.WithAlpha(0.75f)));
         Run(Rest(2), Section4Shatter(Loop(20, 0, 2, 1)));
+        */
         /*
         StartCoroutine(Section4Transform());
         */
         //StartCoroutine(Section1Orange());
         //board.FindAllGraphicsWithSize(1, 1).ForEach(g => .SetOpacity(0.65f, Beat(1)));
+    }
+
+    IEnumerator Section4StoryOfASound() {
+        var g = AddRect(Random.Range(1, 1), Random.Range(1, 1), blues[7], allowStacking:false);
+        yield return Rest(0, 1.1f);
+        g.Move(Coord.FromDirection(DirectionHelper.Random), Beat(1));
+        yield return Rest(0, 1.1f);
+        g.RotateFor(360, Beat(1));
+        yield return Rest(0, 1.1f);
+        /*
+        //g.SetOpacity(0, Beat(1));
+        yield return Rest(0, 1.1f);
+        //g.SetOpacity(blues[7].a, Beat(1));
+        yield return Rest(0, 1.1f);
+        */
+        if (Random.value < 0.3f) {
+            g.SetColor(orange);
+        }
+        g.Transform(new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 4), Random.Range(1, 4)), Beat(1));
+        yield return Rest(0, 1.1f);
+        var squares = g.BreakToUnitSquares();
+        yield return Rest(0, 1.1f);
+        var rot = Random.Range(0, 360);
+        foreach (var unit in squares) {
+            int dx = Random.Range(-1, 2);
+            int dy = Random.Range(-1, 2);
+            unit.Move(dx, dy, Beat(1.1f));
+            unit.RotateFor(rot, Beat(2));
+        }
+        yield return Rest(0, 2.1f);
+        rot = Random.Range(0, 360);
+        foreach (var unit in squares) {
+            int dx = Random.Range(-1, 2);
+            int dy = Random.Range(-1, 2);
+            unit.Move(dx, dy, Beat(1));
+            unit.RotateFor(rot, Beat(2));
+        }
+        yield return Rest(0, 2.1f);
+        foreach (var unit in squares) {
+            if (unit != null) unit.Remove(Beat(2));
+        }
     }
 
     IEnumerator Section4Rotation() {
@@ -275,11 +321,11 @@ public class StoryOfASound : MonoBehaviour {
         yield return Rest(49, 0);
         board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
 
-        Run(Rest(1, 0), Section3AddRect(Loop(20, 0, 1, 0)));
-        Run(Rest(3, 1), Section3Shatter(Loop(19, 3, 2, 0)));
-        Run(Rest(4, 2), Section1Orange(MeasureToBeats(16), 4, 7));
-        Run(Rest(5, 1), Section3Movement(Loop(18, 0, 1, 0)));
-        Run(Rest(6, 0), Section3Delete(Loop(19, 3, 0, 3)));
+        Run(Rest(1, 0), Section3AddRect(Loop(16, 0, 1, 0)));
+        Run(Rest(3, 1), Section3Shatter(Loop(15, 3, 2, 0)));
+        Run(Rest(4, 2), Section1Orange(MeasureToBeats(15), 4, 7));
+        Run(Rest(5, 1), Section3Movement(Loop(15, 0, 1, 0)));
+        Run(Rest(6, 0), Section3Delete(Loop(15, 3, 0, 3)));
     }
 
     IEnumerator Section3AddRect(IEnumerable<IEnumerator> loop) {
@@ -414,12 +460,15 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     /***** SECTION 1 *****/
+    // 24 measures
     IEnumerator Section1() {
         var rect = AddRect(cols, rows, blues[0]);
         rect.BreakToUnitSquares();
 
-        Run(Rest(2),  Section1Snake(Loop(22, 0, 4, 0)));
-        Run(Rest(8),  Section1Orange(MeasureToBeats(16), 5, 7));
+        Run(Rest(2),  Section1Snake(Loop(10, 0, 4, 0)));
+        Run(Rest(12),  Section1Snake(Loop(12, 0, 2, 0)));
+        Run(Rest(8),  Section1Orange(MeasureToBeats(6), 5, 7));
+        Run(Rest(14),  Section1Orange(MeasureToBeats(10), 3, 5));
         Run(Rest(12), Section1Fade(Loop(12, 0, 2, 0)));
 
         yield return null;
@@ -475,9 +524,9 @@ public class StoryOfASound : MonoBehaviour {
                 StartCoroutine(C.WithDelay(() => {
                     var currOpacity = gr.opacity;
                     if (gr.color.RGBEquals(orange)) {
-                        gr.SetColor(blue.WithAlpha(1f/2f));
+                        gr.SetColor(blue.WithAlpha(2f/3f));
                     } else {
-                        gr.SetOpacity(Mathf.Min(1, currOpacity + 1f/2f));
+                        gr.SetOpacity(Mathf.Min(1, currOpacity + 2f/3f));
                     }
                     // what i want - start with new opacity, fade down
                 }, Beat(ij*2)));

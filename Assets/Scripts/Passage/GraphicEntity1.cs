@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /***
  * wrapper for animation, customized for each scene/level
@@ -61,6 +62,18 @@ public class GraphicEntity1 : MonoBehaviour {
         Transform(rect.Translate(x, y), duration);
     }
 
+    public void Move(Coord delta, float duration = 0) {
+        // moves square by (x, y) tile units
+        //
+        // lock properties: Translation, Existence (automatic)
+        // lock destination tiles (we ignore the in-between)
+        // apply move
+        // unlock properties
+        // unlock origin tiles
+        // TODO fix larger rect problem hax
+        Transform(rect.Translate(delta.x, delta.y), duration);
+    }
+
     public void Transform(GridRect targetRect, float duration=0) {
         // moves and resizes square
         var origin = rect;
@@ -96,12 +109,15 @@ public class GraphicEntity1 : MonoBehaviour {
         // create multiple GE and delete itself
     }
 
-    public void BreakToUnitSquares(float duration =0) {
+    public IList<GraphicEntity1> BreakToUnitSquares(float duration =0) {
+        var squares = new List<GraphicEntity1>();
         foreach (var gridRect in rect.SplitToUnitSquares()) {
             var g = GraphicEntity1.New(gridRect, board);
             g.SetColor(animatable.color);
+            squares.Add(g);
         }
         Remove(duration, DONTUNLOCK:true);
+        return squares;
         // splits existing x to this as much as it can
     }
 

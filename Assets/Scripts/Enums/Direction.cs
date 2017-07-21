@@ -1,7 +1,22 @@
 using UnityEngine;
 
+[System.Flags]
 public enum Direction {
-    None, Up, Right, Down, Left
+    None        = 0,
+    Up          = 1 << 0,
+    Down        = 1 << 1,
+    Right       = 1 << 2,
+    Left        = 1 << 3,
+
+    UpRight    = 1 << 4,
+    UpLeft = 1 << 5,
+    DownRight = 1 << 6,
+    DownLeft  = 1 << 7,
+
+    Axis        = Up | Right | Down | Left,
+    Diagonal    = UpRight | UpLeft | DownRight | DownLeft,
+
+    Any         = Axis | Diagonal
 }
 
 public static class DirectionHelper {

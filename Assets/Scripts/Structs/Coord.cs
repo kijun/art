@@ -20,6 +20,10 @@ public class Coord {
         return new Coord(x+dx, y+dy);
     }
 
+    public Coord Multiply (int mx, int my) {
+        return new Coord(x * mx, y * my);
+    }
+
     public Vector2 ToVector2() {
         return new Vector2(x, y);
     }
@@ -74,5 +78,24 @@ public class Coord {
 
     public static Coord Min(Coord c1, Coord c2) {
         return new Coord(Mathf.Min(c1.x, c2.x), Mathf.Min(c1.y, c2.y));
+    }
+
+    public static Coord FromDirection(Direction dir) {
+        var c = new Coord(0, 0);
+        switch (dir) {
+            case Direction.Left:
+                return c = new Coord(-1, 0);
+                break;
+            case Direction.Right:
+                return c = new Coord(1, 0);
+                break;
+            case Direction.Up:
+                return c = new Coord(0, 1);
+                break;
+            case Direction.Down:
+                return c = new Coord(0, -1);
+                break;
+        }
+        return c;
     }
 }

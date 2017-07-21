@@ -181,6 +181,11 @@ public class Board1 {
         }
     }
 
+    /***** COORD *****/
+    public Coord RandomCoord() {
+        return new Coord(Random.Range(0, width), Random.Range(0, height));
+    }
+
     /*** ACCESS ***/
     public void LockTiles(GridRect rect, GraphicEntity1 ge) {
         //Debug.Log($"Board1: Lock {rect}");
