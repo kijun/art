@@ -202,52 +202,56 @@ public class StoryOfASound : MonoBehaviour {
 
     IEnumerator Section4StoryOfASound() {
         var g = AddRect(Random.Range(1, 1), Random.Range(1, 1), blues[8], allowStacking:false);
-        yield return Rest(0, 1.1f);
+        yield return Rest(0, 1.25f);
         g.Move(Coord.FromDirection(DirectionHelper.Random), Beat(1));
-        yield return Rest(0, 1.1f);
+        yield return Rest(0, 1.25f);
         g.RotateFor(360, Beat(1));
-        yield return Rest(0, 1.1f);
+        yield return Rest(0, 1.25f);
         /*
         //g.SetOpacity(0, Beat(1));
-        yield return Rest(0, 1.1f);
+        yield return Rest(0, 1.25f);
         //g.SetOpacity(blues[7].a, Beat(1));
-        yield return Rest(0, 1.1f);
+        yield return Rest(0, 1.25f);
         */
         if (g != null) StartCoroutine(Section4Lifecycle(g));
     }
 
     IEnumerator Section4Lifecycle(GraphicEntity1 g) {
-        g.Transform(new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(2, 3), Random.Range(2, 3)), Beat(1));
+        g.Transform(new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 4), Random.Range(1, 4)), Beat(1));
         g.SetOpacity(Mathf.Max(0, g.opacity - 0.1f), Beat(1));
-        yield return Rest(0, 1.1f);
+        yield return Rest(0, 1.25f);
         if (g.opacity.IsZero()) {
             g.Remove();
             yield break;
         }
         // Break to unit squares
         g.RotateTo(0, Beat(1));
-        yield return Rest(0, 1.1f);
+        yield return Rest(0, 1.25f);
         var squares = g.BreakToUnitSquares();
-        yield return Rest(0, 1.1f);
-        var rot = Random.Range(0, 360);
+        yield return Rest(0, 1.25f);
+        var rot = Random.Range(0, 12) * 30;
         foreach (var unit in squares) {
-            if (Random.value < 0.3f) {
+            var colorRand = Random.value;
+            if (colorRand < 0.33f) {
                 unit.SetColor(orange.WithAlpha(unit.opacity));
             }
+            //else if (colorRand < 0.66f) {
+                //unit.SetColor(blue.WithAlpha(unit.opacity));
+            //}
             int dx = Random.Range(-1, 2);
             int dy = Random.Range(-1, 2);
-            unit.Move(dx, dy, Beat(1.1f));
+            unit.Move(dx, dy, Beat(1.25f));
             unit.RotateFor(rot, Beat(2));
         }
-        yield return Rest(0, 2.1f);
-        rot = Random.Range(0, 360);
+        yield return Rest(0, 2.5f);
+        rot = Random.Range(0, 12) * 30;
         foreach (var unit in squares) {
             int dx = Random.Range(-1, 2);
             int dy = Random.Range(-1, 2);
             unit.Move(dx, dy, Beat(1));
             unit.RotateFor(rot, Beat(2));
         }
-        yield return Rest(0, 2.1f);
+        yield return Rest(0, 2.5f);
         foreach (var unit in squares) {
             if (unit != null) {
                 if (Random.value < 0.2f) {
