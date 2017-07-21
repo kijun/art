@@ -77,7 +77,7 @@ public class GraphicEntity1 : MonoBehaviour {
     public void Transform(GridRect targetRect, float duration=0) {
         // moves and resizes square
         var origin = rect;
-        Debug.Log($"GraphicEntity1: Transform {origin} -> {targetRect}");
+        //Debug.Log($"GraphicEntity1: Transform {origin} -> {targetRect}");
         var target = board.GridRectToRectParams(targetRect);
         // if target
         _LockProperty(GraphicEntityMutexFlag.Translation);

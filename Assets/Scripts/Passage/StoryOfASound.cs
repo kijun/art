@@ -38,7 +38,7 @@ public class StoryOfASound : MonoBehaviour {
         board = new Board1(cols, rows, sideLength, 0.414f * sideLength);
         */
 
-        var gap = 0.1f;
+        var gap = 0.309f;
         var sideLength = CameraHelper.Height / ((1+gap)*rows + gap);
         cols = (int)(CameraHelper.Width / ((1+gap) * sideLength));
         board = new Board1(cols, rows, sideLength, gap * sideLength);
@@ -81,7 +81,7 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator TitleAndCredit() {
         yield return Rest(1, 3);
         title.gameObject.active = false;
-        yield return Rest(93, 1);
+        yield return Rest(119, 1);
         credits.gameObject.active = true;
     }
 
@@ -227,8 +227,11 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     IEnumerator Section4Lifecycle(GraphicEntity1 g) {
-        g.Transform(new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 4), Random.Range(1, 4)), Beat(1));
-        g.SetOpacity(Mathf.Max(0, g.opacity - 0.1f), Beat(1));
+        var targetRect = new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 5), Random.Range(1, 5));
+        g.Transform(targetRect, Beat(1));
+        if (targetRect.area > 1) {
+            g.SetOpacity(Mathf.Max(0, g.opacity - 0.14f), Beat(1));
+        }
         yield return Rest(0, 1.25f);
         if (g.opacity.IsZero()) {
             g.Remove();
@@ -236,7 +239,7 @@ public class StoryOfASound : MonoBehaviour {
         }
         // Break to unit squares
         g.RotateTo(0, Beat(1));
-        yield return Rest(0, 1.25f);
+        yield return Rest(0, 2.25f);
         var squares = g.BreakToUnitSquares();
         yield return Rest(0, 1.25f);
         var rot = Random.Range(0, 12) * 30;
@@ -362,37 +365,41 @@ public class StoryOfASound : MonoBehaviour {
 
     /***** SECTION 3 *****/
     IEnumerator Section3() {
+        // 24
         yield return Rest(49, 0);
         board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
 
-        Run(Rest(1, 0), Section3AddRect(Loop(16, 0, 1, 0)));
-        Run(Rest(3, 1), Section3Shatter(Loop(15, 3, 2, 0)));
-        Run(Rest(4, 2), Section1Orange(MeasureToBeats(15), 4, 7));
-        Run(Rest(5, 1), Section3Movement(Loop(15, 0, 1, 0)));
-        Run(Rest(6, 0), Section3Delete(Loop(15, 3, 0, 3)));
+        Run(Rest(2, 0), Section2Rotation(Loop(23, 0, 0, 3), 1, 1));
+        Run(Rest(1, 0), Section3AddRect(Loop(10, 0, 1, 0)));
+        Run(Rest(3, 1), Section3Shatter(Loop(24-4, 3, 1, 1)));
+        Run(Rest(4, 2), Section1Orange(MeasureToBeats(24-5), 3, 6));
+        Run(Rest(5, 1), Section3Movement(Loop(24-7, 2, 0, 3)));
+        Run(Rest(6, 0), Section3Delete(Loop(24-7, 0, 0, 2)));
+
+        Run(Rest(10, 0), Section3AddRect(Loop(11, 0, 0, 2)));
     }
 
     IEnumerator Section3AddRect(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
-            AddRect(Random.Range(1, 4), Random.Range(1, 4), blue);
+            AddRect(Random.Range(1, 4), Random.Range(1, 4), blues[7]);
             yield return rest;
         }
     }
 
     IEnumerator Section3Movement(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
-            var g = board.FindRandomGraphicWithSize(1, 1);
+            var g = board.FindRandomGraphic();
             if (g != null) {
 
                 var rand = Random.value;
                 if (rand < 0.25f) {
-                    g.Move(1, 0, Beat(1.5f));
+                    g.Move(1, 0, Beat(1f));
                 } else if (rand < 0.50f) {
-                    g.Move(-1, 0, Beat(1.5f));
+                    g.Move(-1, 0, Beat(1f));
                 } else if (rand < 0.75f) {
-                    g.Move(0, 1, Beat(1.5f));
+                    g.Move(0, 1, Beat(1f));
                 } else {
-                    g.Move(0, -1, Beat(1.5f));
+                    g.Move(0, -1, Beat(1f));
                 }
             }
 
@@ -403,7 +410,7 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section3Shatter(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
             var g = board.FindGraphicWithSizeGreaterThan(1, 1);
-            if (g != null) g.BreakToUnitSquares();
+            if (g != null && g.rotation.IsZero()) g.BreakToUnitSquares();
             yield return rest;
         }
     }
@@ -411,7 +418,7 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section3Delete(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
             var g = board.FindRandomGraphicWithSize(1, 1);
-            if (g != null) g.Remove(Beat(2));
+            if (g != null) g.Remove(Beat(0.3f));
             yield return rest;
         }
     }
@@ -424,10 +431,115 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section2() {
         yield return Rest(24);
         board.GraphicEntities().ForEach(g => g.SetColor(blue));
-        Run(Rest(0, 4.8f), Section2Rotation(Loop(23, 3, 2, 0)));
+        Run(Rest(0, 5.8f), Section2Rotation(Loop(23-12, 3, 2, 0)));
         Run(Rest(0, 2), Section2Shape(Loop(23, 1, 2, 0)));
-        Run(Rest(0, 3), Section2Cascade(Loop(22, 0, 2, 0)));
+        Run(Rest(0, 3), Section2Cascade(Loop(12, 0, 2, 0)));
         Run(Rest(0, 4), Section1Orange(MeasureToBeats(22), 8, 8));
+        Run(Rest(12, 3), Section2Cascade2(Loop(11, 0, 2, 0)));
+        Run(Rest(12, 5.8f), Section2Rotation(Loop(23-12, 3, 2, 0), 3, 6, true));
+    }
+
+    // let's
+    // build a rect
+    // build two rects
+    // line and a cross...?
+    /*
+    IEnumerator Section2PrebakedShape(IEnumerable<IEnumerator> loop) {
+        int index = 0;
+        foreach (var rest in loop) {
+            switch (index) {
+                case
+            }
+            foreach (var g in board.FindAllGraphicsWithSize(1, 1)) {
+                Coord pos = g.rect.min;
+                if (pos) {
+                    g.SetOpacity(0, Beat(0.3f));
+                }
+            }
+
+            yield return rest;
+            index++;
+        }
+    }
+    */
+
+    IEnumerator Section2Shape(IEnumerable<IEnumerator> loop) {
+        foreach (var rest in loop) {
+            bool[,] collection = new bool[cols,rows];
+            for (int i = 0; i < cols; i++) {
+                for (int j = 0; j < rows; j++) {
+                    if (Random.value < 0.25) {
+                        collection[i, j] = true;
+                    } else {
+                        collection[i, j] = false;
+                    }
+                }
+            }
+
+            var visibleColor = Random.value > 0.8f ? orange : blue;
+            var useSameColor = Random.value > 0.5f;
+
+            board.FindAllGraphicsWithSize(1, 1).ForEach(g => {
+                if (!collection[g.rect.min.x, g.rect.min.y]) {
+                    g.SetOpacity(0, Beat(0.3f));
+                } else {
+                    if (useSameColor) {
+                        g.SetColor(visibleColor);
+                    } else {
+                        //g.SetColor(Random.value > 0.8f ? orange : blue);
+                    }
+                }
+            });
+
+            //board.FindAllGraphicsWithSize(1,1).ToArray().Shuffle().Take(30).ForEach(g => g.SetOpacity(0, Beat(0.3f)));
+            yield return rest;
+        }
+    }
+
+    /*
+    IEnumerator Section2Rotation(IEnumerable<IEnumerator> loop, int min=1, int max=1) {
+        var rotating = new HashSet<GraphicEntity1>();
+        foreach (var rest in loop) {
+            var cnt = Random.Range(min, max+1);
+            for (int i = 0; i < cnt; i++) {
+                var g = board.FindGraphicAtPosition(Random.Range(0, cols), Random.Range(0, rows));
+                if (!rotating.Contains(g)) {
+                    g.RotateTo(360, Beat(2));
+                    rotating.Add(g);
+                }
+            }
+            rotating.Clear();
+            yield return rest;
+        }
+    }
+    */
+
+    IEnumerator Section2Rotation(IEnumerable<IEnumerator> loop, int min=1, int max=1, bool rotateLines=false) {
+        var rotating = new HashSet<GraphicEntity1>();
+        foreach (var rest in loop) {
+            if (rotateLines && Random.value < 0.3f) {
+                if (Random.value < 0.5f) {
+                    foreach (var g in board.FindGraphicsForRow(Random.Range(0, rows))) {
+                        g.RotateTo(360, Beat(1.9f));
+                    }
+                } else {
+                    foreach (var g in board.FindGraphicsForColumn(Random.Range(0, cols))) {
+                        g.RotateTo(360, Beat(1.9f));
+                    }
+                }
+            } else {
+                var cnt = Random.Range(min, max+1);
+                for (int i = 0; i < cnt; i++) {
+                    var g = board.FindGraphicAtPosition(Random.Range(0, cols), Random.Range(0, rows));
+                    if (g != null && !rotating.Contains(g)) {
+                        g.RotateTo(360, Beat(1.9f));
+                        rotating.Add(g);
+                    }
+                }
+                rotating.Clear();
+            }
+            yield return rest;
+        }
     }
 
     IEnumerator Section2Cascade(IEnumerable<IEnumerator> loop) {
@@ -444,54 +556,60 @@ public class StoryOfASound : MonoBehaviour {
         }
     }
 
-    IEnumerator Section2Shape(IEnumerable<IEnumerator> loop) {
+    IEnumerator Section2Cascade2(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
-            board.FindAllGraphicsWithSize(1, 1).ToArray().Shuffle().Take(30).ForEach(g => g.SetOpacity(0, Beat(0.3f)));
-            yield return rest;
-        }
-    }
-
-    IEnumerator Section2Rotation(IEnumerable<IEnumerator> loop) {
-        foreach (var rest in loop) {
-            board.FindRandomGraphicWithSize(1, 1).RotateTo(360, Beat(2));
+            var rand = Random.value;
+            if (rand < 0.5f) {
+                if (rand < 0.3f) {
+                    if (rand < 0.15f) {
+                        CascadeLeft();
+                    } else {
+                        CascadeRight();
+                    }
+                } else {
+                    if (rand < 0.4f) {
+                        CascadeTop();
+                    } else {
+                        CascadeDown();
+                    }
+                }
+                //Random.value < 0.6f ? (Random.value > 0.5f ? CascadeLeft() : CascadeRight()) CascadeVertically(Random.value < 0.5f ? Direction.Up : Direction.Down, Random.Range(1, 5)) :
+            } else {
+                if (Random.value < 0.3f) {
+                    CascadeVertically(Random.value < 0.5f ? Direction.Up : Direction.Down, Random.Range(1, 5));
+                } else {
+                    CascadeHorizontally(Random.value < 0.5f ? Direction.Right : Direction.Left, Random.Range(1, 5));
+                }
+            }
             yield return rest;
         }
     }
 
     void CascadeRight() {
-        for (int i = 0; i < rows; i++) {
-            int index = 1;
-            foreach (var g in board.FindGraphicsForRow(i)) {
-                StartCoroutine(C.WithDelay(() => {
-                    g.SetOpacity(0, Beat(0.2f));
-                }, Beat(index * 0.3f)));
-                StartCoroutine(C.WithDelay(() => {
-                    g.SetOpacity(1, Beat(1f));
-                }, Beat(index * 0.3f+0.3f)));
-                index++;
-            };
-        }
+        //CascadeHorizontally(Direction.Right, Random.Range(1, rows+1));
+        CascadeHorizontally(Direction.Right, rows);
     }
 
     void CascadeLeft() {
-        for (int i = 0; i < rows; i++) {
-            int index = 1;
-            foreach (var g in board.FindGraphicsForRow(i).Reverse()) {
-                StartCoroutine(C.WithDelay(() => {
-                    g.SetOpacity(0, Beat(0.2f));
-                }, Beat(index * 0.3f)));
-                StartCoroutine(C.WithDelay(() => {
-                    g.SetOpacity(1, Beat(1f));
-                }, Beat(index * 0.3f+0.3f)));
-                index++;
-            };
-        }
+        //CascadeHorizontally(Direction.Left, Random.Range(1, rows+1));
+        CascadeHorizontally(Direction.Right, rows);
     }
 
     void CascadeTop() {
+        CascadeVertically(Direction.Up, cols);
+    }
+
+    void CascadeDown() {
+        CascadeVertically(Direction.Down, cols);
+    }
+
+    void CascadeVertically(Direction initialDirection, int swapCount) {
+        bool isUpDir = initialDirection == Direction.Up;
         for (int i = 0; i < cols; i++) {
+            var graphics = board.FindGraphicsForColumn(i);
+            if (!isUpDir) graphics = graphics.Reverse();
             int index = 1;
-            foreach (var g in board.FindGraphicsForColumn(i)) {
+            foreach (var g in graphics) {
                 StartCoroutine(C.WithDelay(() => {
                     g.SetOpacity(0, Beat(0.2f));
                 }, Beat(index * 0.3f)));
@@ -500,8 +618,35 @@ public class StoryOfASound : MonoBehaviour {
                 }, Beat(index * 0.3f+0.3f)));
                 index++;
             };
+            if ((i + 1) % swapCount == 0) {
+                Debug.Log("swaping direction");
+                isUpDir = !isUpDir;
+            }
         }
     }
+
+    void CascadeHorizontally(Direction initialDirection, int swapCount) {
+        bool isRightDir = initialDirection == Direction.Right;
+        for (int i = 0; i < rows; i++) {
+            var graphics = board.FindGraphicsForRow(i);
+            if (!isRightDir) graphics = graphics.Reverse();
+            int index = 1;
+            foreach (var g in graphics) {
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(0, Beat(0.2f));
+                }, Beat(index * 0.3f)));
+                StartCoroutine(C.WithDelay(() => {
+                    g.SetOpacity(1, Beat(1f));
+                }, Beat(index * 0.3f+0.3f)));
+                index++;
+            };
+            if ((i + 1) % swapCount == 0) {
+                Debug.Log("swaping direction");
+                isRightDir = !isRightDir;
+            }
+        }
+    }
+
 
     /***** SECTION 1 *****/
     // 24 measures
@@ -531,7 +676,9 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section1Fade(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
             int index = 0;
-            foreach (var g in board.FindGraphicsForRow(Random.Range(0, rows))) {
+            var row = board.FindGraphicsForRow(Random.Range(0, rows));
+            if (Random.value > 0.5f) row = row.Reverse();
+            foreach (var g in row) {
                 StartCoroutine(C.WithDelay(() => {
                     g.SetOpacity(1, Beat(0.5f));
                 }, Beat(index * 0.3f)));
