@@ -16,6 +16,7 @@ public class StoryOfASound : MonoBehaviour {
     public Color white;
 
     Color[] blues;
+    Color[] oranges;
 
     public TimeSignature timeSignature;
     public Camera camera;
@@ -52,6 +53,17 @@ public class StoryOfASound : MonoBehaviour {
         blues[6] = blue.WithAlpha(0.125f*6);
         blues[7] = blue.WithAlpha(0.125f*7);
         blues[8] = blue;
+
+        oranges = new Color[9];
+        oranges[0] = orange.WithAlpha(0);
+        oranges[1] = orange.WithAlpha(0.125f);
+        oranges[2] = orange.WithAlpha(0.125f*2);
+        oranges[3] = orange.WithAlpha(0.125f*3);
+        oranges[4] = orange.WithAlpha(0.125f*4);
+        oranges[5] = orange.WithAlpha(0.125f*5);
+        oranges[6] = orange.WithAlpha(0.125f*6);
+        oranges[7] = orange.WithAlpha(0.125f*7);
+        oranges[8] = orange;
         //StartCoroutine(Run());
         //StartCoroutine(Run2());
         StartCoroutine(Section1());
@@ -155,7 +167,7 @@ public class StoryOfASound : MonoBehaviour {
         GameObject.FindObjectsOfType<GraphicEntity1>().ForEach(g => g.Remove(Beat(1.9f)));
         yield return Rest(1, 0);
         //StartCoroutine(Section4StoryOfASound());
-        foreach (var rest in Loop(24, 0, 0, 3)) {
+        foreach (var rest in Loop(24, 0, 1, 0)) {
             StartCoroutine(Section4StoryOfASound());
             yield return rest;
         }
@@ -189,7 +201,7 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     IEnumerator Section4StoryOfASound() {
-        var g = AddRect(Random.Range(1, 1), Random.Range(1, 1), blues[7], allowStacking:false);
+        var g = AddRect(Random.Range(1, 1), Random.Range(1, 1), blues[8], allowStacking:false);
         yield return Rest(0, 1.1f);
         g.Move(Coord.FromDirection(DirectionHelper.Random), Beat(1));
         yield return Rest(0, 1.1f);
@@ -201,15 +213,27 @@ public class StoryOfASound : MonoBehaviour {
         //g.SetOpacity(blues[7].a, Beat(1));
         yield return Rest(0, 1.1f);
         */
-        if (Random.value < 0.3f) {
-            g.SetColor(orange);
+        if (g != null) StartCoroutine(Section4Lifecycle(g));
+    }
+
+    IEnumerator Section4Lifecycle(GraphicEntity1 g) {
+        g.Transform(new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(2, 3), Random.Range(2, 3)), Beat(1));
+        g.SetOpacity(Mathf.Max(0, g.opacity - 0.1f), Beat(1));
+        yield return Rest(0, 1.1f);
+        if (g.opacity.IsZero()) {
+            g.Remove();
+            yield break;
         }
-        g.Transform(new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 4), Random.Range(1, 4)), Beat(1));
+        // Break to unit squares
+        g.RotateTo(0, Beat(1));
         yield return Rest(0, 1.1f);
         var squares = g.BreakToUnitSquares();
         yield return Rest(0, 1.1f);
         var rot = Random.Range(0, 360);
         foreach (var unit in squares) {
+            if (Random.value < 0.3f) {
+                unit.SetColor(orange.WithAlpha(unit.opacity));
+            }
             int dx = Random.Range(-1, 2);
             int dy = Random.Range(-1, 2);
             unit.Move(dx, dy, Beat(1.1f));
@@ -225,7 +249,13 @@ public class StoryOfASound : MonoBehaviour {
         }
         yield return Rest(0, 2.1f);
         foreach (var unit in squares) {
-            if (unit != null) unit.Remove(Beat(2));
+            if (unit != null) {
+                if (Random.value < 0.2f) {
+                    StartCoroutine(Section4Lifecycle(unit));
+                } else {
+                    unit.Remove(Beat(2));
+                }
+            }
         }
     }
 

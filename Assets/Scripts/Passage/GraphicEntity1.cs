@@ -184,6 +184,12 @@ public class GraphicEntity1 : MonoBehaviour {
         }
     }
 
+    public float rotation {
+        get {
+            return animatable.rotation;
+        }
+    }
+
     void _RunAnimation(string keyPath,
                        float startTime, float startValue,
                        float endTime, float endValue) {
