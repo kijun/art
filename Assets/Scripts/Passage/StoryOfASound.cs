@@ -39,6 +39,7 @@ public class StoryOfASound : MonoBehaviour {
         */
 
         var gap = 0.309f;
+        //var gap = 0.1f;
         var sideLength = CameraHelper.Height / ((1+gap)*rows + gap);
         cols = (int)(CameraHelper.Width / ((1+gap) * sideLength));
         board = new Board1(cols, rows, sideLength, gap * sideLength);
@@ -68,21 +69,20 @@ public class StoryOfASound : MonoBehaviour {
         oranges[8] = orange;
         //StartCoroutine(Run());
         //StartCoroutine(Run2());
+        StartCoroutine(HideTitle());
         StartCoroutine(Section1());
         StartCoroutine(Section2());
         StartCoroutine(Section3());
         StartCoroutine(Section4());
-        StartCoroutine(TitleAndCredit());
+        StartCoroutine(SectionClosing());
 
         //AddRow();
         //StartCoroutine(Run());
     }
 
-    IEnumerator TitleAndCredit() {
-        yield return Rest(1, 3);
+    IEnumerator HideTitle() {
+        yield return Rest(1, 2);
         title.gameObject.active = false;
-        yield return Rest(119, 1);
-        credits.gameObject.active = true;
     }
 
     void FFixedUpdate() {
@@ -147,6 +147,11 @@ public class StoryOfASound : MonoBehaviour {
         return true;
     }
 
+    void AddSquareAtPosition(int x, int y, Color color) {
+        var ge = GraphicEntity1.New(new GridRect(x, y, 1, 1), board);
+        ge.SetColor(color);
+    }
+
     GraphicEntity1 AddRect(int width, int height, Color color, bool allowStacking = false) {
         GridRect emptyRect = board.FindEmptyRectWithSize(width, height);
         if (emptyRect == null && allowStacking) {
@@ -171,43 +176,39 @@ public class StoryOfASound : MonoBehaviour {
         }
         return null;
     }
+
+    IEnumerator SectionClosing() {
+        yield return Rest(122, 0);
+        AddSquareAtPosition(2, rows - 1, blue);
+        yield return Rest(0, 1);
+        AddSquareAtPosition(3, rows - 1, blue);
+        yield return Rest(0, 1);
+        AddSquareAtPosition(4, rows - 1, blue);
+        yield return Rest(0, 1);
+        AddSquareAtPosition(5, rows - 1, blue);
+        yield return Rest(0, 1);
+        AddSquareAtPosition(5, 0, orange);
+        yield return Rest(0, 1);
+        AddSquareAtPosition(4, 0, orange);
+        yield return Rest(0, 1);
+        AddSquareAtPosition(3, 0, orange);
+        yield return Rest(0, 1);
+        AddSquareAtPosition(2, 0, orange);
+        yield return Rest(0, 1);
+        credits.gameObject.active = true;
+    }
+
     /***** SECTION 4 FINAL *****/
     IEnumerator Section4() {
         yield return Rest(73, 0);
         GameObject.FindObjectsOfType<GraphicEntity1>().ForEach(g => g.Remove(Beat(1.9f)));
         yield return Rest(1, 0);
         //StartCoroutine(Section4StoryOfASound());
-        foreach (var rest in Loop(24, 0, 1, 0)) {
+        //24 -> 37 // probability
+        foreach (var rest in Loop(40, 0, 1, 0)) {
             StartCoroutine(Section4StoryOfASound());
             yield return rest;
         }
-        //var rect = AddRect(2, 2, blues[7]);
-        //rect.BreakToUnitSquares();
-        /*
-        StartCoroutine(Section4AddShapes());
-        //board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
-        yield return Rest(1, 0);
-        Run(Rest(1, 0), Section3AddRect(Loop(20, 0, 1, 0)));
-        Run(Rest(3, 1), Section3Shatter(Loop(19, 3, 2, 0)));
-        Run(Rest(4, 2), Section1Orange(MeasureToBeats(16), 4, 7));
-        Run(Rest(6, 0), Section3Delete(Loop(19, 3, 0, 3)));
-        Run(Rest(0, 1), Section2Rotation(Loop(23, 3, 1, 0)));
-        Run(Rest(0, 2), Section2Shape(Loop(23, 1, 2, 0)));
-        Run(Rest(0, 3), Section2Cascade(Loop(22, 0, 2, 0)));
-        Run(Rest(2),  Section1Snake(Loop(24, 0, 4, 0)));
-        Run(Rest(8),  Section1Orange(MeasureToBeats(16), 5, 7));
-        Run(Rest(12), Section1Fade(Loop(12, 0, 2, 0)));
-        Run(Rest(3, 1), Section4Movement(Loop(18, 0, 1, 0)));
-        StartCoroutine(Section4Rotation());
-        Run(Rest(2), Section4Delete());
-        Run(Rest(1, 2), FnChangeColor(MeasureToBeats(16), 3, 6, orange.WithAlpha(0.75f)));
-        Run(Rest(2), Section4Shatter(Loop(20, 0, 2, 1)));
-        */
-        /*
-        StartCoroutine(Section4Transform());
-        */
-        //StartCoroutine(Section1Orange());
-        //board.FindAllGraphicsWithSize(1, 1).ForEach(g => .SetOpacity(0.65f, Beat(1)));
     }
 
     IEnumerator Section4StoryOfASound() {
@@ -227,10 +228,10 @@ public class StoryOfASound : MonoBehaviour {
     }
 
     IEnumerator Section4Lifecycle(GraphicEntity1 g) {
-        var targetRect = new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 5), Random.Range(1, 5));
+        var targetRect = new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 5), Random.Range(1, 4));
         g.Transform(targetRect, Beat(1));
         if (targetRect.area > 1) {
-            g.SetOpacity(Mathf.Max(0, g.opacity - 0.14f), Beat(1));
+            g.SetOpacity(Mathf.Max(0, g.opacity - 0.17f), Beat(1));
         }
         yield return Rest(0, 1.25f);
         if (g.opacity.IsZero()) {
@@ -239,13 +240,13 @@ public class StoryOfASound : MonoBehaviour {
         }
         // Break to unit squares
         g.RotateTo(0, Beat(1));
-        yield return Rest(0, 2.25f);
+        yield return Rest(0, 2f);
         var squares = g.BreakToUnitSquares();
         yield return Rest(0, 1.25f);
         var rot = Random.Range(0, 12) * 30;
         foreach (var unit in squares) {
             var colorRand = Random.value;
-            if (colorRand < 0.33f) {
+            if (colorRand < 0.45f) {
                 unit.SetColor(orange.WithAlpha(unit.opacity));
             }
             //else if (colorRand < 0.66f) {
@@ -374,7 +375,7 @@ public class StoryOfASound : MonoBehaviour {
         Run(Rest(3, 1), Section3Shatter(Loop(24-4, 3, 1, 1)));
         Run(Rest(4, 2), Section1Orange(MeasureToBeats(24-5), 3, 6));
         Run(Rest(5, 1), Section3Movement(Loop(24-7, 2, 0, 3)));
-        Run(Rest(6, 0), Section3Delete(Loop(24-7, 0, 0, 2)));
+        Run(Rest(6, 0), Section3Delete(Loop(24-8, 2, 0, 2)));
 
         Run(Rest(10, 0), Section3AddRect(Loop(11, 0, 0, 2)));
     }
@@ -559,15 +560,15 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section2Cascade2(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
             var rand = Random.value;
-            if (rand < 0.5f) {
-                if (rand < 0.3f) {
-                    if (rand < 0.15f) {
+            if (rand < 0.25f) {
+                if (Random.value < 0.6f) {
+                    if (Random.value < 0.5f) {
                         CascadeLeft();
                     } else {
                         CascadeRight();
                     }
                 } else {
-                    if (rand < 0.4f) {
+                    if (Random.value < 0.5f) {
                         CascadeTop();
                     } else {
                         CascadeDown();
@@ -575,7 +576,7 @@ public class StoryOfASound : MonoBehaviour {
                 }
                 //Random.value < 0.6f ? (Random.value > 0.5f ? CascadeLeft() : CascadeRight()) CascadeVertically(Random.value < 0.5f ? Direction.Up : Direction.Down, Random.Range(1, 5)) :
             } else {
-                if (Random.value < 0.3f) {
+                if (Random.value < 0.5f) {
                     CascadeVertically(Random.value < 0.5f ? Direction.Up : Direction.Down, Random.Range(1, 5));
                 } else {
                     CascadeHorizontally(Random.value < 0.5f ? Direction.Right : Direction.Left, Random.Range(1, 5));
@@ -654,7 +655,7 @@ public class StoryOfASound : MonoBehaviour {
         var rect = AddRect(cols, rows, blues[0]);
         rect.BreakToUnitSquares();
 
-        Run(Rest(2),  Section1Snake(Loop(10, 0, 4, 0)));
+        Run(Rest(2),  Section1Snake(Loop(11, 0, 4, 0)));
         Run(Rest(12),  Section1Snake(Loop(12, 0, 2, 0)));
         Run(Rest(8),  Section1Orange(MeasureToBeats(6), 5, 7));
         Run(Rest(14),  Section1Orange(MeasureToBeats(10), 3, 5));
@@ -666,7 +667,8 @@ public class StoryOfASound : MonoBehaviour {
     IEnumerator Section1Orange(int durationInBeats, int minRest, int maxRest) {
         int beatsRested = 0;
         while (beatsRested < durationInBeats) {
-            board.RandomGraphicEntity().SetColor(orange);
+            var g = board.RandomGraphicEntity();
+            if (g != null) g.SetColor(orange);
             var beatsToRest = Random.Range(minRest, maxRest);
             beatsRested += beatsToRest;
             yield return Rest(0, beatsToRest);

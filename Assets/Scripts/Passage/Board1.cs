@@ -157,7 +157,11 @@ public class Board1 {
 
     public GraphicEntity1 FindRandomGraphic() {
         // TODO performance!!
-        return GraphicEntities().ToArray().Shuffle().First();
+        var gs = GraphicEntities().ToArray().Shuffle();
+        if (gs.Count() > 0) {
+            return gs.First();
+        }
+        return null;
     }
 
 
