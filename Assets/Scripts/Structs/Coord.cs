@@ -55,6 +55,14 @@ public class Coord {
         return (x == p.x) && (y == p.y);
     }
 
+    public float SquareDistance(Coord other) {
+        return Mathf.Pow(other.x - x, 2) + Mathf.Pow(other.y - y, 2);
+    }
+
+    public float Distance(Coord other) {
+        return Mathf.Sqrt(SquareDistance(other));
+    }
+
 
     public override string ToString() {
         return $"({x}, {y})";

@@ -74,7 +74,7 @@ public class Board1 {
     }
 
     public GridRect FindRandomRectWithSize(int rectWidth, int rectHeight) {
-        return new GridRect(Random.Range(-1, width - rectWidth), Random.Range(0, height - rectHeight), rectWidth, rectHeight);
+        return new GridRect(Random.Range(0, width - rectWidth), Random.Range(0, height - rectHeight), rectWidth, rectHeight);
     }
 
     /*** GRAPHIC ENTITY QUERY ***/
@@ -152,8 +152,7 @@ public class Board1 {
     */
 
     public GraphicEntity1 RandomGraphicEntity() {
-        // TODO make random
-        return GraphicEntities().First();
+        return FindRandomGraphic();
     }
 
     public GraphicEntity1 FindRandomGraphic() {
