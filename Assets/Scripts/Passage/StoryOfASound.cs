@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using PureShape;
-using OscJack;
 
 
 public class StoryOfASound : MonoBehaviour {
@@ -19,6 +18,7 @@ public class StoryOfASound : MonoBehaviour {
     Color[] oranges;
     public UnityEngine.UI.Text title;
     public UnityEngine.UI.Text credits;
+    public Timer timer;
 
     public TimeSignature timeSignature;
     public Camera camera;
@@ -69,13 +69,8 @@ public class StoryOfASound : MonoBehaviour {
         oranges[8] = orange;
         //StartCoroutine(Run());
         //StartCoroutine(Run2());
-        StartCoroutine(HideTitle());
-        StartCoroutine(Section1());
-        StartCoroutine(Section2());
-        StartCoroutine(Section3());
-        StartCoroutine(Section4());
-        StartCoroutine(SectionClosing());
 
+        OSCHandler.Instance.Init();
         //AddRow();
         //StartCoroutine(Run());
     }
@@ -85,47 +80,28 @@ public class StoryOfASound : MonoBehaviour {
         title.gameObject.active = false;
     }
 
-    void FFixedUpdate() {
-        if (OscMaster.HasData("/Velocity1")) {
-            foreach (var x in OscMaster.GetData("/Velocity1")) {
-                var val = float.Parse(x+"");
-                if (val.IsNonZero()) {
-                    Debug.Log(val);
-                    //AddRect(1,1);
-                }
+    bool started = false;
+
+    void Update() {
+        if (!started) {
+            OSCHandler.Instance.UpdateLogs();
+
+            if(OSCHandler.Instance.Servers["Visuals"].log.Count > 0) {
+                Debug.Log("received ping");
+                started = true;
+                timer.enabled = true;
+                StartVisualization();
             }
-            OscMaster.ClearData("/Velocity1");
-        }
-        if (OscMaster.HasData("/Note1")) {
-            foreach (var x in OscMaster.GetData("/Note1")) {
-            }
-            OscMaster.ClearData("/Note1");
         }
     }
 
-    void UUpdate() {
-        if (OscMaster.HasData("/Velocity1")) {
-            foreach (var x in OscMaster.GetData("/Velocity1")) {
-                var val = float.Parse(x+"");
-                if (val.IsNonZero()) {
-                    Debug.Log(val);
-                    //AddRect(1,1);
-                }
-            }
-            OscMaster.ClearData("/Velocity1");
-        }
-        if (OscMaster.HasData("/Note1")) {
-            foreach (var x in OscMaster.GetData("/Note1")) {
-            }
-            OscMaster.ClearData("/Note1");
-        }
-    }
-
-
-    void Dispatch() {
-        // action
-        // but how do you know whether an action is capable or not?
-        // random - return
+    void StartVisualization() {
+        StartCoroutine(HideTitle());
+        StartCoroutine(Section1());
+        StartCoroutine(Section2());
+        StartCoroutine(Section3());
+        StartCoroutine(Section4());
+        StartCoroutine(SectionClosing());
     }
 
     bool AddRow(Color color, bool force=false) {

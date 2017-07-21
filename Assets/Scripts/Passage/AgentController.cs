@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using PureShape;
-using OscJack;
+//using OscJack;
 
 public class AgentController : MonoBehaviour {
 
@@ -23,6 +23,7 @@ public class AgentController : MonoBehaviour {
     }
 
     void Update() {
+        /*
         Debug.Log(OscMaster.MasterDirectory.TotalMessageCount);
         if (OscMaster.HasData("/Velocity1")) {
             foreach (var x in OscMaster.GetData("/Velocity1")) {
@@ -36,6 +37,7 @@ public class AgentController : MonoBehaviour {
             }
             OscMaster.ClearData("/Note1");
         }
+        */
     }
 
     void CreateTiles() {
