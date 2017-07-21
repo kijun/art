@@ -17,6 +17,8 @@ public class StoryOfASound : MonoBehaviour {
 
     Color[] blues;
     Color[] oranges;
+    public UnityEngine.UI.Text title;
+    public UnityEngine.UI.Text credits;
 
     public TimeSignature timeSignature;
     public Camera camera;
@@ -70,9 +72,17 @@ public class StoryOfASound : MonoBehaviour {
         StartCoroutine(Section2());
         StartCoroutine(Section3());
         StartCoroutine(Section4());
+        StartCoroutine(TitleAndCredit());
 
         //AddRow();
         //StartCoroutine(Run());
+    }
+
+    IEnumerator TitleAndCredit() {
+        yield return Rest(1, 3);
+        title.gameObject.active = false;
+        yield return Rest(93, 1);
+        credits.gameObject.active = true;
     }
 
     void FFixedUpdate() {
