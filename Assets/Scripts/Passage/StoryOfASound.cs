@@ -89,7 +89,6 @@ public class StoryOfASound : MonoBehaviour {
             if(OSCHandler.Instance.Servers["Visuals"].log.Count > 0) {
                 Debug.Log("received ping");
                 started = true;
-                timer.enabled = true;
                 StartVisualization();
             }
         }
