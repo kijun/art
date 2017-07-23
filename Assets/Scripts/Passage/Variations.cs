@@ -5,7 +5,7 @@ using UnityEngine;
 using PureShape;
 
 
-public class StoryOfASound : MonoBehaviour {
+public class Variations : MonoBehaviour {
 
     public Color black;
     public Color red;
@@ -16,9 +16,6 @@ public class StoryOfASound : MonoBehaviour {
 
     Color[] blues;
     Color[] oranges;
-    public UnityEngine.UI.Text title;
-    public UnityEngine.UI.Text credits;
-    public Timer timer;
 
     public TimeSignature timeSignature;
     public Camera camera;
@@ -29,65 +26,19 @@ public class StoryOfASound : MonoBehaviour {
 
     GridRect boardRect;
 
-    Board1 board;
+    Board2 board;
 
     void Start() {
-        //CreateTiles();
-        /*var sideLength = CameraHelper.Height / (1.414f * rows + 0.414f);
-        cols = (int)(CameraHelper.Width / (1.414f * sideLength));
-        board = new Board1(cols, rows, sideLength, 0.414f * sideLength);
-        */
-        //OSCHandler.Instance.Init();
         StartCoroutine(SetupAndLaunch());
     }
 
     IEnumerator SetupAndLaunch() {
         yield return null;
-        /*
-        if (Display.displays.Count() > 1) {
-            Screen.SetResolution(Screen.width, Screen.height, false);
-
-            //var secondary = Display.displays[1];
-            //PlayerPrefs.SetInt("UnitySelectMonitor", 0);
-            //Screen.SetResolution(secondary.systemWidth, secondary.systemHeight, true);
-        }// else {
-        //    PlayerPrefs.SetInt("UnitySelectMonitor", 0);
-        //}
-        */
-        //Screen.SetResolution(Screen.width, Screen.height, false);
-
-        /* Store the current screen resolution
-        int screenWidth = Screen.width;
-        int screenHeight = Screen.height;
-        // Setting this PlayerPrefs is what actually changes the monitor to display on
-        // Set the resolution low for a frame
-        Screen.SetResolution(800, 600, isFullScreen);
-
-        yield return null;     // Wait a frame
-        // Set the previous resolution
-        Screen.SetResolution(screenWidth, screenHeight, isFullScreen);
-
-        while (!Screen.fullScreen) {
-            yield return null;     // Wait a frame
-        }
-
-        if (Display.displays.Count() > 1) {
-            var second = Display.displays[0];
-            Screen.SetResolution(second.systemWidth, second.systemHeight, true);
-        }
-
-        //Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, true);
-        //Screen.SetResolution(1920, 1200, true);
-        yield return null;     // Wait a frame
-        yield return null;     // Wait a frame
-        yield return null;     // Wait a frame
-
-        */
         var gap = 0.309f;
         //var gap = 0.1f;
         var sideLength = CameraHelper.Height / ((1+gap)*rows + gap);
         cols = (int)(CameraHelper.Width / ((1+gap) * sideLength));
-        board = new Board1(cols, rows, sideLength, gap * sideLength);
+        board = new Board2(cols, rows, sideLength, gap * sideLength);
 
         //Debug.Log($"Creating {rows} rows, {cols} cols");
         boardRect = new GridRect(0, 0, cols, rows);
@@ -119,32 +70,22 @@ public class StoryOfASound : MonoBehaviour {
         StartVisualization();
     }
 
-    IEnumerator HideTitle() {
-        yield return Rest(1, 2);
-        title.gameObject.active = false;
-    }
-
-    bool started = true;
-
-    void Update() {
-        if (!started) {
-            OSCHandler.Instance.UpdateLogs();
-
-            if(OSCHandler.Instance.Servers["Visuals"].log.Count > 0) {
-                Debug.Log("received ping");
-                started = true;
-                StartVisualization();
-            }
-        }
-    }
-
     void StartVisualization() {
-        StartCoroutine(HideTitle());
+        //StartCoroutine(Core());
+        StartCoroutine(Section4());
+        /*
         StartCoroutine(Section1());
         StartCoroutine(Section2());
         StartCoroutine(Section3());
-        StartCoroutine(Section4());
         StartCoroutine(SectionClosing());
+        */
+    }
+
+    IEnumerator Core() {
+        foreach (var rest in Loop(64, 0, 0, 2)) {
+            AddRect(Random.Range(0, cols/3), Random.Range(0, rows/3), blues[Random.Range(1, 9)], true);
+            yield return rest;
+        }
     }
 
     bool AddRow(Color color, bool force=false) {
@@ -160,24 +101,25 @@ public class StoryOfASound : MonoBehaviour {
             }
         }
 
-        var newGe = GraphicEntity1.New(emptyRow, board);
+        var newGe = GraphicEntity2.New(emptyRow, board);
         newGe.SetColor(color);
         //newGe.SetOpacity(1, Beat(1));
         return true;
     }
 
     void AddSquareAtPosition(int x, int y, Color color) {
-        var ge = GraphicEntity1.New(new GridRect(x, y, 1, 1), board);
+        var ge = GraphicEntity2.New(new GridRect(x, y, 1, 1), board);
         ge.SetColor(color);
     }
 
-    GraphicEntity1 AddRect(int width, int height, Color color, bool allowStacking = false) {
+    GraphicEntity2 AddRect(int width, int height, Color color, bool allowStacking = false) {
+        Debug.Log(width + " " + height);
         GridRect emptyRect = board.FindEmptyRectWithSize(width, height);
         if (emptyRect == null && allowStacking) {
             emptyRect = board.FindRandomRectWithSize(width, height);
         }
         if (emptyRect != null) {
-            var ge = GraphicEntity1.New(emptyRect, board);
+            var ge = GraphicEntity2.New(emptyRect, board);
             ge.SetColor(color);
             //ge.SetOpacity(opacity, Beat(1));
             return ge;
@@ -185,10 +127,10 @@ public class StoryOfASound : MonoBehaviour {
         return null;
     }
 
-    GraphicEntity1 AddRectAtPosition(int minX, int minY, int width, int height, Color color) {
+    GraphicEntity2 AddRectAtPosition(int minX, int minY, int width, int height, Color color) {
         GridRect emptyRect = new GridRect(minX, minY, width, height);
         if (emptyRect != null) {
-            var ge = GraphicEntity1.New(emptyRect, board);
+            var ge = GraphicEntity2.New(emptyRect, board);
             ge.SetColor(color);
             ge.SetOpacity(1, Beat(1));
             return ge;
@@ -214,39 +156,118 @@ public class StoryOfASound : MonoBehaviour {
         yield return Rest(0, 1);
         AddSquareAtPosition(2, 0, orange);
         yield return Rest(0, 1);
-        credits.gameObject.active = true;
     }
 
     /***** SECTION 4 FINAL *****/
     IEnumerator Section4() {
-        yield return Rest(73, 0);
-        GameObject.FindObjectsOfType<GraphicEntity1>().ForEach(g => g.Remove(Beat(1.9f)));
-        yield return Rest(1, 0);
+        //yield return Rest(73, 0);
         //StartCoroutine(Section4StoryOfASound());
         //24 -> 37 // probability
+        StartCoroutine(Section4StoryOfASound());
+        // REPEAT ONLY ON CERTAIN CONDITION (and nearest beat)
+        /*
         foreach (var rest in Loop(40, 0, 1, 0)) {
             StartCoroutine(Section4StoryOfASound());
             yield return rest;
         }
+        */
+        yield return null;
     }
 
     IEnumerator Section4StoryOfASound() {
-        var g = AddRect(Random.Range(1, 1), Random.Range(1, 1), blues[8], allowStacking:false);
-        yield return Rest(0, 1.25f);
-        g.Move(Coord.FromDirection(DirectionHelper.Random), Beat(1));
-        yield return Rest(0, 1.25f);
-        g.RotateFor(360, Beat(1));
-        yield return Rest(0, 1.25f);
-        /*
-        //g.SetOpacity(0, Beat(1));
-        yield return Rest(0, 1.25f);
-        //g.SetOpacity(blues[7].a, Beat(1));
-        yield return Rest(0, 1.25f);
-        */
-        if (g != null) StartCoroutine(Section4Lifecycle(g));
+        yield return null;
+        var g = AddRect(Random.Range(2, 2), Random.Range(2, 2), blues[8], allowStacking:false);
+        var actions = new List<GraphicAction2>();
+        var b = Beat(1f);
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Movement,
+            a1 = 2, a2 = 0, duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Movement,
+            a1 = Random.Range(-2, 3), a2 = 0, duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Movement,
+            a1 = 0, a2 = Random.Range(-2, 3), duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Movement,
+            a1 = 0, a2 = Random.Range(-2, 3), duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.RotateFor,
+            a1 = 30
+        });
+        // TODO evaluator func
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Transform,
+            rect = new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(2, 4), Random.Range(2, 4)),
+            duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.IncreaseOpacity,
+            a1 = -0.17f,
+            duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Remove,
+            conditional = (GraphicEntity2 ge) => ge.opacity.IsZero()
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.RotateTo,
+            a1 = 0, duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Split,
+            duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.ColorChange,
+            // TODO with current alpha? maybe we have a evaluator function
+            color = orange,
+            duration = b,
+            probability = 0.25f
+        });
+        // TODO random for each?
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Movement,
+            a1 = Random.Range(-1, 2), a2 = Random.Range(-1, 2),
+            duration = b
+        });
+        // TODO stack movement
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.RotateFor,
+            a1 = Random.Range(0, 12) * 30,
+            duration = b
+        });
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Movement,
+            a1 = Random.Range(-1, 2), a2 = Random.Range(-1, 2),
+            duration = b
+        });
+        // TODO stack movement
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.RotateFor,
+            a1 = Random.Range(0, 12) * 30,
+            duration = b
+        });
+
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Remove,
+            duration = b * 2,
+            probability = 0.4f
+        });
+
+        actions.Add(new GraphicAction2 {
+            type = GraphicAction2Type.Repeat,
+            duration = b,
+        });
+
+        g.ApplyActions(actions);
     }
 
-    IEnumerator Section4Lifecycle(GraphicEntity1 g) {
+    IEnumerator Section4Lifecycle(GraphicEntity2 g) {
         var targetRect = new GridRect(g.rect.min.x - 1, g.rect.min.y - 1, Random.Range(1, 5), Random.Range(1, 4));
         g.Transform(targetRect, Beat(1));
         if (targetRect.area > 1) {
@@ -518,7 +539,7 @@ public class StoryOfASound : MonoBehaviour {
 
     /*
     IEnumerator Section2Rotation(IEnumerable<IEnumerator> loop, int min=1, int max=1) {
-        var rotating = new HashSet<GraphicEntity1>();
+        var rotating = new HashSet<GraphicEntity2>();
         foreach (var rest in loop) {
             var cnt = Random.Range(min, max+1);
             for (int i = 0; i < cnt; i++) {
@@ -535,7 +556,7 @@ public class StoryOfASound : MonoBehaviour {
     */
 
     IEnumerator Section2Rotation(IEnumerable<IEnumerator> loop, int min=1, int max=1, bool rotateLines=false) {
-        var rotating = new HashSet<GraphicEntity1>();
+        var rotating = new HashSet<GraphicEntity2>();
         foreach (var rest in loop) {
             if (rotateLines && Random.value < 0.3f) {
                 if (Random.value < 0.5f) {
@@ -718,7 +739,7 @@ public class StoryOfASound : MonoBehaviour {
             //g.SetOpacity(g.opacity + 0.5f, Beat(0.4f));
 
             //g = board.FindRandomGraphicWithSize(1, 1);
-            List<GraphicEntity1> ge = new List<GraphicEntity1>();
+            List<GraphicEntity2> ge = new List<GraphicEntity2>();
             ge.Add(g);
             for (int i = 0; i < 9; i++) { // beats - 1
                 foreach (var nextGE in board.FindAdjacentGraphics(g.rect)) {
