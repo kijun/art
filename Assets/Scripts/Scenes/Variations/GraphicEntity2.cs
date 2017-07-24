@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public enum GraphicAction2Type {
+public enum GA2Type {
     None,
     Movement,
     Opacity,
@@ -23,27 +23,43 @@ public enum GraphicAction2Type {
 
 
 // TODO use namespaces
-public class Composite<T> {
+public class GAParam2<T> {
     public T val;
-    public System.Func<GraphicEntity2, T> eval;
+    public System.Func<GraphicEntity2, T> func;
 
-    public T GetValue(GraphicEntity2 ge) {
-        if (eval != null) {
-            return eval(ge);
+    public GAParam2() {
+    }
+
+    public GAParam2(T val) {
+        this.val = val;
+    }
+
+    public GAParam2(System.Func<GraphicEntity2, T> func) {
+        this.func = func;
+    }
+
+    public T Eval(GraphicEntity2 ge) {
+        if (func != null) {
+            return func(ge);
         }
         return val;
     }
 }
 
-public class GraphicAction2 {
-    public GraphicAction2Type type;
-    public float a1;
-    public float a2;
-    public float duration;
-    public Color color;
-    public GridRect rect;
-    public float probability = 1;
+public class GA2 {
+    // GraphicAction2
+    static GAParam2<float> one = new GAParam2<float> { val=1 };
+    public GA2Type type;
+    public GAParam2<float> a1;
+    public GAParam2<float> a2;
+    public GAParam2<Color> color;
+    public GAParam2<GridRect> rect;
+
+    // redundant
+    public GAParam2<float> probability = one;
     public System.Func<GraphicEntity2, bool> conditional;
+
+    public GAParam2<float> duration;
 }
 
 public class GraphicEntity2 : MonoBehaviour {
@@ -52,7 +68,7 @@ public class GraphicEntity2 : MonoBehaviour {
     public GridRect rect; // TODO haxor
     GraphicEntityMutexFlag mutex;
     Animatable2 animatable;
-    List<GraphicAction2> actions;
+    List<GA2> actions;
 
     public static GraphicEntity2 New(GridRect rect, Board2 board) {
         var ge = new GameObject().AddComponent<GraphicEntity2>();
@@ -69,9 +85,9 @@ public class GraphicEntity2 : MonoBehaviour {
         animatable = NoteFactory.CreateRect(rectParams);
     }
 
-    public void ApplyActions(List<GraphicAction2> origActions, int fromIndex=0) {
+    public void ApplyActions(List<GA2> origActions, int fromIndex=0) {
         // TODO modify actions at a given rate
-        //origActions.Insert(Random.Range(0, origActions.Count), new GraphicAction2 {});
+        //origActions.Insert(Random.Range(0, origActions.Count), new GA2 {});
         // modify duration, range of values, rect, color, etc
 
         this.actions = origActions;
@@ -83,44 +99,47 @@ public class GraphicEntity2 : MonoBehaviour {
         ge.ApplyActions(actions);
     }
 
-    IEnumerator _ApplyActions(List<GraphicAction2> actions, int fromIndex) {
+    IEnumerator _ApplyActions(List<GA2> actions, int fromIndex) {
         yield return null;
         // should actions be deleted?
         bool repeat = false;
         foreach (var action in actions.GetRange(fromIndex, actions.Count - fromIndex)) {
             fromIndex++;
             // TODO apply this to original action... how? oh, just to duplication
-            if (Random.value > action.probability) continue;
+            if (Random.value > action.probability.Eval(this)) continue;
             if (action.conditional != null && !action.conditional(this)) continue;
-            var animDur = action.duration - 0.2f;
+            var animDur = action.duration.Eval(this) - 0.2f;
             switch (action.type) {
-                case GraphicAction2Type.Movement:
-                    Move((int)action.a1, (int)action.a2, animDur);
+                case GA2Type.Movement:
+                    Move((int)action.a1.Eval(this), (int)action.a2.Eval(this), animDur);
                     break;
-                case GraphicAction2Type.Opacity:
-                    SetOpacity(action.a1, animDur);
+                case GA2Type.Opacity:
+                    SetOpacity(action.a1.Eval(this), animDur);
                     break;
-                case GraphicAction2Type.Transform:
-                    Transform(action.rect, animDur);
+                case GA2Type.IncreaseOpacity:
+                    SetOpacity(Mathf.Clamp(opacity + action.a1.Eval(this), 0, 1), animDur);
                     break;
-                case GraphicAction2Type.RotateTo:
-                    RotateTo(action.a1, animDur);
+                case GA2Type.Transform:
+                    Transform(action.rect.Eval(this), animDur);
                     break;
-                case GraphicAction2Type.RotateFor:
-                    RotateFor(action.a1, animDur);
+                case GA2Type.RotateTo:
+                    RotateTo(action.a1.Eval(this), animDur);
                     break;
-                case GraphicAction2Type.Merge:
+                case GA2Type.RotateFor:
+                    RotateFor(action.a1.Eval(this), animDur);
                     break;
-                case GraphicAction2Type.ColorChange:
-                    SetColor(action.color, animDur);
+                case GA2Type.Merge:
                     break;
-                case GraphicAction2Type.Remove:
+                case GA2Type.ColorChange:
+                    SetColor(action.color.Eval(this), animDur);
+                    break;
+                case GA2Type.Remove:
                     Remove(animDur);
                     break;
-                case GraphicAction2Type.Duplicate:
+                case GA2Type.Duplicate:
                     Duplicate(animDur);
                     break;
-                case GraphicAction2Type.Split:
+                case GA2Type.Split:
                     var ges = BreakToUnitSquares(animDur);
                     foreach (var ge in ges) {
                         // but carry everything else?
@@ -128,11 +147,11 @@ public class GraphicEntity2 : MonoBehaviour {
                     }
                     Remove();
                     break;
-                case GraphicAction2Type.Repeat:
+                case GA2Type.Repeat:
                     repeat = true;
                     break;
             }
-            yield return new WaitForSeconds(action.duration);
+            yield return new WaitForSeconds(action.duration.Eval(this));
             if (repeat) break;
         }
         if (repeat) ApplyActions(actions);
