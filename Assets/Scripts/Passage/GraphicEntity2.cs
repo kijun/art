@@ -22,6 +22,19 @@ public enum GraphicAction2Type {
 }
 
 
+// TODO use namespaces
+public class Composite<T> {
+    public T val;
+    public System.Func<GraphicEntity2, T> eval;
+
+    public T GetValue(GraphicEntity2 ge) {
+        if (eval != null) {
+            return eval(ge);
+        }
+        return val;
+    }
+}
+
 public class GraphicAction2 {
     public GraphicAction2Type type;
     public float a1;

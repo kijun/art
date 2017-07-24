@@ -176,7 +176,7 @@ public class Variations : MonoBehaviour {
 
     IEnumerator Section4StoryOfASound() {
         yield return null;
-        var g = AddRect(Random.Range(2, 2), Random.Range(2, 2), blues[8], allowStacking:false);
+        var g = AddRectAtPosition(cols/2, rows/2, Random.Range(2, 2), Random.Range(2, 2), blues[8]);
         var actions = new List<GraphicAction2>();
         var b = Beat(1f);
         actions.Add(new GraphicAction2 {
@@ -256,7 +256,7 @@ public class Variations : MonoBehaviour {
         actions.Add(new GraphicAction2 {
             type = GraphicAction2Type.Remove,
             duration = b * 2,
-            probability = 0.4f
+            probability = 0.6f
         });
 
         actions.Add(new GraphicAction2 {

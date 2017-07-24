@@ -129,8 +129,15 @@ public class Animatable2 : MonoBehaviour {
     }
 
     public float rotation {
+        /*
         get { return rigidbody2D.rotation; }
         set { rigidbody2D.rotation = value; }
+        */
+        get { return transform.rotation.eulerAngles.z; }
+        set {
+            var currEuler = transform.rotation.eulerAngles.SwapZ(value);
+            transform.rotation = Quaternion.Euler(currEuler);
+        }
     }
 
     public Rigidbody2D rigidbody2D {
