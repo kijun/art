@@ -23,32 +23,33 @@ public class VPassion: MonoBehaviour {
     public Camera camera;
     public CameraAnimatable cameraAnimatable;
 
+    Color[] colors;
     void Start() {
 //        NoteFactory.CreateCircle(new CircleProperty());
         //StartCoroutine(RunLineIntro());
 //        StartCoroutine(RunShapes());
+        colors = new Color[]{orange, red, purple, blue, peach};
         StartCoroutine(RunSquareBeats());
         StartCoroutine(RunHorizontalLines());
         StartCoroutine(RunDiagonalLines());
         //StartCoroutine(RunRisingGraph());
-        StartCoroutine(RunCamera());
-        StartCoroutine(RunCameraZoom());
+        //StartCoroutine(RunCamera());
+        //StartCoroutine(RunCameraZoom());
         //StartCoroutine(RunCameraPosition());
         //
         StartCoroutine(RunCircles());
     }
 
     IEnumerator RunCircles() {
-        Color[] colors = {orange, red, purple};
         System.Action MakeCircle = () => {
-            var randomColor = Color.Lerp(peach, blue, Random.Range(0.0f, 0.5f));
+            var randomColor = colors.Shuffle().First();
             var diameter = CameraHelper.Height * Random.Range(0.7f, 0.8f);
             var cp = new CircleProperty(color:randomColor, diameter:diameter, center: CameraHelper.RandomPositionNearCenter(diameter/2));
             var anim = NoteFactory.CreateCircle(cp);
             Keyframe[] kff = KeyframeHelper.CreateKeyframes(
                 0, 0,
-                Beat*4, 1,
-                Beat*6, 1,
+                Beat*1, randomColor.a,
+                Beat*7, randomColor.a,
                 Beat*8, 0
             );
 
@@ -57,7 +58,7 @@ public class VPassion: MonoBehaviour {
         };
 
         // until measure 40
-        foreach (var rest in Loop(100000000, 0, 2, 0)) {
+        foreach (var rest in Loop(100000000, 0, 2, 0.25f)) {
             MakeCircle();
             yield return rest;
         }
@@ -124,17 +125,18 @@ public class VPassion: MonoBehaviour {
     }
 
     IEnumerator RunSquareBeats() {
-        Color[] colors = {orange, red, purple};
+        //Color[] colors = {orange, red, purple};
         float[] heights = {0.08f, 0.2f, 0.13f};
         System.Action MakeShape = () => {
-            var randomColor = Color.Lerp(red, blue, Random.Range(0.5f, 1f));
+            var randomColor = colors.Shuffle().First();
+            //var randomColor = Color.Lerp(red, blue, Random.Range(0.5f, 1f));
             var randHeight = RandomHelper.Pick(heights);
             var anim = NoteFactory.CreateRectInViewport(
                 x:Random.Range(0, 9)/10f+0.1f, y:Random.Range(0, 9)/10f + 0.1f, width:randHeight/1.6f, height: randHeight, color: randomColor, level: ShapeZLevel.Back/1000f);
             Keyframe[] kff = KeyframeHelper.CreateKeyframes(
                 0, 0,
-                Beat, 1,
-                Beat*6, 1,
+                Beat, randomColor.a,
+                Beat*6f, randomColor.a,
                 Beat*7, 0
             );
 
@@ -143,23 +145,23 @@ public class VPassion: MonoBehaviour {
         };
 
         // until measure 40
-        foreach (var rest in Loop(10000000, 0, 1, 1)) {
+        foreach (var rest in Loop(10000000, 0, 2, 1)) {
             MakeShape();
             yield return rest;
         }
     }
 
     IEnumerator RunHorizontalLines() {
-        yield return Rest(8);
         System.Action MakeShape = () => {
-            var randomColor = Color.Lerp(orange, red, Random.value); // closer to red
+            var randomColor = colors.Shuffle().First();
+            //var randomColor = Color.Lerp(orange, red, Random.value); // closer to red
             var anim = NoteFactory.CreateRectInViewport(
                 x:0.5f, y:Random.Range(0, 10)/10f, width:1f, height: 0.03f, color: randomColor);
-            var maxOpacity = Random.Range(0.7f, 1f);
+            var maxOpacity = Random.Range(1f, 1f);
             Keyframe[] kff = KeyframeHelper.CreateKeyframes(
                 0, 0,
-                Beat*2, maxOpacity,
-                Beat*6, maxOpacity,
+                Beat*2, randomColor.a,
+                Beat*6, randomColor.a,
                 Beat*8, 0
             );
 
@@ -167,30 +169,23 @@ public class VPassion: MonoBehaviour {
             anim.AddAnimationCurve(AnimationKeyPath.Opacity, new AnimationCurve(kff));
         };
 
-        foreach (var rest in Loop(32, 0, 0, 2)) {
-            MakeShape();
-            yield return rest;
-        }
-
-        yield return Rest(8);
-
-        foreach (var rest in Loop(16, 0, 0, 2)) {
+        foreach (var rest in Loop(10000000, 0, 1, 1)) {
             MakeShape();
             yield return rest;
         }
     }
 
     IEnumerator RunDiagonalLines() {
-        yield return Rest(24);
         System.Action MakeShape = () => {
-            var randomColor = Color.Lerp(orange, red, Random.value); // closer to red
+            //var randomColor = Color.Lerp(orange, red, Random.value); // closer to red
+            var randomColor = colors.Shuffle().First();
             var anim = NoteFactory.CreateRectInViewport(
                 x:0.5f, y:Random.Range(0, 10)/10f, width:0.7f, height: 0.1f, color: randomColor, rotation: Random.value*360);
-            var maxOpacity = Random.Range(0.5f, 1f);
+            var maxOpacity = Random.Range(1f, 1f);
             Keyframe[] kff = KeyframeHelper.CreateKeyframes(
                 0, 0,
-                Beat, maxOpacity,
-                Beat*2, maxOpacity,
+                Beat, randomColor.a,
+                Beat*2, randomColor.a,
                 Beat*3, 0
             );
 
@@ -198,14 +193,7 @@ public class VPassion: MonoBehaviour {
             anim.AddAnimationCurve(AnimationKeyPath.Opacity, new AnimationCurve(kff));
         };
 
-        foreach (var rest in Loop(16, 0, 0, 4)) {
-            MakeShape();
-            yield return rest;
-        }
-
-        yield return Rest(8);
-
-        foreach (var rest in Loop(16, 0, 0, 4)) {
+        foreach (var rest in Loop(1000000, 0, 1, 2)) {
             MakeShape();
             yield return rest;
         }

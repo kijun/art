@@ -41,15 +41,15 @@ public class VBottom : MonoBehaviour {
     public Camera camera;
 
     void Start() {
-        StartCoroutine(RunBlack());
+        //StartCoroutine(RunBlack());
         StartCoroutine(RunBlack2());
         StartCoroutine(RunYellow2());
         StartCoroutine(RunGray());
         StartCoroutine(RunGray2());
         StartCoroutine(RunWhite());
         //StartCoroutine(RunText());
-        StartCoroutine(RunCamera());
-        StartCoroutine(RunCameraZoom());
+//        StartCoroutine(RunCamera());
+//        StartCoroutine(RunCameraZoom());
 //        StartCoroutine(RunCameraPosition());
 //        StartCoroutine(RunBoxes());
     }
@@ -58,7 +58,7 @@ public class VBottom : MonoBehaviour {
         var choices = new float[]{0, 90, 180, 270};
         var restChoices = new float[]{2, 3, 4, 6, 8};
         yield return Rest(0, 4f);
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             camera.transform.rotation = Quaternion.Euler(0, 0, RandomHelper.Pick(choices));
             yield return Rest(0, RandomHelper.Pick(restChoices));
         }
@@ -67,7 +67,7 @@ public class VBottom : MonoBehaviour {
     IEnumerator RunCameraPosition() {
         var restChoices = new float[]{2.1f, 3.1f};
         var deltaPos = new float[]{5f, -5f};
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             var pos = camera.transform.position;
             var xd = RandomHelper.Pick(deltaPos);
             var yd = RandomHelper.Pick(deltaPos);
@@ -91,7 +91,7 @@ public class VBottom : MonoBehaviour {
     IEnumerator RunCameraZoom() {
         var cameraZoomLevels = new float [] {2, 5, 13};
         var restChoices = new float[]{2.4f, 3.4f};
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             camera.orthographicSize = RandomHelper.Pick(cameraZoomLevels);
             yield return Rest(0, RandomHelper.Pick(restChoices));
         }
@@ -99,7 +99,7 @@ public class VBottom : MonoBehaviour {
 
     IEnumerator RunText() {
         var fontSize = new float[]{220, 350, 450};
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
 
             textBox.fontSize = (int)RandomHelper.Pick(fontSize);
             var offsetMax = textBox.rectTransform.offsetMax;
@@ -118,7 +118,7 @@ public class VBottom : MonoBehaviour {
     }
 
     IEnumerator RunWhite() {
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             //var width = Random.Range(3ff);
             var width = 6;
 
@@ -126,12 +126,12 @@ public class VBottom : MonoBehaviour {
                 _FixedLine(width:width, xOffset:Random.value, color:white, level:CurrentBeat);
                 //yield return Rest(0, gap1);
             }
-            yield return Rest(0, 4);
+            yield return Rest(6, 1);
         }
     }
 
     IEnumerator RunBlack() {
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             //var speed = Random.Range(3f, 4f);
             var numberOfLines = Random.Range(1, 1);
             var gap1 = 1f;
@@ -143,12 +143,12 @@ public class VBottom : MonoBehaviour {
                 //_Line(Direction.Left, width, speed, gray, CurrentBeat + 64);
                 //yield return Rest(0, 0.25f);
             }
-            yield return Rest(0, 4);
+            yield return Rest(0, 4*4+1);
         }
     }
 
     IEnumerator RunBlack2() {
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             //var speed = Random.Range(3f, 4f);
             var numberOfLines = Random.Range(1, 3);
             var gap1 = 1f;
@@ -157,48 +157,48 @@ public class VBottom : MonoBehaviour {
             foreach (var _ in Times(numberOfLines)) {
                 var width = 26f;
                 var speed = 18f;
-                _Line(DirectionHelper.Random, width, speed, black, CurrentBeat + 16);
+                _Line(DirectionHelper.Random, width, speed, black, CurrentBeat-7*4);
             }
-            yield return Rest(0, 8);
+            yield return Rest(3, 0);
         }
     }
 
     IEnumerator RunGray2() {
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             var width = Random.Range(0.3f, 2f);
 
-            foreach (var _ in Times(3)) {
+            foreach (var _ in Times(1)) {
                 _FixedLine(width:width, xOffset:Random.value, color:gray, level:CurrentBeat);
                 //yield return Rest(0, gap1);
             }
-            yield return Rest(0, 8);
+            yield return Rest(5, 1);
         }
     }
 
     IEnumerator RunYellow2() {
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             var width = Random.Range(4f, 6f);
 
             foreach (var _ in Times(Random.Range(1, 2))) {
                 _FixedLine(width:width, xOffset:Random.value, color:yellow, level:CurrentBeat-1);
                 //yield return Rest(0, gap1);
             }
-            yield return Rest(0, 4);
+            yield return Rest(0, 4*4-1);
         }
     }
 
     IEnumerator RunGray() {
         yield return Rest(0, 1);
-        foreach (var i in Times(500)) {
-            foreach (var j in Times(4)) {
+        foreach (var i in Times(10000000)) {
+            foreach (var j in Times(1)) {
                 _Line(Direction.Left, grayWidth, graySpeed, gray, CurrentBeat+1);
             }
-            yield return Rest(0, 1);
+            yield return Rest(3, 1);
         }
     }
 
     IEnumerator RunYellow() {
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             _Line(Direction.Right, yellowWidth, yellowSpeed, yellow, ShapeZLevel.Default);
             yield return Rest(0, yellowMeter);
         }
@@ -206,7 +206,7 @@ public class VBottom : MonoBehaviour {
 
     IEnumerator RunBoxes() {
         var angles = new float[] {0, 45, 90};
-        foreach (var i in Times(5000)) {
+        foreach (var i in Times(10000000)) {
             foreach (var _ in Times(Random.Range(3, 8))) {
                 var scale = new Vector2(0.05f, 4f);
                 scale = DirectionHelper.Random.Align(scale);
@@ -287,7 +287,7 @@ public class VBottom : MonoBehaviour {
 
     int CurrentBeat {
         get {
-            return (int)(Time.time / timeSignature.beatDuration) - 100;
+            return -900 + (int)((Time.time / timeSignature.beatDuration)%900) ;
         }
     }
 

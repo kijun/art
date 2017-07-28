@@ -79,14 +79,75 @@ public class Variations : MonoBehaviour {
         StartCoroutine(Section3());
         StartCoroutine(SectionClosing());
         */
+        StartCoroutine(RunCamera());
+        StartCoroutine(RunCameraPosition());
+        StartCoroutine(RunCameraZoom());
     }
 
-    IEnumerator Core() {
-        foreach (var rest in Loop(64, 0, 0, 2)) {
-            AddRect(Random.Range(0, cols/3), Random.Range(0, rows/3), blues[Random.Range(1, 9)], true);
-            yield return rest;
+    IEnumerator RunCamera() {
+        var choices = new float[]{0, 90, 180, 270};
+        var obliqueChoices = new float[]{10, 30, 45, 60, 80};
+        var restChoices = new float[]{2*2, 3*2, 4*2, 6*2, 8*2};
+        var longRestChoices = new float[]{5*2, 6*2};
+        foreach (var i in Times(100000000)) {
+            var axis = RandomHelper.Pick(choices);
+            if (Random.value > 0.80f) {
+                var angle = RandomHelper.Pick(obliqueChoices);
+                var swing = Random.Range(-2f, 2f);
+                camera.transform.rotation = Quaternion.Euler(0, 0, axis + angle + swing);
+                yield return Rest(0, RandomHelper.Pick(longRestChoices));
+            } else {
+                camera.transform.rotation = Quaternion.Euler(0, 0, axis);
+                yield return Rest(0, RandomHelper.Pick(restChoices));
+            }
         }
     }
+
+    IEnumerator RunCameraPosition() {
+        var restChoices = new float[]{2.1f*2, 3.1f*2};
+        var deltaPos = new float[]{1f, -1f};
+        foreach (var i in Times(1000000000)) {
+            var pos = camera.transform.position;
+            var xd = RandomHelper.Pick(deltaPos);
+            var yd = RandomHelper.Pick(deltaPos);
+
+            if (Mathf.Abs(pos.x) > 15) {
+                xd = -Mathf.Sign(pos.x) * Mathf.Abs(xd);
+            }
+
+            if (Mathf.Abs(pos.y) > 15) {
+                yd = -Mathf.Sign(pos.y) * Mathf.Abs(yd);
+            }
+
+
+            camera.transform.position = camera.transform.position +
+                new Vector3(xd, yd);
+
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+        }
+    }
+
+    IEnumerator RunCameraZoom() {
+        var cameraZoomLevels = new float [] {2, 5, 13, 20};
+        var restChoices = new float[]{3.25f*2, 4.75f*2};
+        var prevOrthoSize = 0f;
+        foreach (var i in Times(1000000000)) {
+            var size = RandomHelper.Pick(cameraZoomLevels);
+            if (prevOrthoSize != size) {
+                camera.orthographicSize = size;
+                if (Random.value < 0.2f) {
+                cameraAnimatable.orthographicSizeVelocity = Random.value > 0.5 ? size / 100f : -size / 100f;
+                } else {
+                cameraAnimatable.orthographicSizeVelocity = 0;//Random.value > 0.5 ? size / 100f : -size / 100f;
+                }
+                //cameraAnimatable.orthographicSizeVelocity = -size / 20f * Random.Range(-1, 2);
+                prevOrthoSize = size;
+            }
+            //cameraAnimatable.orthographicSizeVelocity = -size / 20f * Random.Range(-2, 3);
+            yield return Rest(0, RandomHelper.Pick(restChoices));
+        }
+    }
+
 
     bool AddRow(Color color, bool force=false) {
         // search for vacant spots
@@ -176,7 +237,7 @@ public class Variations : MonoBehaviour {
         var a = new List<GA2>();
         if (prevActions == null) {
             //var b = new GAParam2<float>(Beat(1));
-            var b = Beat(2);
+            var b = Beat(1);
             a.Add(Move(2, 0, b));
             a.Add(Move(-2, Range(-2, 3), b));
             a.Add(Move(0, Range(-2, 3), b));
@@ -195,7 +256,7 @@ public class Variations : MonoBehaviour {
             });
             a.Add(RotateTo(0, b));
             var sp = Split(b);
-            sp.probability = new GAParam2<float>(0.5f);
+            sp.probability = new GAParam2<float>(1.5f);
             a.Add(sp);
             a.Add(RestA(b/2));
             var cc = ChangeColor(orange, b);
@@ -210,7 +271,7 @@ public class Variations : MonoBehaviour {
             a.Add(new GA2 {
                 type = GA2Type.Remove,
                 duration = new GAParam2<float>(b * 2),
-                probability = new GAParam2<float>(0.6f)
+                probability = new GAParam2<float>(0.4f)
             });
             a.Add(new GA2 {
                 type = GA2Type.Repeat,
