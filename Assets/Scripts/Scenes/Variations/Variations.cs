@@ -72,7 +72,7 @@ public class Variations : MonoBehaviour {
 
     void StartVisualization() {
         //StartCoroutine(Core());
-        StartCoroutine(Section4());
+        //StartCoroutine(Section4());
         /*
         StartCoroutine(Section1());
         StartCoroutine(Section2());
@@ -82,7 +82,16 @@ public class Variations : MonoBehaviour {
         StartCoroutine(RunCamera());
         StartCoroutine(RunCameraPosition());
         StartCoroutine(RunCameraZoom());
+        StartCoroutine(CleanUp());
     }
+
+    IEnumerator CleanUp() {
+        foreach (var rest in Loop(10000000, 0, 8, 0)) {
+            Resources.UnloadUnusedAssets();
+            yield return rest;
+        }
+    }
+
 
     IEnumerator RunCamera() {
         var choices = new float[]{0, 90, 180, 270};

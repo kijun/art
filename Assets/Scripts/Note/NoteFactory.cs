@@ -10,6 +10,19 @@ public class NoteFactory : MonoBehaviour {
     static Animatable2 _prefab;
 
 
+    public static Animatable2 CreateLine(SplineParams sp, MotionParams mp=new MotionParams()) {
+        int parts = 10;
+        for (int i = 0; i < parts; i++) {
+            float t = i / (float)parts;
+            var p = sp.spline.GetPoint(t);
+            var d = sp.spline.GetDirection(t);
+            CreateRect(new RectParams {width= sp.width, color= sp.color, position=p, height=sp.width, rotation=d.AngleInDegrees()});
+        }
+
+        return null;//p.gameObject.AddComponent<Animatable2>();
+        //return CreateRect(lp.ToRectParams(), mp);
+    }
+
     public static Animatable2 CreateLine(LineParams2 lp, MotionParams mp=new MotionParams()) {
         return CreateRect(lp.ToRectParams(), mp);
     }

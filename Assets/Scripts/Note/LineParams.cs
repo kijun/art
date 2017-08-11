@@ -31,6 +31,12 @@ public struct LineParams2 {
     }
 }
 
+public struct SplineParams {
+    public BezierSpline2D spline;
+    public Color color;
+    public float width;
+}
+
 [System.Serializable]
 public struct RectParams {
     public float x;
