@@ -54,20 +54,120 @@ public class BigDipper : MonoBehaviour {
     }
 
     IEnumerator RunDipper() {
-        foreach (var rest in Loop(40, 0, 1, 0)) {
+        foreach (var rest in Loop(40, 0, 2, 0)) {
             // create line
-           CreateLine();
+           StartCoroutine(CreateLine1());
+           StartCoroutine(CreateLine1());
+           StartCoroutine(CreateLine2());
+           StartCoroutine(CreateLine3());
            yield return rest;
         }
     }
 
-    void CreateLine() {
-        Debug.Log("create lien");
+    Vector2 RV() {
+        return RandomHelper.RandomVector2(-11, 11, -11, 11);
+    }
+
+    Vector2 RV2(float x) {
+        return new Vector2(Random.Range(-8, 8), x);
+        //return RandomHelper.RandomVector2(-11, 11, -11, 11);
+    }
+
+    IEnumerator CreateLine2() {
         var sp = new SplineParams();
-        sp.spline = new BezierSpline2D(new Vector2(0, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(3, 0));
-        sp.color = red;
-        sp.width = 0.2f;
-        NoteFactory.CreateLine(sp);
+        sp.spline = new BezierSpline2D(
+                RV(), RV(), RV(), RV());
+        sp.spline.AddCurve(RV(), RV(), RV());
+        sp.spline.AddCurve(RV(), RV(), RV());
+        sp.spline.AddCurve(RV(), RV(), RV());
+        sp.color = Color.Lerp(blue, red, Random.value).WithAlpha(0);
+        sp.width = Random.Range(0.02f, 0.2f);
+        Animatable2[] anims = NoteFactory.CreateLine(sp);
+        foreach (var l in anims) {
+            l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.Linear(0, 0, 1, 1));
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        foreach (var l in anims) {
+            //l.velocity = RandomHelper.RandomVector2(-0.5f, 0.5f, -0.5f, 0.5f);
+            //l.angularVelocity = Random.Range(-90f, 90f);
+            l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.EaseInOut(0, 1, 3, 0));
+            l.DestroyIn(4f);
+        }
+    }
+
+    IEnumerator CreateLine3() {
+        var sp = new SplineParams();
+        sp.spline = new BezierSpline2D(
+                RV(), RV(), RV(), RV());
+        sp.spline.AddCurve(RV(), RV(), RV());
+        sp.color = Color.Lerp(blue, red, Random.value).WithAlpha(0);
+        sp.width = Random.Range(0.02f, 0.2f);
+        Animatable2[] anims = NoteFactory.CreateLine(sp);
+        foreach (var l in anims) {
+            l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.Linear(0, 0, 1, 1));
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        foreach (var l in anims) {
+            //l.velocity = RandomHelper.RandomVector2(-0.5f, 0.5f, -0.5f, 0.5f);
+            //l.angularVelocity = Random.Range(-90f, 90f);
+            l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.EaseInOut(0, 1, 3, 0));
+            l.DestroyIn(4f);
+        }
+    }
+
+    IEnumerator CreateLine1() {
+        var sp = new SplineParams();
+        /*
+        sp.spline = new BezierSpline2D(
+                RV(), RV(), RV(), RV());
+        sp.spline.AddCurve(RV(), RV(), RV());
+        sp.spline.AddCurve(RV(), RV(), RV());
+        sp.spline.AddCurve(RV(), RV(), RV());
+        */
+        /*
+        sp.spline = new BezierSpline2D(
+                RV2(-10), RV2(-9), RV2(-8), RV2(-7));
+        sp.spline.AddCurve(RV2(-6), RV2(-5), RV2(-4));
+        sp.spline.AddCurve(RV2(-3), RV2(-2), RV2(-1));
+        sp.spline.AddCurve(RV2(0), RV2(1), RV2(2));
+        sp.spline.AddCurve(RV2(3), RV2(4), RV2(5));
+        sp.spline.AddCurve(RV2(6), RV2(7), RV2(8));
+        sp.spline.AddCurve(RV2(9), RV2(10), RV2(11));
+        */
+        sp.spline = new BezierSpline2D(
+                RV2(-9), RV2(-7), RV2(-5), RV2(-2));
+        sp.spline.AddCurve(RV2(2), RV2(6), RV2(10));
+        /*
+        sp.spline.AddCurve(RV2(0), RV2(1), RV2(2));
+        sp.spline.AddCurve(RV2(3), RV2(4), RV2(5));
+        sp.spline.AddCurve(RV2(6), RV2(7), RV2(8));
+        sp.spline.AddCurve(RV2(9), RV2(10), RV2(11));
+        */
+        //sp.spline.AddCurve(RV(), RV(), RV());
+        //sp.spline.AddCurve(RV(), RV(), RV());
+        //sp.spline.AddCurve(RV(), RV(), RV());
+        sp.color = Color.Lerp(blue, red, Random.value).WithAlpha(0);
+        sp.width = Random.Range(0.02f, 0.2f);
+        Animatable2[] anims = NoteFactory.CreateLine(sp);
+        foreach (var l in anims) {
+            l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.Linear(0, 0, 1, 1));
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        foreach (var l in anims) {
+            //l.velocity = RandomHelper.RandomVector2(-0.5f, 0.5f, -0.5f, 0.5f);
+            //l.angularVelocity = Random.Range(-90f, 90f);
+            l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.EaseInOut(0, 1, 3, 0));
+            l.DestroyIn(4f);
+        }
     }
 
     bool AddRow(Color color, bool force=false) {

@@ -49,5 +49,9 @@ public static class RandomHelper {
     public static T Pick<T>(params T[] choices) {
         return choices[Random.Range(0, choices.Length)];
     }
+
+    public static Vector2 RandomVector2(float xmin, float xmax, float ymin, float ymax) {
+        return new Vector2(Random.Range(xmin, xmax), Random.Range(ymin, ymax));
+    }
 }
 

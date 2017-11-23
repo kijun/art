@@ -24,39 +24,20 @@ public class PlayerController : MonoBehaviour {
     public Rigidbody2D stroke1;
     public Rigidbody2D stroke2;
 
-    public ShipStats stats;
-
-    public AudioSource soundSource;
-    public AudioClip hitSound;
-    public BoxCollider2D localPositionConstraint;
-    public ScreenFader fader;
-
-    public enum State {
-        Start,
-        Normal,
-        Hit,
-        Destroyed,
-        Won
-    }
-
     public OnHitDelegate OnHit;
 
 
     private Vector2 originalPosition;
-    private State currentState = State.Start;
     private Rigidbody2D rg2d;
     //TODO remove
     private bool upOnce = true;
 
     // Stats
     public void LockCurrentRegion() {
-        yDeltaSpeed = stats.maxYSpeed;
         yBaseSpeed = 0;
     }
 
     public void UnlockCurrentRegion() {
-        yDeltaSpeed = stats.maxYSpeed - stats.baseYSpeed;
-        yBaseSpeed = stats.baseYSpeed;
     }
 
 	// Use this for initialization
@@ -67,71 +48,28 @@ public class PlayerController : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
-        switch (currentState) {
-            case State.Start:
-                //if (GameManager.instance.journeying) {
-                    currentState = State.Normal;
-                //}
-                break;
-            case State.Normal:
-                if (upOnce) {
-                    if (Input.GetKeyDown("up")) {
-                        UnlockCurrentRegion();
-                        upOnce = false;
-                    }
-                }
-                float xdir = Input.GetAxisRaw("Horizontal");
-                float ydir = Input.GetAxisRaw("Vertical");
-                Vector2 newPos = transform.position;
-
-                float dx = xdir * stats.maxXSpeed * Time.deltaTime;
-                float dy = (ydir * yDeltaSpeed + yBaseSpeed) * Time.deltaTime;
-
-                var deltaPos = new Vector2(dx, dy);
-
-                deltaPos = Camera.main.transform.rotation * deltaPos;
-
-                newPos += deltaPos;
-
-                if (dx*dx + dy*dy > (yBaseSpeed * yBaseSpeed * Time.deltaTime * Time.deltaTime)) {
-                    stroke1.angularVelocity = stroke1MaxAngularVelocity;
-                    stroke2.angularVelocity = stroke2MaxAngularVelocity;
-                } else {
-                    stroke1.angularVelocity = stroke1BaseAngularVelocity;
-                    stroke2.angularVelocity = stroke2BaseAngularVelocity;
-                }
-
-                newPos = ConstrainPoint(newPos);
-
-                transform.position = newPos;
-
-                /*
-                if (maxAltitude < altitude) {
-                    Debug.Log("You win");
-                    currentState = State.Won;
-                }
-                */
-
-                break;
-            case State.Hit:
-                /*
-                if (Time.time > spinUntil) {
-                    currentState = State.Normal;
-                }
-                */
-                break;
-            case State.Destroyed:
-                break;
-            case State.Won:
-                Debug.Log("you won!");
-                break;
+        float xdir = Input.GetAxisRaw("Horizontal");
+        float ydir = Input.GetAxisRaw("Vertical");
+        var v = new Vector2(xdir, ydir);
+        var vmag = v.sqrMagnitude;
+        if (vmag < float.Epsilon) {
+            rg2d.AddForce(rg2d.velocity * -1f);
+        } else {
+            // if velocity is larger than 25, do not add
+            // if velocity is zero, v * 10
+            var f = v * 10 / (vmag + 1);
+            rg2d.AddForce(f);
         }
-    }
 
-    public void ChangeState(State state) {
-        currentState = state;
-    }
+        /*
+        if (maxAltitude < altitude) {
+            Debug.Log("You win");
+            currentState = State.Won;
+        }
+        */
 
+    }
+    /*
     public void Reset() {
         //transform.position = originalPosition;
     }
@@ -178,5 +116,6 @@ public class PlayerController : MonoBehaviour {
         fader.fadeIn = true;
         ChangeState(State.Normal);
     }
+    */
 }
 

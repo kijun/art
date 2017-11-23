@@ -221,8 +221,8 @@ public class BezierSpline2D {
 			new Vector3(4f, 0f, 0f)
 		};
 		modes = new BezierControlPointMode[] {
-			BezierControlPointMode.Free,
-			BezierControlPointMode.Free
+			BezierControlPointMode.Mirrored,
+			BezierControlPointMode.Mirrored
 		};
 	}
 }
