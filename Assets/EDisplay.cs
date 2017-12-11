@@ -30,16 +30,16 @@ public class EDisplay : MonoBehaviour {
       if (Input.GetKey(KeyCode.Alpha1)) {
           // off
           StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundOffColor, offDuration));
-          bloom.bloomIntensity = onBloomIntensity;
-          bloom.sepBlurSpread = onBloomSampleDistance;
+          StartCoroutine(LerpIntensity(bloom.bloomIntensity, onBloomIntensity, offDuration));
+          StartCoroutine(LerpSpread(bloom.sepBlurSpread, onBloomSampleDistance, offDuration));
       } else if (Input.GetKey(KeyCode.Alpha2)) {
-          StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundOnColor, offDuration));
-          bloom.bloomIntensity = onBloomIntensity;
-          bloom.sepBlurSpread = onBloomSampleDistance;
+          StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundOnColor, onDuration));
+          StartCoroutine(LerpIntensity(bloom.bloomIntensity, onBloomIntensity, onDuration));
+          StartCoroutine(LerpSpread(bloom.sepBlurSpread, onBloomSampleDistance, onDuration));
       } else if (Input.GetKey(KeyCode.Alpha3)) {
-          StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundMaxColor, offDuration));
-          bloom.bloomIntensity = maxBloomIntensity;
-          bloom.sepBlurSpread = maxBloomSampleDistance;
+          StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundMaxColor, maxDuration));
+          StartCoroutine(LerpIntensity(bloom.bloomIntensity, maxBloomIntensity, maxDuration));
+          StartCoroutine(LerpSpread(bloom.sepBlurSpread, maxBloomSampleDistance, maxDuration));
       } else if (Input.GetKey(KeyCode.Alpha0)) {
           CreateSpheres();
       }
@@ -49,6 +49,22 @@ public class EDisplay : MonoBehaviour {
         float startTime = Time.time;
         while (Time.time - startTime < duration) {
             _mainCam.backgroundColor = Color.Lerp(from, to, (Time.time - startTime) / duration);
+            yield return null;
+        }
+    }
+
+    IEnumerator LerpIntensity(float from, float to, float duration) {
+        float startTime = Time.time;
+        while (Time.time - startTime < duration) {
+            bloom.bloomIntensity = Mathf.Lerp(from, to, (Time.time - startTime) / duration);
+            yield return null;
+        }
+    }
+
+    IEnumerator LerpSpread(float from, float to, float duration) {
+        float startTime = Time.time;
+        while (Time.time - startTime < duration) {
+            bloom.sepBlurSpread = Mathf.Lerp(from, to, (Time.time - startTime) / duration);
             yield return null;
         }
     }

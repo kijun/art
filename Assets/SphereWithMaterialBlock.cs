@@ -24,7 +24,7 @@ public class SphereWithMaterialBlock : MonoBehaviour {
         _curColor = colorOff;
 
 
-        _offset = Random.value;
+        _offset = Mathf.PI * 2 * Random.value;
         _flickerSpeed = baseFlickerSpeed * Random.Range(0.5f, 1.5f);// ?
     }
 
@@ -64,15 +64,22 @@ public class SphereWithMaterialBlock : MonoBehaviour {
         Color c = _curColor;
         switch (_state) {
             case SphereState.Off:
-                c = Color.Lerp(_lerpStartColor, colorOff, _lerpDuration() * offSpeed);
+                //c = Color.Lerp(_lerpStartColor, colorOff, _lerpDuration() * offSpeed);
+                if (_lerpDuration() < 1f/offSpeed) {
+                    c = Color.Lerp(_lerpStartColor, colorOff, _lerpDuration() * offSpeed + Random.Range(-0.1f, 0.1f));
+                } else {
+                    c = colorOff;//Color.Lerp(_lerpStartColor, colorOnMin, _lerpDuration() * onSpeed + Random.Range(-0.1f, 0.1f));
+                    // flicker
+                    //c = Color.Lerp(colorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _flickerSpeed + _offset) + 1f) / 2f);
+                }
                 break;
             case SphereState.On:
             case SphereState.Max:
                 if (_lerpDuration() < 1f/onSpeed) {
-                    c = Color.Lerp(_lerpStartColor, colorOnMin, _lerpDuration() * onSpeed);
+                    c = Color.Lerp(_lerpStartColor, colorOnMin, _lerpDuration() * onSpeed + Random.Range(-0.1f, 0.1f));
                 } else {
                     // flicker
-                    c = Color.Lerp(colorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * baseFlickerSpeed + _offset) + 1f) / 2f);
+                    c = Color.Lerp(colorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _flickerSpeed + _offset) + 1f) / 2f);
                 }
                 break;
         }
