@@ -81,21 +81,19 @@ public class Toska : MonoBehaviour {
         // for each element
         // create lines
         // render into existence
+        var color = RandomColor();
         foreach (var sub in c.subs) {
             foreach (var line in sub.lines) {
-                RenderLine(line);
+                RenderLine(line, color);
             }
         }
     }
 
-    public void RenderLine(ToskaLine c) {
-        Debug.Log(c.start.x);
-        Debug.Log(c.end.x);
+    public void RenderLine(ToskaLine c, Color color) {
         for (int x = c.start.x; x <= c.end.x; x++) {
             for (int y = c.start.y; y <= c.end.y; y++) {
                 var g = board.FindGraphicAtPosition(x,y);
-                Debug.Log(g);
-                g.SetColor(Color.black);
+                if (g != null) g.SetColor(color, 2);
             }
         }
     }
@@ -138,61 +136,6 @@ public class Toska : MonoBehaviour {
     }
 
     IEnumerator SetupAndLaunch() {
-        var rect = AddRect(cols, rows, Color.white);
-        rect.BreakToUnitSquares();
-        foreach (var _ in Times(2)) {
-            var c = CreateComposition();
-            RenderComposition(c);
-            yield return Rest(1);
-        }
-        /*
-        if (Display.displays.Count() > 1) {
-            Screen.SetResolution(Screen.width, Screen.height, false);
-
-            //var secondary = Display.displays[1];
-            //PlayerPrefs.SetInt("UnitySelectMonitor", 0);
-            //Screen.SetResolution(secondary.systemWidth, secondary.systemHeight, true);
-        }// else {
-        //    PlayerPrefs.SetInt("UnitySelectMonitor", 0);
-        //}
-        */
-        //Screen.SetResolution(Screen.width, Screen.height, false);
-
-        /* Store the current screen resolution
-        int screenWidth = Screen.width;
-        int screenHeight = Screen.height;
-        // Setting this PlayerPrefs is what actually changes the monitor to display on
-        // Set the resolution low for a frame
-        Screen.SetResolution(800, 600, isFullScreen);
-
-        yield return null;     // Wait a frame
-        // Set the previous resolution
-        Screen.SetResolution(screenWidth, screenHeight, isFullScreen);
-
-        while (!Screen.fullScreen) {
-            yield return null;     // Wait a frame
-        }
-
-        if (Display.displays.Count() > 1) {
-            var second = Display.displays[0];
-            Screen.SetResolution(second.systemWidth, second.systemHeight, true);
-        }
-
-        //Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, true);
-        //Screen.SetResolution(1920, 1200, true);
-        yield return null;     // Wait a frame
-        yield return null;     // Wait a frame
-        yield return null;     // Wait a frame
-
-        */
-        var gap = 0.309f;
-        //var gap = 0.1f;
-        var sideLength = CameraHelper.Height / ((1+gap)*rows + gap);
-        cols = (int)(CameraHelper.Width / ((1+gap) * sideLength));
-        board = new Board1(cols, rows, sideLength, gap * sideLength);
-
-        //Debug.Log($"Creating {rows} rows, {cols} cols");
-        boardRect = new GridRect(0, 0, cols, rows);
         blues = new Color[9];
         blues[0] = blue.WithAlpha(0);
         blues[1] = blue.WithAlpha(0.125f);
@@ -214,11 +157,20 @@ public class Toska : MonoBehaviour {
         oranges[6] = orange.WithAlpha(0.125f*6);
         oranges[7] = orange.WithAlpha(0.125f*7);
         oranges[8] = orange;
+        var rect = AddRect(cols, rows, Color.clear);
+        rect.BreakToUnitSquares();
+        StartVisualization();
+        foreach (var _ in Times(100)) {
+            var c = CreateComposition();
+            RenderComposition(c);
+            //StartCoroutine(Section4StoryOfASound());
+            yield return Rest(1);
+        }
+        //var gap = 0.1f;
         //StartCoroutine(Run());
         //StartCoroutine(Run2());
         //AddRow();
         //StartCoroutine(Run());
-        StartVisualization();
     }
 
     IEnumerator HideTitle() {
@@ -321,9 +273,6 @@ public class Toska : MonoBehaviour {
 
     /***** SECTION 4 FINAL *****/
     IEnumerator Section4() {
-        yield return Rest(73, 0);
-        GameObject.FindObjectsOfType<GraphicEntity1>().ForEach(g => g.Remove(Beat(1.9f)));
-        yield return Rest(1, 0);
         //StartCoroutine(Section4StoryOfASound());
         //24 -> 37 // probability
         foreach (var rest in Loop(40, 0, 1, 0)) {
@@ -488,7 +437,6 @@ public class Toska : MonoBehaviour {
     /***** SECTION 3 *****/
     IEnumerator Section3() {
         // 24
-        yield return Rest(49, 0);
         board.GraphicEntities().ForEach(g => g.Remove(Beat(2f)));
 
         Run(Rest(2, 0), Section2Rotation(Loop(23, 0, 0, 3), 1, 1));
@@ -499,10 +447,14 @@ public class Toska : MonoBehaviour {
         Run(Rest(6, 0), Section3Delete(Loop(24-8, 2, 0, 2)));
 
         Run(Rest(10, 0), Section3AddRect(Loop(11, 0, 0, 2)));
+        yield return null;
     }
 
     IEnumerator Section3AddRect(IEnumerable<IEnumerator> loop) {
         foreach (var rest in loop) {
+            Debug.Log(loop);
+            Debug.Log(rest);
+            Debug.Log(blues[7]);
             AddRect(Random.Range(1, 4), Random.Range(1, 4), blues[7]);
             yield return rest;
         }
@@ -551,7 +503,6 @@ public class Toska : MonoBehaviour {
     // 2 composition
     // 3 refresh
     IEnumerator Section2() {
-        yield return Rest(24);
         board.GraphicEntities().ForEach(g => g.SetColor(blue));
         Run(Rest(0, 5.8f), Section2Rotation(Loop(23-12, 3, 2, 0)));
         Run(Rest(0, 2), Section2Shape(Loop(23, 1, 2, 0)));
@@ -559,6 +510,7 @@ public class Toska : MonoBehaviour {
         Run(Rest(0, 4), Section1Orange(MeasureToBeats(22), 8, 8));
         Run(Rest(12, 3), Section2Cascade2(Loop(11, 0, 2, 0)));
         Run(Rest(12, 5.8f), Section2Rotation(Loop(23-12, 3, 2, 0), 3, 6, true));
+        yield return null;
     }
 
     // let's
@@ -773,9 +725,6 @@ public class Toska : MonoBehaviour {
     /***** SECTION 1 *****/
     // 24 measures
     IEnumerator Section1() {
-        var rect = AddRect(cols, rows, blues[0]);
-        rect.BreakToUnitSquares();
-
         Run(Rest(2),  Section1Snake(Loop(11, 0, 4, 0)));
         Run(Rest(12),  Section1Snake(Loop(12, 0, 2, 0)));
         Run(Rest(8),  Section1Orange(MeasureToBeats(6), 5, 7));
@@ -977,6 +926,17 @@ public class Toska : MonoBehaviour {
             return true;
         }
         return false;
+    }
+
+    Color RandomColor() {
+        var v = Random.value;
+        var cnt = 1/6.0f;
+        if (v < cnt) return black;
+        if (v < cnt*2) return red;
+        if (v < cnt*3) return blue;
+        if (v < cnt*4) return yellow;
+        if (v < cnt*5) return orange;
+        return white;
     }
 
 }
