@@ -3,38 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SphereWithMaterialBlock : MonoBehaviour {
-    public Color black, white, blue;
-    public float Speed = 1, Offset;
-    public SphereState state = SphereState.Black;
+    public Color colorOff, colorOnMin, colorOnMax;
+    public float onSpeed, offSpeed, baseFlickerSpeed;
 
-    public Color curColor;
+    Color _curColor;
+    SphereState _state = SphereState.Off;
+    Color _lerpStartColor;
+    float _lerpStartTime;
+    float _offset;
+    float _flickerSpeed;
 
-    private Renderer _renderer;
-    private MaterialPropertyBlock _propBlock;
+    Renderer _renderer;
+    MaterialPropertyBlock _propBlock;
 
     void Awake() {
         _propBlock = new MaterialPropertyBlock();
         _renderer = GetComponent<Renderer>();
-        //Speed = Random.value * 5f;
-        //Offset = Random.value;
-        curColor = white;
+        _propBlock.SetColor("_Color", colorOff);
+        _renderer.SetPropertyBlock(_propBlock);
+        _curColor = colorOff;
+
+
+        _offset = Random.value;
+        _flickerSpeed = baseFlickerSpeed * Random.Range(0.5f, 1.5f);// ?
     }
 
     void Update() {
         if (Input.GetKey(KeyCode.Alpha1)) {
-            state = SphereState.Black;
+            // off
+            _state = SphereState.Off;
+            _lerpStartColor = _curColor;
+            _lerpStartTime = Time.time;
         } else if (Input.GetKey(KeyCode.Alpha2)) {
-            state = SphereState.White;
+            // on
+            _state = SphereState.On;
+            _lerpStartColor = _curColor;
+            _lerpStartTime = Time.time;
         } else if (Input.GetKey(KeyCode.Alpha3)) {
-            state = SphereState.Lerp;
-            Speed = 1000;
-            Offset = Random.value * 0.4f;
+            // max
+            _state = SphereState.Max;
+            _lerpStartColor = _curColor;
+            _lerpStartTime = Time.time;
         } else if (Input.GetKey(KeyCode.Alpha4)) {
+            /* ?
             state = SphereState.Random;
             Speed = Random.value * 100f + 100f;
             Offset = Random.value;
+            */
         } else if (Input.GetKey(KeyCode.Alpha5)) {
-            state = SphereState.Blue;
+            //state = SphereState.Blue;
         } else if (Input.GetKey(KeyCode.Alpha6)) {
         } else if (Input.GetKey(KeyCode.Alpha7)) {
         } else if (Input.GetKey(KeyCode.Alpha8)) {
@@ -44,31 +61,33 @@ public class SphereWithMaterialBlock : MonoBehaviour {
     }
     void HandleState() {
         _renderer.GetPropertyBlock(_propBlock);
-        Color c = curColor;
-        switch (state) {
-            case SphereState.Black:
-                c = black;
+        Color c = _curColor;
+        switch (_state) {
+            case SphereState.Off:
+                c = Color.Lerp(_lerpStartColor, colorOff, _lerpDuration() * offSpeed);
                 break;
-            case SphereState.White:
-                c = white;
+            case SphereState.On:
+            case SphereState.Max:
+                if (_lerpDuration() < 1f/onSpeed) {
+                    c = Color.Lerp(_lerpStartColor, colorOnMin, _lerpDuration() * onSpeed);
+                } else {
+                    // flicker
+                    c = Color.Lerp(colorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * baseFlickerSpeed + _offset) + 1f) / 2f);
+                }
                 break;
-            case SphereState.Blue:
-                c = blue;
-                break;
-            case SphereState.Lerp:
-            case SphereState.Random:
-                c = Color.Lerp(black, white, (Mathf.Sin(Time.time * Speed + Offset) + 2f) / 2f);
-                break;
-
         }
-        if (!c.RGBEquals(curColor)) {
+        if (!c.RGBEquals(_curColor)) {
             _propBlock.SetColor("_Color", c);
-            curColor = c;
+            _curColor = c;
             _renderer.SetPropertyBlock(_propBlock);
         }
+    }
+
+    float _lerpDuration() {
+        return Time.time - _lerpStartTime;
     }
 }
 
 public enum SphereState {
-    Black, White, Blue, Lerp, Random
+    Off, On, Max //, Lerp, Random
 }

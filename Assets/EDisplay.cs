@@ -5,39 +5,66 @@ using UnityEngine;
 public class EDisplay : MonoBehaviour {
 
     public SphereWithMaterialBlock prefab;
+    public Color backgroundOffColor, backgroundOnColor, backgroundMaxColor;
+    public float offDuration, onDuration, maxDuration;
+    public int lightsPerColumn; // basically orthographic size
+    public float screenToLightDisplayRatio;
+    public Range lightSize;
+    public float onBloomIntensity, maxBloomIntensity;
+    public float onBloomSampleDistance, maxBloomSampleDistance;
+    public UnityStandardAssets.ImageEffects.Bloom bloom;
+
+    Camera _mainCam;
 
 	// Use this for initialization
 	void Start () {
         Cursor.visible = false;
+        Camera.main.orthographicSize = lightsPerColumn * screenToLightDisplayRatio / 2;
+        _mainCam = Camera.main;
+        _mainCam.backgroundColor = backgroundOffColor;
+        CreateSpheres();
 	}
 
 	// Update is called once per frame
 	void Update () {
-      if (Input.GetKey(KeyCode.Alpha8)) {
-          Camera.main.orthographicSize = 10;
-          CreateSpheres();
-      } else if (Input.GetKey(KeyCode.Alpha9)) {
-          Camera.main.orthographicSize = 15;
-          CreateSpheres();
+      if (Input.GetKey(KeyCode.Alpha1)) {
+          // off
+          StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundOffColor, offDuration));
+          bloom.bloomIntensity = onBloomIntensity;
+          bloom.sepBlurSpread = onBloomSampleDistance;
+      } else if (Input.GetKey(KeyCode.Alpha2)) {
+          StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundOnColor, offDuration));
+          bloom.bloomIntensity = onBloomIntensity;
+          bloom.sepBlurSpread = onBloomSampleDistance;
+      } else if (Input.GetKey(KeyCode.Alpha3)) {
+          StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundMaxColor, offDuration));
+          bloom.bloomIntensity = maxBloomIntensity;
+          bloom.sepBlurSpread = maxBloomSampleDistance;
       } else if (Input.GetKey(KeyCode.Alpha0)) {
-          Camera.main.orthographicSize = 20;
           CreateSpheres();
       }
 	}
+
+    IEnumerator LerpScreen(Color from, Color to, float duration) {
+        float startTime = Time.time;
+        while (Time.time - startTime < duration) {
+            _mainCam.backgroundColor = Color.Lerp(from, to, (Time.time - startTime) / duration);
+            yield return null;
+        }
+    }
 
     void CreateSpheres() {
         foreach (var s in GameObject.FindObjectsOfType<SphereWithMaterialBlock>()) {
             Destroy(s.gameObject);
         }
-        int width = (int)CameraHelper.Width;
-        int height = (int)CameraHelper.Height;
+        Debug.Log(CameraHelper.HeightToWidthRatio);
+        int width = (int)(CameraHelper.HeightToWidthRatio * lightsPerColumn);
+        int height = lightsPerColumn;
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 var go = GameObject.Instantiate(prefab, new Vector3(x - width/2f+0.5f, y - height/2f+0.5f, 0), Quaternion.Euler(-90, 0, 0));
-                //go.transform.localScale = Vector3.one * (0.1f + Random.Range(-0.1f, 0.1f));
-                //var go = GameObject.Instantiate(prefab, new Vector3(x - width/2f, y - height/2f, 0), Quaternion.Euler(-90, 0, 0));
-                go.transform.localScale = Vector3.one * (0.85f + Random.Range(-0.1f, 0.1f));
+                go.transform.localScale = Vector3.one * lightSize.RandomValue();
             }
         }
         Debug.Log("Created " + width*height);

@@ -25,6 +25,12 @@ static class CameraHelper {
         }
     }
 
+    public static float HeightToWidthRatio {
+        get {
+            return (float)Screen.width / (float)Screen.height;
+        }
+    }
+
     public static Rect Rect {
         get {
             return Camera.main.rect;
