@@ -32,6 +32,7 @@ public class EDisplay : MonoBehaviour {
 	void Update () {
 //        Debug.Log(MidiMaster.GetKnob(74, 0));
 
+        //bloom.bloomIntensity = gMidiMaster.GetKnob(93)
       if (Input.GetKey(KeyCode.Alpha1)) {
           // off
           StartCoroutine(LerpScreen(_mainCam.backgroundColor, backgroundOffColor, offDuration));

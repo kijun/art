@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MidiJack;
 
 public class SphereWithMaterialBlock : MonoBehaviour {
     public Color colorOff, colorOnMin, colorOnMax;
@@ -12,6 +13,7 @@ public class SphereWithMaterialBlock : MonoBehaviour {
     float _lerpStartTime;
     float _offset;
     float _vibrationSpeed;
+    Color _curColorOnMin;
 
     Renderer _renderer;
     MaterialPropertyBlock _propBlock;
@@ -23,19 +25,21 @@ public class SphereWithMaterialBlock : MonoBehaviour {
         _renderer.SetPropertyBlock(_propBlock);
         _curColor = colorOff;
 
-
         _offset = Random.value;
         _vibrationSpeed = baseVibrationSpeed * Random.Range(0.5f, 2.5f);// ?
     }
 
     void Update() {
         var oldState = _state;
-        if (Input.GetKey(KeyCode.Alpha1)) {
-            // off
-            _state = SphereState.Off;
-        } else if (Input.GetKey(KeyCode.Alpha2)) {
-            // on
+
+        // TODO optimize this shit
+        _curColorOnMin = Color.Lerp(colorOnMin, colorOnMax, 1f-MidiMaster.GetKnob(77, 0));
+
+        if (MidiMaster.GetKeyDown(36)) {
             _state = SphereState.On;
+        } else if (MidiMaster.GetKeyDown(37)) {
+            // on
+            _state = SphereState.Off;
         } else if (Input.GetKey(KeyCode.Alpha3)) {
             // max
             _state = SphereState.Max;
@@ -63,22 +67,29 @@ public class SphereWithMaterialBlock : MonoBehaviour {
                 if (_lerpDuration() < 1f/offSpeed) {
                     c = Color.Lerp(_lerpStartColor, colorOff, _lerpDuration() * offSpeed + Random.Range(-0.1f, 0.1f));
                 } else {
-                    c = colorOff;//Color.Lerp(_lerpStartColor, colorOnMin, _lerpDuration() * onSpeed + Random.Range(-0.1f, 0.1f));
+                    c = colorOff;//Color.Lerp(_lerpStartColor, _curColorOnMin, _lerpDuration() * onSpeed + Random.Range(-0.1f, 0.1f));
                     // flicker
-                    //c = Color.Lerp(colorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 1f) / 2f);
+                    //c = Color.Lerp(_curColorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 1f) / 2f);
                 }
                 break;
             case SphereState.On:
-                c = Color.Lerp(colorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 2f) / 2f);
+                if (_lerpDuration() < 1f/onSpeed) {
+                    c = Color.Lerp(_lerpStartColor, colorOnMax, _lerpDuration() * onSpeed + Random.Range(-0.005f, 0.005f));
+                } else {
+                    c = Color.Lerp(_curColorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 2f) / 2f);
+                    // flicker
+                    //c = Color.Lerp(_curColorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 1f) / 2f);
+                }
+                //c = Color.Lerp(_curColorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 2f) / 2f);
                 //var randSize = Random.Range(0.75f, 0.8f);
                 //gameObject.transform.localScale = new Vector3(randSize, randSize, randSize);
                 break;
             case SphereState.Max:
                 if (_lerpDuration() < 1f/onSpeed) {
-                    c = Color.Lerp(_lerpStartColor, colorOnMin, _lerpDuration() * onSpeed + Random.Range(-0.1f, 0.1f));
+                    c = Color.Lerp(_lerpStartColor, _curColorOnMin, _lerpDuration() * onSpeed + Random.Range(-0.1f, 0.1f));
                 } else {
                     // flicker
-                    c = Color.Lerp(colorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 1f) / 2f);
+                    c = Color.Lerp(_curColorOnMin, colorOnMax, (Mathf.Sin(_lerpDuration() * _vibrationSpeed + _offset) + 1f) / 2f);
                 }
                 break;
             case SphereState.Flicker:
