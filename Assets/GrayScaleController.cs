@@ -18,26 +18,26 @@ public class GrayScaleController : MonoBehaviour {
     bool powerOn = false;
 
 	void Update () {
-        float brightnessDial = MidiMaster.GetKnob(74, 0); // knob 2
+        float brightnessDial = MidiMaster.GetKnob(77, 0); // knob 2
         maxRampOffset = brightnessDial * 1.2f + minRampOffset;
         if (!powerOn) {
-            if (MidiMaster.GetKeyDown(36)) {
+            if (MidiMaster.GetKeyDown(41)) {
                 StartC(LerpToMax(setPowerOn: true));
             }
             return;
         }
 
 
-        float frequencyDial = MidiMaster.GetKnob(71, 0); // knob 3
+        float frequencyDial = MidiMaster.GetKnob(78, 0); // knob 3
         lerpFrequency = 1 + 10*frequencyDial;
 
         bool lerpStatusChanged = false;
-        if (!lerp && MidiMaster.GetKeyDown(38)) {
+        if (!lerp && MidiMaster.GetKeyDown(73)) {
             lerp = true;
             lerpStatusChanged = true;
             Debug.Log("Pulse On");
         }
-        if (lerp && MidiMaster.GetKeyDown(39)) {
+        if (lerp && MidiMaster.GetKeyDown(74)) {
             lerp = false;
             lerpStatusChanged = true;
             Debug.Log("Pulse Off");
@@ -58,7 +58,7 @@ public class GrayScaleController : MonoBehaviour {
             gray.rampOffset = maxRampOffset;
         }
 
-        if (MidiMaster.GetKeyDown(37)) {
+        if (MidiMaster.GetKeyDown(42)) {
             powerOn = false;
             StopC();
             StartC(LerpToMin());

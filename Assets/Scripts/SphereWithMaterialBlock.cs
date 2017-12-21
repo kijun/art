@@ -33,11 +33,11 @@ public class SphereWithMaterialBlock : MonoBehaviour {
         var oldState = _state;
 
         // TODO optimize this shit
-        _curColorOnMin = Color.Lerp(colorOnMin, colorOnMax, 1f-MidiMaster.GetKnob(77, 0));
+        _curColorOnMin = Color.Lerp(colorOnMin, colorOnMax, 1f-MidiMaster.GetKnob(79, 0));
 
-        if (MidiMaster.GetKeyDown(36)) {
+        if (MidiMaster.GetKeyDown(41)) {
             _state = SphereState.On;
-        } else if (MidiMaster.GetKeyDown(37)) {
+        } else if (MidiMaster.GetKeyDown(42)) {
             // on
             _state = SphereState.Off;
         } else if (Input.GetKey(KeyCode.Alpha3)) {
