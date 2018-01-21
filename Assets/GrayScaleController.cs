@@ -11,18 +11,19 @@ public class GrayScaleController : MonoBehaviour {
     public float prevDial = 0.5f;
     public float maxRampOffset = 0;
     public float lerpFrequency = 1;
+    public float grayOnRamp = 0.4f;
 
-    float minRampOffset = -0.20f;
+    float minRampOffset = -0.70f;
 
     bool lerp = false;
     bool powerOn = false;
 
 	void Update () {
-        float brightnessDial = MidiMaster.GetKnob(77, 0); // knob 2
-        maxRampOffset = brightnessDial * 1.2f + minRampOffset;
+        float brightnessDial = MidiMaster.GetKnob(77, (-minRampOffset)/1.7f); // knob 2
+        maxRampOffset = brightnessDial * 1.7f + minRampOffset;
         if (!powerOn) {
             if (MidiMaster.GetKeyDown(41)) {
-                StartC(LerpToMax(setPowerOn: true));
+                StartC(LerpToOn(setPowerOn: true));
             }
             return;
         }
@@ -61,7 +62,7 @@ public class GrayScaleController : MonoBehaviour {
         if (MidiMaster.GetKeyDown(42)) {
             powerOn = false;
             StopC();
-            StartC(LerpToMin());
+            StartC(LerpToOff());
         }
 
 	}
@@ -76,29 +77,47 @@ public class GrayScaleController : MonoBehaviour {
         StartCoroutine(c);
     }
 
-    IEnumerator LerpToMax(bool setPowerOn = false) {
+    IEnumerator LerpToOn(bool setPowerOn = false) {
         float startTime = Time.time;
         float startOff = gray.rampOffset;
-        float approachDuration = 1;
+        float approachDuration = 0.08f;
+        maxRampOffset = 0;
         while (Time.time - startTime < approachDuration) {
-            gray.rampOffset = Mathf.Lerp(startOff, maxRampOffset, (Time.time - startTime) / approachDuration);
+            gray.rampOffset = Mathf.Lerp(grayOnRamp*1.5f/2, grayOnRamp, (Time.time - startTime) / approachDuration);
             yield return null;
         }
-        gray.rampOffset = maxRampOffset;
+
+        startTime = Time.time;
+        approachDuration = 2f;
+        while (Time.time - startTime < approachDuration) {
+            gray.rampOffset = Mathf.Lerp(grayOnRamp, maxRampOffset, (Time.time - startTime) / approachDuration);
+            yield return null;
+        }
         lerp = false;
 
         if (setPowerOn) powerOn = true;
     }
 
-    IEnumerator LerpToMin() {
+    IEnumerator LerpToMax() {
         float startTime = Time.time;
         float startOff = gray.rampOffset;
-        float approachDuration = 1;
+        float approachDuration = 0.5f;
         while (Time.time - startTime < approachDuration) {
-            gray.rampOffset = Mathf.Lerp(startOff, minRampOffset, (Time.time - startTime) / approachDuration);
+            gray.rampOffset = Mathf.Lerp(startOff, maxRampOffset, (Time.time - startTime) / approachDuration);
             yield return null;
         }
-        gray.rampOffset = minRampOffset;
+        lerp = false;
+    }
+
+    IEnumerator LerpToOff() {
+        float startTime = Time.time;
+        float startOff = gray.rampOffset;
+        float approachDuration = 4.0f;
+        while (Time.time - startTime < approachDuration) {
+            gray.rampOffset = Mathf.Lerp(startOff, 0, (Time.time - startTime) / approachDuration);
+            yield return null;
+        }
+        gray.rampOffset = 0;
         lerp = false;
     }
 
@@ -113,7 +132,7 @@ public class GrayScaleController : MonoBehaviour {
             }
             if (!prevLerpFreq.Approx(lerpFrequency))  {
                 prevLerpFreq = lerpFrequency;
-                float currLerpParam = Mathf.InverseLerp(minRampOffset, maxRampOffset, gray.rampOffset);
+                float currLerpParam = Mathf.InverseLerp(0, maxRampOffset, gray.rampOffset);
                 float sinVal = Mathf.Sin(Time.time - startTime);
                 float upOrDown = Mathf.Sign(sinVal);
 
@@ -121,7 +140,7 @@ public class GrayScaleController : MonoBehaviour {
                 //startTime = startTime + 2 * (Mathf.PI / 2 - startTime);
                 // if opposite direction, (pi / 2) - startTime
             }
-            gray.rampOffset = Mathf.Lerp(minRampOffset, maxRampOffset, (Mathf.Sin((Time.time - startTime)*lerpFrequency) + 1f) / 2f);
+            gray.rampOffset = Mathf.Lerp(0, maxRampOffset, (Mathf.Sin((Time.time - startTime)*lerpFrequency) + 1f) / 2f);
             yield return null;
         }
     }

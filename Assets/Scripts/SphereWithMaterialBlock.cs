@@ -14,6 +14,7 @@ public class SphereWithMaterialBlock : MonoBehaviour {
     float _offset;
     float _vibrationSpeed;
     Color _curColorOnMin;
+    float _flickerSpeed;
 
     Renderer _renderer;
     MaterialPropertyBlock _propBlock;
@@ -33,16 +34,18 @@ public class SphereWithMaterialBlock : MonoBehaviour {
         var oldState = _state;
 
         // TODO optimize this shit
-        _curColorOnMin = Color.Lerp(colorOnMin, colorOnMax, 1f-MidiMaster.GetKnob(79, 0));
+        _curColorOnMin = Color.Lerp(colorOnMin, colorOnMax, 1f-MidiMaster.GetKnob(79, 0.3f));
+        _flickerSpeed = baseFlickerSpeed * (0.5f + MidiMaster.GetKnob(80, 0.5f));
 
         if (MidiMaster.GetKeyDown(41)) {
             _state = SphereState.On;
         } else if (MidiMaster.GetKeyDown(42)) {
             // on
             _state = SphereState.Off;
-        } else if (Input.GetKey(KeyCode.Alpha3)) {
+        } else if (MidiMaster.GetKeyDown(43)) {
             // max
-            _state = SphereState.Max;
+            _state = SphereState.Flicker;
+            //_state = SphereState.Max;
         } else if (Input.GetKey(KeyCode.Alpha4)) {
             _state = SphereState.Flicker;
         } else if (Input.GetKey(KeyCode.Alpha5)) {
@@ -93,7 +96,7 @@ public class SphereWithMaterialBlock : MonoBehaviour {
                 }
                 break;
             case SphereState.Flicker:
-                c = Color.Lerp(colorOff, colorOnMax, (Mathf.Sin(_lerpDuration() * baseFlickerSpeed) + 1f) / 2f);
+                c = Color.Lerp(colorOff, colorOnMax, 1.5f*Random.Range(0.4f, 1.2f)*(Mathf.Sin(_lerpDuration() * _flickerSpeed) + 1f) / 2f);
                 break;
         }
         if (!c.RGBEquals(_curColor)) {
