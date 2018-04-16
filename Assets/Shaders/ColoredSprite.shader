@@ -1,4 +1,6 @@
-﻿Shader "Custom/SpriteGradient" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/SpriteGradient" {
  Properties {
      [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
      _Color ("Left Color", Color) = (1,1,1,1)
@@ -30,7 +32,7 @@
          v2f vert (appdata_full v)
          {
              v2f o;
-             o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+             o.pos = UnityObjectToClipPos (v.vertex);
              o.col = lerp(_Color,_Color2, v.texcoord.x );
  //            o.col = half4( v.vertex.y, 0, 0, 1);
              return o;

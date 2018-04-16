@@ -6,10 +6,10 @@ public class ObjectGenerationHelper {
 	[MenuItem ("Object/Set Border Thickness %&b")]
 	public static void CreatePattern () {
         var go = Selection.activeGameObject;
-        var top = go.transform.FindChild("Top");
-        var right = go.transform.FindChild("Right");
-        var left  = go.transform.FindChild("Left");
-        var bottom = go.transform.FindChild("Bottom");
+        var top = go.transform.Find("Top");
+        var right = go.transform.Find("Right");
+        var left  = go.transform.Find("Left");
+        var bottom = go.transform.Find("Bottom");
 
         if (top == null || right == null || left == null || bottom == null) {
             Debug.LogError("not a rect" + top + right + left + bottom);
