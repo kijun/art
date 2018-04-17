@@ -15,6 +15,7 @@
 *.booproj
 *.swo
 *.swp
+*.swn
 
 # Unity3D generated meta files
 *.pidb.meta

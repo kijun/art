@@ -69,20 +69,69 @@ public struct ProductionRule {
 public class JM1ProductionTable {
 
     Dictionary<ProductionRule, float> table = new Dictionary<ProductionRule, float>();
+    Dictionary<Type, Dictionary<ProductionOutput, float>> table = new Dictionary<Type, Dictionary<ProductionOutput, float>>();
+
+    public JM1ProductionTable() {
+        //helper for add production rule
+        AddProductionRule(JM1Node, new ProductionOutput(RectBorderNode));
+        AddProductionRule(JM1Node, new ProductionOutput(RectBorderNode));
+        AddProductionRule(JM1CompositeRowNode,
+                new ProductionOutput(new int[2]{0, 2}, LineRowNode, LineGapNode, LineRowNode));
+        Add(JM1CompositeRowNode, PO(F(LineRowNode, 1), F(LineGapNode), F(LineRowNode, 1)));
+        // HAX or overload annotation of node and use duplicate
+        // meta annotation?
+        //
+        //
+        /*
+         * problem is that i cannot annotate how the first and the last are the same
+         * line rows
+         * if instead, we use a... but then how would we clone it?
+         */
+    }
 
     public void AddProductionRule(Type input, ProductionOutput output, float probability=1) {
-        table.Add(new ProductionRule(input, output), probability); // probably better to run a function
+        if (table.Contains(input)) {
+            table[input][output] = probability;
+        }
     }
 
     /**
-     * TODO should be somewhere else
+     * TODO should be outside
      */
-    public BaseNode RunProduction(Type input) {
-
+    public BaseNode RunProduction(BaseNode root) {
+        nodes = table[root.GetType()];
+        ProductionOutput bestOutput;
+        foreach (var child in bestOutput.GenerateNodes()) {
+            root.AddChild(child);
+        }
     }
 }
 
-public class ProductionOutput {
+
+
+
+public class ProductionOutputSchema {
+    public ProductionOutputSchema(params NodeFactory[] nodes) {
+    }
+
+    public List<BaseNode> GenerateNodes() {
+        var bn = new List<BaseNode>();
+        foreach (var nodeFactory in productionOutputSchema) {
+            if (bnelem.symbolId = nodeFactory.symbolId && != -1) {
+                bn.Add(bnelem) ;
+            } else {
+                NodeFactory
+            }
+        }
+    }
+}
+
+public class NodeFactory {
+    public NodeFactory(BaseNode nodeType, id = -1) {
+    }
+
+    public BaseNode Create() {
+    }
 }
 
 /**
@@ -118,15 +167,22 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
 
     public void GenerateProperty(JM1CompositeRowNode node) {
         // if one line, full, if multiple - line gap first?
+        // how to (?)
     }
 }
+/*
+ * production rule involves AST, but type and annotation is not oging to work
+ * symbols? how would it work?
+ * l1 gap l1
+ * l1 gap l2
+ */
 
 /*
  * AST Nodes
  */
-
 public class BaseNode {
     public List<BaseNode> children = new List<BaseNode>();
+    public int symbolId = -1; // annotation blabblab
 
     public void Draw(Canvas canvas) {
         foreach (var child in children) {
