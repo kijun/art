@@ -18,42 +18,58 @@ public class JM1ProductionTable : ProductionTable {
 
     public JM1ProductionTable() {
         //https://stackoverflow.com/questions/223058/how-to-inherit-constructors?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-        AddRule(typeof(JM1RootNode), new ProductionOutputSchema(new RectBorderNode()));
-        /*
+        AddRule(typeof(JM1RootNode),    PO(new RectBorderNode()));
+        AddRule(typeof(RectBorderNode), PO(new RectMarginNode()));
+        AddRule(typeof(RectMarginNode), PO(new JM1CompositeRowNode()));
+        AddRule(typeof(JM1CompositeRowNode), PO(new LineRowNode(1)), 0.3f);
         AddRule(typeof(JM1CompositeRowNode),
-                new ProductionOutputSchema(new LineRowNode(1), new LineGapNode(), new LineRowNode(1)));
-                */
-        //AddRule(JM1CompositeRowNode, PO(F(LineRowNode, 1), F(LineGapNode), F(LineRowNode, 1)));
-        // HAX or overload annotation of node and use duplicate
-        // meta annotation?
-        //
-        //
-        /*
-         * problem is that i cannot annotate how the first and the last are the same
-         * line rows
-         * if instead, we use a... but then how would we clone it?
-         */
+                PO(new LineRowNode(1), new LineGapNode(), new LineRowNode(1)),
+                0.3f);
+        AddRule(typeof(JM1CompositeRowNode),
+                PO(new LineRowNode(1), new LineGapNode(2), new LineRowNode(3), new LineGapNode(2), new LineRowNode(1)), 0.3f);
+        AddRule(typeof(LineRowNode), PO(new LineNode()), 0.25f);
+        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode()), 0.25f);
+        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode()), 0.25f);
+        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode(), new LineNode()), 0.25f);
     }
 
     public void AddRule(System.Type input, ProductionOutputSchema output, float probability=1) {
-        if (table.ContainsKey(input)) {
-            table[input][output] = probability;
+        if (!table.ContainsKey(input)) {
+            table[input] = new Dictionary<ProductionOutputSchema, float>();
         }
+        table[input][output] = probability;
+    }
+
+    public ProductionOutputSchema PO(params BaseNode[] nodes) {
+        return new ProductionOutputSchema(nodes);
     }
 
     /**
      * TODO should be outside
      */
     public BaseNode Produce(BaseNode root) {
-        var schemas = table[root.GetType()];
-        return null;
-        /*
+        Debug.Log(root.GetType());
+        if (table.ContainsKey(root.GetType())) {
+            var schemaTable = table[root.GetType()];
 
-           TODO pick best schema
-        foreach (var child in bestOutput.GenerateNodes()) {
-            root.AddChild(child);
+            ProductionOutputSchema chosenSchema = null;
+            float schemaValue = -1;
+            foreach (var curr in schemaTable) {
+                var currSchemaValue = Random.value * curr.Value;
+                if (currSchemaValue > schemaValue) {
+                    chosenSchema = curr.Key;
+                    schemaValue = currSchemaValue;
+                }
+            }
+
+            if (chosenSchema != null) {
+                foreach (var child in chosenSchema.GenerateNodes()) {
+                    root.AddChild(Produce(child));
+                }
+            }
         }
-        */
+
+        return root;
     }
 }
 
@@ -66,18 +82,22 @@ public class ProductionOutputSchema {
     public List<BaseNode> GenerateNodes() {
         var bn = new List<BaseNode>();
         foreach (var prototype in outputNodes) {
-            var match = bn.Find(node => node.symbolId != -1 && node.symbolId == prototype.symbolId);
-            if (match != null) {
-                bn.Add(match);
-            } else {
-                BaseNode newNode;
-                using (MemoryStream ms = new System.IO.MemoryStream()) {
-                    BinaryFormatter formatter = new BinaryFormatter();
-                    formatter.Serialize(ms, prototype);
-                    ms.Position = 0;
-                    newNode = (BaseNode)formatter.Deserialize(ms);
+            if (prototype.symbolId != -1) {
+                var match = bn.Find(node => node.symbolId == prototype.symbolId);
+                if (match != null) {
+                    bn.Add(match);
+                    continue;
                 }
             }
+
+            BaseNode newNode;
+            using (MemoryStream ms = new System.IO.MemoryStream()) {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(ms, prototype);
+                ms.Position = 0;
+                newNode = (BaseNode)formatter.Deserialize(ms);
+            }
+            bn.Add(newNode);
         }
         return bn;
     }

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Kernel {
-public class Canvas : MonoBehaviour {
+public class Canvas {
 
-    Animatable2 rectPrefab;
     // rect (normalized)
     Stack<Rect> zoomStack = new Stack<Rect>();
 
-    void Start() {
+    public Canvas () {
+    //void Start() {
         zoomStack.Push(new Rect(0, 0, 1, 1));
     }
 
@@ -34,6 +34,7 @@ public class Canvas : MonoBehaviour {
         };
 
         NoteFactory.CreateRect(rp);
+        Debug.Log(rp);
         //rect = NodeFactory.CreateRect(
     }
 
@@ -47,19 +48,6 @@ public class Canvas : MonoBehaviour {
         get {
             return CameraHelper.ViewportToWorldRect(currZoom);
         }
-    }
-}
-
-public class MainApp : MonoBehaviour {
-
-    JM1ProductionTable pt = new JM1ProductionTable();
-    JM1NodePropertyGenerator pg = new JM1NodePropertyGenerator();
-    Canvas canvas;
-
-    void Start() {
-        var root = pt.Produce(new JM1RootNode());
-        pg.GenerateProperty(root);
-        root.Render(canvas);
     }
 }
 }
