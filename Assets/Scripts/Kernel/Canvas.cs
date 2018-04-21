@@ -33,8 +33,9 @@ public class Canvas {
             position = rect.center, scale = rect.size, level=zoomStack.Count, color=color
         };
 
-        NoteFactory.CreateRect(rp);
-        Debug.Log(rp);
+        var r = NoteFactory.CreateRect(rp);
+        Debug.Log(r);
+        Debug.Log(rp.position + " " + rp.scale + " " + rp.color.b);
         //rect = NodeFactory.CreateRect(
     }
 

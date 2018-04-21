@@ -32,9 +32,9 @@ public class BaseNode {
 // but it's really a rect
 [System.Serializable]
 public class LineNode : BaseNode {
-    public float width=1;
+    public float width;
     public float offset;
-    public ColorS color = new ColorS(0, 0, 1, 0.5f);
+    public ColorS color = new ColorS(0, 0, 0, 0f);
 
     public override void Render(Canvas canvas) {
         canvas.Zoom(offset, 0, width, 1);
@@ -73,7 +73,7 @@ public class LineGapNode : LineNode {
 
 [System.Serializable]
 public class LineRowNode : BaseNode {
-    public float width=1;
+    public float width;
     public float offset;
     public override void Render(Canvas canvas) {
         canvas.Zoom(offset, 0, width, 1);
