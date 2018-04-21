@@ -1,6 +1,6 @@
 using UnityEngine;
 
-static class CameraHelper {
+public static class CameraHelper {
     public static float HalfWidth {
         get {
             return Camera.main.orthographicSize / Screen.height * Screen.width;
@@ -153,8 +153,20 @@ static class CameraHelper {
         return Camera.main.ViewportToWorldPoint(new Vector2(x, y));
     }
 
+    public static Vector2 ViewportToWorldPoint(Vector2 v) {
+        return Camera.main.ViewportToWorldPoint(v);
+    }
+
     public static Vector2 ViewportToWorldScale(float width, float height) {
         return new Vector2(Width * width, Height * height);
+    }
+
+    public static Vector2 ViewportToWorldScale(Vector2 v) {
+        return new Vector2(Width * v.x, Height * v.y);
+    }
+
+    public static Rect ViewportToWorldRect(Rect vRect) {
+        return new Rect(ViewportToWorldPoint(vRect.min), ViewportToWorldScale(vRect.size));
     }
 
     public static Vector2 RandomPositionNearCenter(float maxDistance = 0) {

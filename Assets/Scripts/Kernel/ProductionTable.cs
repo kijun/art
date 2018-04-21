@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-namespace Marfa {
+namespace Kernel {
 /*
  * Production Tables
  */
@@ -44,7 +44,7 @@ public class JM1ProductionTable : ProductionTable {
     /**
      * TODO should be outside
      */
-    public BaseNode RunProduction(BaseNode root) {
+    public BaseNode Produce(BaseNode root) {
         var schemas = table[root.GetType()];
         return null;
         /*

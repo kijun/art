@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace Marfa {
+
+namespace Kernel {
 /*
  * AST Nodes
  */
@@ -13,13 +14,11 @@ public class BaseNode {
         this.symbolId = symbolId;
     }
 
-    /*
-    public void Draw(Canvas canvas) {
+    public void Render(Canvas canvas) {
         foreach (var child in children) {
-            child.Draw(canvas);
+            child.Render(canvas);
         }
     }
-    */
 }
 
 // line can be dumb rectangle or smart object and it should be smart
