@@ -74,8 +74,21 @@ public static class RandomHelper {
         offsets = new float[cnt];
         var sum = 0.0f;
         var currOffset = 0.0f;
+        var min = 0.1f;
         for (int i = 0; i < cnt; i++) {
-            widths[i] = Random.value;
+            var val = 0.0f;
+            if (i % 2 == 1) {
+                if (widths[1] != 0) {
+                    val = widths[1];
+                } else {
+                    val = Random.Range(0.05f, 0.2f);
+                }
+            } else {
+                while (val < min) {
+                    val = Random.value;
+                }
+            }
+            widths[i] = val;
             sum += widths[i];
         }
 

@@ -14,6 +14,7 @@ public class Canvas {
     }
 
     public void Zoom(float offsetX, float offsetY, float width, float height) {
+        Debug.Log("Zooming: width " + width);
         var newSize = currZoom.size.MultiplyEach(width, height);
         var newZoom = new Rect(currZoom.min + currZoom.size.MultiplyEach(offsetX, offsetY), newSize);
         zoomStack.Push(newZoom);
@@ -34,8 +35,6 @@ public class Canvas {
         };
 
         var r = NoteFactory.CreateRect(rp);
-        Debug.Log(r);
-        Debug.Log(rp.position + " " + rp.scale + " " + rp.color.b);
         //rect = NodeFactory.CreateRect(
     }
 

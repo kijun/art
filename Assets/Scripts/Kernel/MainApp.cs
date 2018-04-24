@@ -16,6 +16,7 @@ public class MainApp : MonoBehaviour {
     IEnumerator Run() {
         for (int i = 0; i < 10000; i++) {
             var root = pt.Produce(new JM1RootNode());
+            pg.Reset();
             pg.GenerateProperty(root);
             root.Render(canvas);
             yield return new WaitForSeconds(1);

@@ -10,6 +10,8 @@ namespace Kernel {
 public class BaseNode {
     public List<BaseNode> children = new List<BaseNode>();
     public int symbolId = -1; // annotation blabblab
+    public float width = 1;
+    public float offset;
 
     public BaseNode(int symbolId = -1) {
         this.symbolId = symbolId;
@@ -21,9 +23,15 @@ public class BaseNode {
 
     public virtual void Render(Canvas canvas) {
         Debug.Log("render " + this);
+        canvas.Zoom(offset, 0, width, 1);
+        RenderNode(canvas);
         foreach (var child in children) {
             child.Render(canvas);
         }
+        canvas.UndoZoom();
+    }
+
+    public virtual void RenderNode(Canvas canvas) {
     }
 }
 
@@ -32,15 +40,11 @@ public class BaseNode {
 // but it's really a rect
 [System.Serializable]
 public class LineNode : BaseNode {
-    public float width;
-    public float offset;
     public ColorS color = new ColorS(0, 0, 0, 0f);
 
-    public override void Render(Canvas canvas) {
-        canvas.Zoom(offset, 0, width, 1);
+    public override void RenderNode(Canvas canvas) {
+        Debug.Log("RENDERING LINE");
         canvas.Fill(color.ToColor());
-        base.Render(canvas);
-        canvas.UndoZoom();
     }
 
     public LineNode(int symbolId = -1) : base(symbolId) {
@@ -73,13 +77,6 @@ public class LineGapNode : LineNode {
 
 [System.Serializable]
 public class LineRowNode : BaseNode {
-    public float width;
-    public float offset;
-    public override void Render(Canvas canvas) {
-        canvas.Zoom(offset, 0, width, 1);
-        base.Render(canvas);
-        canvas.UndoZoom();
-    }
 
     public LineRowNode(int symbolId = -1) : base(symbolId) {
     }

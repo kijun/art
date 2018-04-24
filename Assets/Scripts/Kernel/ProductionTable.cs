@@ -21,18 +21,19 @@ public class JM1ProductionTable : ProductionTable {
         AddRule(typeof(JM1RootNode),    PO(new RectBorderNode()));
         AddRule(typeof(RectBorderNode), PO(new RectMarginNode()));
         AddRule(typeof(RectMarginNode), PO(new JM1CompositeRowNode()));
-        AddRule(typeof(JM1CompositeRowNode), PO(new LineRowNode(1)), 0.3f);
+        AddRule(typeof(JM1CompositeRowNode), PO(new LineRowNode(1)), 0.2f);
         AddRule(typeof(JM1CompositeRowNode),
                 PO(new LineRowNode(1), new LineGapNode(), new LineRowNode(1)),
                 0.3f);
         AddRule(typeof(JM1CompositeRowNode),
-                PO(new LineRowNode(1), new LineGapNode(2), new LineRowNode(3), new LineGapNode(2), new LineRowNode(1)), 0.3f);
-        AddRule(typeof(JM1CompositeRowNode),
-                PO(new LineRowNode(1), new LineGapNode(2), new JM1RootNode(), new LineGapNode(2), new LineRowNode(1)), 0.2f);
+                PO(new LineRowNode(1), new LineGapNode(2), new LineRowNode(3), new LineGapNode(2), new LineRowNode(1)), 0.2f);
+        //AddRule(typeof(JM1CompositeRowNode),
+        //        PO(new LineRowNode(1), new LineGapNode(2), new RectBorderNode(), new LineGapNode(2), new LineRowNode(1)), 0.4f);
         AddRule(typeof(LineRowNode), PO(new LineNode()), 0.25f);
-        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode()), 0.25f);
-        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode()), 0.25f);
-        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode(), new LineNode()), 0.25f);
+        //AddRule(typeof(LineRowNode), PO(new JM1CompositeRowNode()), 0.1f);
+        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode()), 0.35f);
+        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode()), 0.15f);
+//        AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode(), new LineNode()), 0.25f);
 //        AddRule(typeof(LineRowNode), PO(new JM1CompositeRowNode()), 0.1f);
     }
 
