@@ -40,7 +40,7 @@ public class BaseNode {
 // but it's really a rect
 [System.Serializable]
 public class LineNode : BaseNode {
-    public ColorS color = new ColorS(0, 0, 0, 0f);
+    public ColorS color = new ColorS(255, 255, 255, 0f);
 
     public override void RenderNode(Canvas canvas) {
         Debug.Log("RENDERING LINE");

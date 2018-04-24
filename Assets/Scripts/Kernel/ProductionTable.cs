@@ -19,7 +19,8 @@ public class JM1ProductionTable : ProductionTable {
     public JM1ProductionTable() {
         //https://stackoverflow.com/questions/223058/how-to-inherit-constructors?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
         AddRule(typeof(JM1RootNode),    PO(new RectBorderNode()));
-        AddRule(typeof(RectBorderNode), PO(new RectMarginNode()));
+        AddRule(typeof(RectBorderNode), PO(new RectMarginNode()), 1f);
+        //AddRule(typeof(RectBorderNode), PO(new JM1CompositeRowNode()), 0.25f);
         AddRule(typeof(RectMarginNode), PO(new JM1CompositeRowNode()));
         AddRule(typeof(JM1CompositeRowNode), PO(new LineRowNode(1)), 0.2f);
         AddRule(typeof(JM1CompositeRowNode),

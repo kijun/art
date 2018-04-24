@@ -115,12 +115,10 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     }
 
     public void GenerateProperty(RectMarginNode node) {
-        if (Random.value > 0.2f) {
-            node.left = Random.value * 0.1f + 0.02f;
-            node.right = node.left;
-            node.bottom = Random.value * 0.1f + 0.05f;
-            node.top = node.bottom;
-        }
+        node.left = Random.value * 0.1f + 0.02f;
+        node.right = node.left;
+        node.bottom = Random.value * 0.1f + 0.05f;
+        node.top = node.bottom;
 //        base.GenerateProperty(node);
         // if one line, full, if multiple - line gap first?
         // how to (?)
