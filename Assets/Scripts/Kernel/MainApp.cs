@@ -18,7 +18,12 @@ public class MainApp : MonoBehaviour {
             var root = pt.Produce(new JM1RootNode());
             pg.GenerateProperty(root);
             root.Render(canvas);
-            yield return new WaitForSeconds(0.33f);
+            yield return new WaitForSeconds(1);
+            /*
+            while (!Input.GetKey("space")) {
+                yield return null;
+            }
+            */
             foreach (var anim in FindObjectsOfType<Animatable2>()) {
                 Destroy(anim.gameObject);
             }

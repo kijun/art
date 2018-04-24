@@ -27,6 +27,8 @@ public class JM1ProductionTable : ProductionTable {
                 0.3f);
         AddRule(typeof(JM1CompositeRowNode),
                 PO(new LineRowNode(1), new LineGapNode(2), new LineRowNode(3), new LineGapNode(2), new LineRowNode(1)), 0.3f);
+        AddRule(typeof(JM1CompositeRowNode),
+                PO(new LineRowNode(1), new LineGapNode(2), new JM1RootNode(), new LineGapNode(2), new LineRowNode(1)), 0.2f);
         AddRule(typeof(LineRowNode), PO(new LineNode()), 0.25f);
         AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode()), 0.25f);
         AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode()), 0.25f);
@@ -83,15 +85,14 @@ public class ProductionOutputSchema {
     public List<BaseNode> GenerateNodes() {
         var bn = new List<BaseNode>();
         foreach (var prototype in outputNodes) {
-            /*
-            if (prototype.symbolId != -1) {
+            //if (prototype.symbolId != -1) {
+            if (false) {
                 var match = bn.Find(node => node.symbolId == prototype.symbolId);
                 if (match != null) {
                     bn.Add(match);
                     continue;
                 }
             }
-            */
 
             BaseNode newNode;
             using (MemoryStream ms = new System.IO.MemoryStream()) {

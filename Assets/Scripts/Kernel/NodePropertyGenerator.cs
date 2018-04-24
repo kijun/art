@@ -28,15 +28,16 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     new Color32(145,58,28,255),
     new Color32(168,101,73,255),
     new Color32(36,36,36,255),
-    new Color32(237,239,238,255),
-    new Color32(242,217,81,255),
-    new Color32(50,88,152,255),
-    new Color32(188,204,213,255),
-    new Color32(232,217,194,255),
-    new Color32(185,182,179,255),
-    new Color32(99,127,92,255),
-    new Color32(164,155,134,255),
-    new Color32(228,177,48,255)};
+//    new Color32(237,239,238,255),
+//    new Color32(242,217,81,255),
+//    new Color32(50,88,152,255),
+//    new Color32(188,204,213,255),
+//    new Color32(232,217,194,255),
+//    new Color32(185,182,179,255),
+//    new Color32(99,127,92,255),
+//    new Color32(164,155,134,255),
+//    new Color32(228,177,48,255)
+    };
 
 
     public void GenerateProperty(BaseNode node) {
@@ -101,7 +102,7 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     }
 
     public void GenerateProperty(RectMarginNode node) {
-        if (Random.value > 0.5f) {
+        if (Random.value > 0.2f) {
             node.left = Random.value * 0.1f + 0.1f;
             node.right = node.left;
             node.bottom = Random.value * 0.1f + 0.1f;
@@ -116,6 +117,24 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     }
 
     public void GenerateProperty(JM1CompositeRowNode node) {
+        var cs = node.children.ToArray();
+        float[] offsets;
+        var widths = RandomHelper.NormalizedWidths(cs.Length, out offsets);
+
+        for (int i = 0; i < cs.Length; i++) {
+            var type = cs[i].GetType();
+            if (type == typeof(LineRowNode)) {
+                var c = (LineRowNode)cs[i];
+                c.width = widths[i];
+                c.offset = offsets[i];
+            } else if (type == typeof(LineGapNode)) {
+                var c = (LineGapNode)cs[i];
+                c.width = widths[i];
+                c.offset = offsets[i];
+            }
+        }
+
+        /*
         switch (node.children.Count) {
             case 1:
                 ((LineRowNode)node.children[0]).width = 1;
@@ -139,6 +158,7 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
                 ((LineRowNode)node.children[4]).offset = 4.0f/5;
                 break;
         }
+        */
 
 //        base.GenerateProperty(node);
         // if one line, full, if multiple - line gap first?
