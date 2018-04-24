@@ -14,15 +14,20 @@ public class MainApp : MonoBehaviour {
     }
 
     IEnumerator Run() {
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             var root = pt.Produce(new JM1RootNode());
             pg.Reset();
             pg.GenerateProperty(root);
             root.Render(canvas);
             //yield return new WaitForSeconds(1);
-            yield return new WaitForSeconds(0.7f);
-            yield return AnimateCamera();
-            yield return DestroyAnims();
+            if (Random.value < 0.97f) {
+                yield return null;
+            } else {
+                yield return new WaitForSeconds(Random.Range(3f, 6f));
+            }
+            DestroyAnims1();
+            //yield return AnimateCamera();
+            //StartCoroutine(DestroyAnims());
             //yield return new WaitForSeconds(1f);
         }
     }
@@ -53,6 +58,12 @@ public class MainApp : MonoBehaviour {
         rgbd.angularVelocity = Vector3.zero;
         transform.eulerAngles = Vector3.zero;
         yield return new WaitForSeconds(1);
+    }
+
+    void DestroyAnims1() {
+        foreach (var anim in FindObjectsOfType<Animatable2>()) {
+            Destroy(anim.gameObject);
+        }
     }
 }
 }
