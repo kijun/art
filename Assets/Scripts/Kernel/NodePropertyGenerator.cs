@@ -24,6 +24,21 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     public Distribution lineRowDistribution;
     public Distribution compositeRowDistribution;
 
+    public Color[] colors = {
+    new Color32(145,58,28,255),
+    new Color32(168,101,73,255),
+    new Color32(36,36,36,255),
+    new Color32(237,239,238,255),
+    new Color32(242,217,81,255),
+    new Color32(50,88,152,255),
+    new Color32(188,204,213,255),
+    new Color32(232,217,194,255),
+    new Color32(185,182,179,255),
+    new Color32(99,127,92,255),
+    new Color32(164,155,134,255),
+    new Color32(228,177,48,255)};
+
+
     public void GenerateProperty(BaseNode node) {
         foreach (dynamic child in node.children) {
             GenerateProperty(child);
@@ -31,39 +46,49 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     }
 
     public void GenerateProperty(LineRowNode node) {
-        switch (node.children.Count) {
+        var cs = node.children.ToArray();
+        float[] offsets;
+        var widths = RandomHelper.NormalizedWidths(cs.Length, out offsets);
+
+        for (int i = 0; i < cs.Length; i++) {
+            var c = (LineNode)cs[i];
+            c.width = widths[i];
+            c.offset = offsets[i];
+            c.color = RandomColor();
+        }
+        /*
+        switch (cs.Length) {
             case 1:
-                ((LineNode)node.children[0]).width = 1;
-                ((LineNode)node.children[0]).color = RandomColor();
+                cs[0].width = RandomHelper.NormalizedWidths(1)[0];
+                cs[0].color = RandomColor();
                 break;
             case 2:
-                ((LineNode)node.children[0]).width = 0.5f;
-                ((LineNode)node.children[1]).width = 0.5f;
-                ((LineNode)node.children[1]).offset = 0.5f;
-                ((LineNode)node.children[0]).color = RandomColor();
-                ((LineNode)node.children[1]).color = RandomColor();
-                /*
-                float width1 = lineRowDistribution.GenerateWidth(lines=2);
-                node.children[0].width = width1;
-                node.children[1].offset = width1;
-                node.children[1].width = 1 - width1;
-                */
+                cs[0].width = 0.5f;
+                cs[1].width = 0.5f;
+                cs[1].offset = 0.5f;
+                cs[0].color = RandomColor();
+                cs[1].color = RandomColor();
+                float width1 = lneRowDistribution.GenerateWidth(lines=2);
+                cs[0]width = width1;
+                cs[1]offset = width1;
+                cs[1]width = 1 - width1;
                 break;
             case 3:
-                ((LineNode)node.children[0]).width = 0.5f;
-                ((LineNode)node.children[1]).width = 0.5f;
-                ((LineNode)node.children[1]).offset = 0.5f;
-                ((LineNode)node.children[0]).color = RandomColor();
-                ((LineNode)node.children[1]).color = RandomColor();
+                cs[0].width = 0.5f;
+                cs[1].width = 0.5f;
+                cs[1].offset = 0.5f;
+                cs[0].color = RandomColor();
+                cs[1].color = RandomColor();
                 break;
             case 4:
-                ((LineNode)node.children[0]).width = 0.5f;
-                ((LineNode)node.children[1]).width = 0.5f;
-                ((LineNode)node.children[1]).offset = 0.5f;
-                ((LineNode)node.children[0]).color = RandomColor();
-                ((LineNode)node.children[1]).color = RandomColor();
+                cs[0].width = 0.5f;
+                cs[1].width = 0.5f;
+                cs[1].offset = 0.5f;
+                cs[0].color = RandomColor();
+                cs[1].color = RandomColor();
                 break;
         }
+*/
        // base.GenerateProperty(node);
         foreach (dynamic child in node.children) {
             GenerateProperty(child);
@@ -71,14 +96,17 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     }
 
     public ColorS RandomColor() {
-        return new ColorS(Random.value, Random.value, Random.value, 0.7f);
+        var c = RandomHelper.Pick<Color>(colors);
+        return new ColorS(c.r, c.g, c.b, c.a);
     }
 
     public void GenerateProperty(RectMarginNode node) {
-        node.left = Random.value * 0.1f;
-        node.right = Random.value * 0.1f;
-        node.bottom = Random.value * 0.1f;
-        node.top = Random.value * 0.1f;
+        if (Random.value > 0.5f) {
+            node.left = Random.value * 0.1f + 0.1f;
+            node.right = node.left;
+            node.bottom = Random.value * 0.1f + 0.1f;
+            node.top = node.bottom;
+        }
 //        base.GenerateProperty(node);
         // if one line, full, if multiple - line gap first?
         // how to (?)
@@ -97,6 +125,7 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
                 ((LineGapNode)node.children[1]).width = 1.0f/3;
                 ((LineGapNode)node.children[1]).offset = 1.0f/3;
                 ((LineRowNode)node.children[2]).width = 1.0f/3;
+                ((LineRowNode)node.children[2]).offset = 2.0f/3;
                 break;
             case 5:
                 ((LineRowNode)node.children[0]).width = 1.0f/5;
@@ -107,6 +136,7 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
                 ((LineGapNode)node.children[3]).width = 1.0f/5;
                 ((LineGapNode)node.children[3]).offset = 3.0f/5;
                 ((LineRowNode)node.children[4]).width = 1.0f/5;
+                ((LineRowNode)node.children[4]).offset = 4.0f/5;
                 break;
         }
 

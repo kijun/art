@@ -31,6 +31,7 @@ public class JM1ProductionTable : ProductionTable {
         AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode()), 0.25f);
         AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode()), 0.25f);
         AddRule(typeof(LineRowNode), PO(new LineNode(), new LineNode(), new LineNode(), new LineNode()), 0.25f);
+//        AddRule(typeof(LineRowNode), PO(new JM1CompositeRowNode()), 0.1f);
     }
 
     public void AddRule(System.Type input, ProductionOutputSchema output, float probability=1) {
@@ -82,6 +83,7 @@ public class ProductionOutputSchema {
     public List<BaseNode> GenerateNodes() {
         var bn = new List<BaseNode>();
         foreach (var prototype in outputNodes) {
+            /*
             if (prototype.symbolId != -1) {
                 var match = bn.Find(node => node.symbolId == prototype.symbolId);
                 if (match != null) {
@@ -89,6 +91,7 @@ public class ProductionOutputSchema {
                     continue;
                 }
             }
+            */
 
             BaseNode newNode;
             using (MemoryStream ms = new System.IO.MemoryStream()) {

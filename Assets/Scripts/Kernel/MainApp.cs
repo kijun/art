@@ -10,10 +10,19 @@ public class MainApp : MonoBehaviour {
     Canvas canvas = new Canvas();
 
     void Start() {
-        var root = pt.Produce(new JM1RootNode());
-        Debug.Log(root);
-        pg.GenerateProperty(root);
-        root.Render(canvas);
+        StartCoroutine(Run());
+    }
+
+    IEnumerator Run() {
+        for (int i = 0; i < 10000; i++) {
+            var root = pt.Produce(new JM1RootNode());
+            pg.GenerateProperty(root);
+            root.Render(canvas);
+            yield return new WaitForSeconds(0.33f);
+            foreach (var anim in FindObjectsOfType<Animatable2>()) {
+                Destroy(anim.gameObject);
+            }
+        }
     }
 }
 }

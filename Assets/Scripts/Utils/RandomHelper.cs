@@ -53,5 +53,39 @@ public static class RandomHelper {
     public static Vector2 RandomVector2(float xmin, float xmax, float ymin, float ymax) {
         return new Vector2(Random.Range(xmin, xmax), Random.Range(ymin, ymax));
     }
+
+    public static float[] NormalizedWidths(int cnt) {
+        var widths = new float[cnt];
+        var sum = 0.0f;
+        for (int i = 0; i < cnt; i++) {
+            widths[i] = Random.value;
+            sum += widths[i];
+        }
+
+        for (int i = 0; i < cnt; i++) {
+            widths[i] /= sum;
+        }
+
+        return widths;
+    }
+
+    public static float[] NormalizedWidths(int cnt, out float[] offsets) {
+        var widths = new float[cnt];
+        offsets = new float[cnt];
+        var sum = 0.0f;
+        var currOffset = 0.0f;
+        for (int i = 0; i < cnt; i++) {
+            widths[i] = Random.value;
+            sum += widths[i];
+        }
+
+        for (int i = 0; i < cnt; i++) {
+            offsets[i] = currOffset;
+            widths[i] /= sum;
+            currOffset += widths[i];
+        }
+
+        return widths;
+    }
 }
 
