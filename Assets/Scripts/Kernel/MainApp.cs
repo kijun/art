@@ -20,10 +20,13 @@ public class MainApp : MonoBehaviour {
             pg.GenerateProperty(root);
             root.Render(canvas);
             //yield return new WaitForSeconds(1);
-            if (Random.value < 0.97f) {
+            //ScreenCapture.CaptureScreenshot("~/Desktop/Screens/" + i + ".png");
+            if (Random.value < 0.998f) {
                 yield return null;
             } else {
-                yield return new WaitForSeconds(Random.Range(3f, 6f));
+                yield return new WaitForSeconds(Random.Range(15f, 20f));
+                yield return AnimateCamera();
+                //ScreenCapture.CaptureScreenshot("~/Desktop/Screens/" + i + "_anim.png");
             }
             DestroyAnims1();
             //yield return AnimateCamera();
@@ -34,13 +37,15 @@ public class MainApp : MonoBehaviour {
 
     IEnumerator AnimateCamera() {
         var rgbd = GetComponent<Rigidbody>();
-        rgbd.angularVelocity = new Vector3(0, RandomHelper.Pick(-0.3f, 0.3f), 0);
+        rgbd.angularVelocity = new Vector3(0, RandomHelper.Pick(-0.2f, 0.2f), 0);
+        //rgbd.angularVelocity = new Vector3(RandomHelper.Pick(-0.3f, 0.3f), 0);
+        //rgbd.angularVelocity = new Vector3(0, 0, RandomHelper.Pick(-0.3f, 0.3f));
         //rgbd.velocity = new Vector3(Random.value, 0, 0);
         //transform.eulerAngles = new Vector3(0, 0, 90);
         //transform.position = transform.position.SwapZ(-16);
-        yield return new WaitForSeconds(5.3f);
-        //transform.eulerAngles = new Vector3(0, 0, 0);
-        //transform.position = transform.position.SwapZ(-10);
+        yield return new WaitForSeconds(20.3f);
+        rgbd.angularVelocity = Vector3.zero;
+        transform.eulerAngles = new Vector3(0, 0, 0);
     }
 
     IEnumerator DestroyAnims() {

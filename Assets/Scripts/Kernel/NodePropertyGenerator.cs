@@ -24,6 +24,7 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     public Distribution lineRowDistribution;
     public Distribution compositeRowDistribution;
 
+    /*
     public Color[] colors = {
     new Color32(145,58,28,255),
     new Color32(168,101,73,255),
@@ -37,6 +38,13 @@ public class JM1NodePropertyGenerator : NodePropertyGenerator {
     new Color32(99,127,92,255),
     new Color32(164,155,134,255),
     new Color32(228,177,48,255)
+    };
+    */
+
+    public Color[] colors = {
+    new Color32(228,177,48,255),
+    new Color32(174,171,160,255),
+//    new Color32(239,234,221,255)
     };
 
 
