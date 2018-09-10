@@ -275,41 +275,82 @@ public class Tracer : MonoBehaviour {
                 Mat imgHSV;
                 Imgproc.cvtColor(rgbaMat, rgbaMat2, Imgproc.COLOR_RGB2HSV);
 
-                //Imgproc.dilate(rgbaMat, rgbaMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
-                //Imgproc.dilate(rgbaMat, rgbaMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(8,8)));
-                //Imgproc.erode(rgbaMat, rgbaMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
                 Core.inRange(rgbaMat2, new Scalar(iLowH, iLowS, iLowV), new Scalar(iHighH, iHighS, iHighV), rgbaMat3);
                 Imgproc.dilate(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
-                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
-                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
-                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
-                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
-                /*
-                Imgproc.dilate(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(8,8)));
-                Imgproc.dilate(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(8,8)));
-                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
-                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
-                */
+                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+                Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
 
                 var moments = Imgproc.moments(rgbaMat3);
                 var dM01 = moments.m01;
                 var dM10 = moments.m10;
                 var dArea = moments.m00;
                 // if the area <= 10000, I consider that the there are no object in the image and it's because of the noise, the area is not zero
-                if (dArea > 20*20) {
+                if (dArea > 50000) {
                     //calculate the position of the ball
                     var posX = dM10 / dArea;
                     var posY = dM01 / dArea;
                     Debug.Log("X = " + posX + " Y = " + posY + " Area = " + dArea);
+                    Utils.matToTexture2D (rgbaMat3, texture, colors);
                 } else {
                     Debug.Log("not found");
                 }
 
-                Utils.matToTexture2D (rgbaMat3, texture, colors);
             } else {
                 //Utils.webCamTextureToMat (webCamTexture, rgbaMat, colors);
                 //Utils.matToTexture2D (rgbaMat, texture, colors);
             }
+        }
+    }
+
+    IEnumerator Trace() {
+        while (true) {
+            // if green visible on screen, start drawing
+            //
+            if (Input.GetMouseButtonDown(0)) {
+                var sp = new SplineParams();
+                float sec = 0.04f;
+                var p1 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                var p2 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                var p3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                var p4 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                sp.spline = new BezierSpline2D(p1, p2, p3, p4);
+                while (Input.GetMouseButton(0)) {
+                    yield return new WaitForSeconds(sec);
+                    p1 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    yield return new WaitForSeconds(sec);
+                    p2 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    yield return new WaitForSeconds(sec);
+                    p3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    sp.spline.AddCurve(p1, p2, p3);
+                }
+                sp.color = Color.white.WithAlpha(0);
+                //sp.width = Random.Range(0.2f, 2f);
+                sp.width = 0.6f;
+                Animatable2[] anims = NoteFactory.CreateLine(sp);
+                int idx = 0;
+                foreach (var l in anims) {
+                    l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.Linear(0, 0, 1, 1));
+                    idx++;
+                    if (idx % 15 == 0) {
+                        //yield return null;// new WaitForSeconds(0.01f);
+                        yield return new WaitForSeconds(0.01f);
+                    }
+                }
+
+                yield return new WaitForSeconds(2f);
+                foreach (var l in anims) {
+                    //l.velocity = RandomHelper.RandomVector2(-0.5f, 0.5f, -0.5f, 0.5f);
+                    //l.angularVelocity = Random.Range(-90f, 90f);
+                    l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.EaseInOut(0, 1, 3, 0));
+                    l.DestroyIn(2f);
+                }
+            }
+            yield return null;
         }
     }
 
