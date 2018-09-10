@@ -11,14 +11,14 @@ public class NoteFactory : MonoBehaviour {
 
 
     public static Animatable2[] CreateLine(SplineParams sp, MotionParams mp=new MotionParams()) {
-        int parts = 200;
+        int parts = 1400;
         var anims = new Animatable2[parts];
         for (int i = 0; i < parts; i++) {
             float t = i / (float)parts;
             var p = sp.spline.GetPoint(t);
             var d = sp.spline.GetDirection(t);
             var v = sp.spline.GetVelocity(t);
-            var anim = CreateRect(new RectParams {width= v.magnitude/15, color= sp.color, position=p, height=sp.width, rotation=d.AngleInDegrees()});
+            var anim = CreateRect(new RectParams {width= v.magnitude/15, color= sp.color, position=p, height=sp.width*v.magnitude/15, rotation=d.AngleInDegrees()});
             anims[i] = anim;
         }
 

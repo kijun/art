@@ -21,11 +21,13 @@ public class MainApp : MonoBehaviour {
             root.Render(canvas);
             //yield return new WaitForSeconds(1);
             //ScreenCapture.CaptureScreenshot("~/Desktop/Screens/" + i + ".png");
-            if (Random.value < 0.998f) {
+            //if (Random.value < 0.998f) {
+            if (Random.value < 0.95f) {
                 yield return null;
             } else {
+            DestroyAnims1();
                 yield return new WaitForSeconds(Random.Range(15f, 20f));
-                yield return AnimateCamera();
+            //    yield return AnimateCamera();
                 //ScreenCapture.CaptureScreenshot("~/Desktop/Screens/" + i + "_anim.png");
             }
             DestroyAnims1();

@@ -50,16 +50,19 @@ public class BigDipper : MonoBehaviour {
     }
 
     void StartVisualization() {
-        StartCoroutine(RunDipper());
+        //StartCoroutine(RunDipper());
+        StartCoroutine(Trace());
     }
 
     IEnumerator RunDipper() {
         foreach (var rest in Loop(40, 0, 2, 0)) {
             // create line
            StartCoroutine(CreateLine1());
+           /*
            StartCoroutine(CreateLine1());
            StartCoroutine(CreateLine2());
            StartCoroutine(CreateLine3());
+           */
            yield return rest;
         }
     }
@@ -140,9 +143,24 @@ public class BigDipper : MonoBehaviour {
         sp.spline.AddCurve(RV2(6), RV2(7), RV2(8));
         sp.spline.AddCurve(RV2(9), RV2(10), RV2(11));
         */
+        /*
         sp.spline = new BezierSpline2D(
                 RV2(-9), RV2(-7), RV2(-5), RV2(-2));
         sp.spline.AddCurve(RV2(2), RV2(6), RV2(10));
+        */
+        sp.spline = new BezierSpline2D(
+                RV2(-9), RV2(-8), RV2(-7), RV2(-6));
+        sp.spline.AddCurve(RV2(-5), RV2(-4), RV2(-3));
+        sp.spline.AddCurve(RV2(-2), RV2(-1), RV2(0));
+        sp.spline.AddCurve(RV2(1), RV2(2), RV2(3));
+        sp.spline.AddCurve(RV2(-2), RV2(-1), RV2(0));
+        sp.spline.AddCurve(RV2(1), RV2(2), RV2(3));
+        sp.spline.AddCurve(RV2(4), RV2(5), RV2(6));
+        sp.spline.AddCurve(RV2(4), RV2(5), RV2(6));
+        sp.spline.AddCurve(RV2(7), RV2(8), RV2(9));
+        sp.spline.AddCurve(RV2(-2), RV2(-1), RV2(0));
+        sp.spline.AddCurve(RV2(1), RV2(2), RV2(3));
+        sp.spline.AddCurve(RV2(4), RV2(5), RV2(6));
         /*
         sp.spline.AddCurve(RV2(0), RV2(1), RV2(2));
         sp.spline.AddCurve(RV2(3), RV2(4), RV2(5));
@@ -152,12 +170,19 @@ public class BigDipper : MonoBehaviour {
         //sp.spline.AddCurve(RV(), RV(), RV());
         //sp.spline.AddCurve(RV(), RV(), RV());
         //sp.spline.AddCurve(RV(), RV(), RV());
-        sp.color = Color.Lerp(blue, red, Random.value).WithAlpha(0);
-        sp.width = Random.Range(0.02f, 0.2f);
+        //sp.color = Color.Lerp(blue, red, Random.value).WithAlpha(0);
+        sp.color = Color.white.WithAlpha(0);
+        //sp.width = Random.Range(0.2f, 2f);
+        sp.width = 0.3f;
         Animatable2[] anims = NoteFactory.CreateLine(sp);
+        int idx = 0;
         foreach (var l in anims) {
             l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.Linear(0, 0, 1, 1));
-            yield return new WaitForSeconds(0.01f);
+            idx++;
+            if (idx % 15 == 0) {
+                //yield return null;// new WaitForSeconds(0.01f);
+                yield return new WaitForSeconds(0.01f);
+            }
         }
 
         yield return new WaitForSeconds(2f);
@@ -167,6 +192,55 @@ public class BigDipper : MonoBehaviour {
             //l.angularVelocity = Random.Range(-90f, 90f);
             l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.EaseInOut(0, 1, 3, 0));
             l.DestroyIn(4f);
+        }
+    }
+
+    IEnumerator Trace() {
+        while (true) {
+            if (Input.GetMouseButtonDown(0)) {
+                var sp = new SplineParams();
+                float sec = 0.04f;
+                var p1 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                var p2 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                var p3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                var p4 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                yield return new WaitForSeconds(sec);
+                sp.spline = new BezierSpline2D(p1, p2, p3, p4);
+                while (Input.GetMouseButton(0)) {
+                    yield return new WaitForSeconds(sec);
+                    p1 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    yield return new WaitForSeconds(sec);
+                    p2 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    yield return new WaitForSeconds(sec);
+                    p3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    sp.spline.AddCurve(p1, p2, p3);
+                }
+                sp.color = Color.white.WithAlpha(0);
+                //sp.width = Random.Range(0.2f, 2f);
+                sp.width = 0.6f;
+                Animatable2[] anims = NoteFactory.CreateLine(sp);
+                int idx = 0;
+                foreach (var l in anims) {
+                    l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.Linear(0, 0, 1, 1));
+                    idx++;
+                    if (idx % 15 == 0) {
+                        //yield return null;// new WaitForSeconds(0.01f);
+                        yield return new WaitForSeconds(0.01f);
+                    }
+                }
+
+                yield return new WaitForSeconds(2f);
+                foreach (var l in anims) {
+                    //l.velocity = RandomHelper.RandomVector2(-0.5f, 0.5f, -0.5f, 0.5f);
+                    //l.angularVelocity = Random.Range(-90f, 90f);
+                    l.AddAnimationCurve(AnimationKeyPath.Opacity, AnimationCurve.EaseInOut(0, 1, 3, 0));
+                    l.DestroyIn(2f);
+                }
+            }
+            yield return null;
         }
     }
 
