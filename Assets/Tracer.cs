@@ -116,17 +116,17 @@ public class Tracer : MonoBehaviour {
     /// <summary>
     /// The predicted trajectory points.
     /// </summary>
-    List<Point> predictedTrajectoryPoints = new List<Point>();
+    LinkedList<Point> predictedTrajectoryPoints = new LinkedList<Point>();
 
     /// <summary>
     /// The cursor trajectory points.
     /// </summary>
-    List<Point> cursorTrajectoryPoints = new List<Point>();
+    LinkedList<Point> cursorTrajectoryPoints = new LinkedList<Point>();
 
     /// <summary>
     /// The estimated trajectory points.
     /// </summary>
-    List<Point> estimatedTrajectoryPoints = new List<Point>();
+    LinkedList<Point> estimatedTrajectoryPoints = new LinkedList<Point>();
 
 
     // Use this for initialization
@@ -398,6 +398,7 @@ public class Tracer : MonoBehaviour {
                 new Point (0, 0),
                 new Point (rgbaMatFinal.width (), rgbaMatFinal.height ()),
                 new Scalar (0, 0, 0, 255), -1);
+        /*
         Point predictedPt;
         Point estimatedPt;
 
@@ -407,36 +408,40 @@ public class Tracer : MonoBehaviour {
         }
 
         // Get cursor point.
+        */
         var pos = GetTrackerPosition();
+        //var pos = new Vector2(500, 500);
         measurement.put (0, 0, new float[] {(float)pos.x,(float)pos.y});
 
         Point measurementPt = new Point(measurement.get (0, 0)[0], measurement.get (1, 0)[0]);
-
+        /*KF.predict();
+        KF.correct(measurement);
         // The update phase.
         using (Mat estimated = KF.correct (measurement)) {
             estimatedPt = new Point (estimated.get (0, 0) [0], estimated.get (1, 0) [0]);
         }
 
-        predictedTrajectoryPoints.Add (predictedPt);
-        cursorTrajectoryPoints.Add (measurementPt);
-        estimatedTrajectoryPoints.Add (estimatedPt);
+        predictedTrajectoryPoints.AddLast (predictedPt);
+        */
+        cursorTrajectoryPoints.AddLast (measurementPt);
+        //estimatedTrajectoryPoints.AddLast (estimatedPt);
 
         DrawCross(rgbaMatFinal, measurementPt, new Scalar(0,255,0,255), 300 );
-        DrawCross(rgbaMatFinal, estimatedPt, new Scalar(255,0,0,255), 300 );
+        //DrawCross(rgbaMatFinal, estimatedPt, new Scalar(255,0,0,255), 300 );
 
-        /*
-        for (int i = 0; i < predictedTrajectoryPoints.Count-1; i++) {
-            Imgproc.line(rgbaMat, predictedTrajectoryPoints[i], predictedTrajectoryPoints[i+1], new Scalar(0,255,255,i), 1);
+        LinkedListNode<Point> node = cursorTrajectoryPoints.First;
+        //LinkedListNode<Point> node = estimatedTrajectoryPoints.First;
+        while (node != null) {
+            var nextNode = node.Next;
+            if (nextNode != null) {
+                Imgproc.line(rgbaMatFinal, node.Value, nextNode.Value, new Scalar(255,255,255,255), 20);
+            }
+            node = nextNode;
         }
-        */
 
-        for (int i = 0; i < estimatedTrajectoryPoints.Count-1; i++) {
-            Imgproc.line(rgbaMatFinal, estimatedTrajectoryPoints[i], estimatedTrajectoryPoints[i+1], new Scalar(255,255,255,255), 10);
-        }
-
-        if (predictedTrajectoryPoints.Count > 255) predictedTrajectoryPoints.RemoveAt (0);
-        if (cursorTrajectoryPoints.Count > 255) cursorTrajectoryPoints.RemoveAt (0);
-        if (estimatedTrajectoryPoints.Count > 255) estimatedTrajectoryPoints.RemoveAt (0);
+        //if (predictedTrajectoryPoints.Count > 300) predictedTrajectoryPoints.RemoveFirst();
+        if (cursorTrajectoryPoints.Count > 50) cursorTrajectoryPoints.RemoveFirst();
+        //if (estimatedTrajectoryPoints.Count > 300) estimatedTrajectoryPoints.RemoveFirst();
 
         Utils.matToTexture2D (rgbaMatFinal, texture, colors);
     }
@@ -449,8 +454,9 @@ public class Tracer : MonoBehaviour {
             Core.inRange(rgbaMat2, new Scalar(iLowH, iLowS, iLowV), new Scalar(iHighH, iHighS, iHighV), rgbaMat3);
             Imgproc.dilate(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
             Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+            //??
             Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
-            Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+            //Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
 
             var moments = Imgproc.moments(rgbaMat3);
             var dM01 = moments.m01;
@@ -475,9 +481,9 @@ public class Tracer : MonoBehaviour {
     // should really use kalman
     Vector2 GetTrackerPosition() {
         var pos = prevPos;
-        if (frameCnt % 3 == 0) {
+        //if (frameCnt % 3 == 0) {
             pos = _GetTrackerPosition();
-        }
+        //}
         if (pos == Vector2.zero) {
             nfCnt++;
             //if (nfCnt < 4) {
