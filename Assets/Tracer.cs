@@ -228,39 +228,6 @@ public class Tracer : MonoBehaviour {
                 hasInitDone = true;
 
                 OnInited ();
-                KF = new KalmanFilter (4, 2, 0, CvType.CV_32FC1);
-
-                // intialization of KF...
-                Mat transitionMat = new Mat (4, 4, CvType.CV_32F);
-                transitionMat.put (0, 0, new float[] {1,0,1,0,   0,1,0,1,  0,0,1,0,  0,0,0,1});
-                KF.set_transitionMatrix (transitionMat);
-
-                measurement = new Mat (2, 1, CvType.CV_32FC1); measurement.setTo (Scalar.all(0));
-
-                cursorPos = new Point ();
-                GetCursorPos(cursorPos);
-
-                // Set initial state estimate.
-                Mat statePreMat = KF.get_statePre ();
-                statePreMat.put (0, 0, new float[] {(float)cursorPos.x,(float)cursorPos.y,0,0});
-                Mat statePostMat = KF.get_statePost ();
-                statePostMat.put (0, 0, new float[] {(float)cursorPos.x,(float)cursorPos.y,0,0});
-
-                Mat measurementMat = new Mat (2, 4, CvType.CV_32FC1);
-                Core.setIdentity (measurementMat);
-                KF.set_measurementMatrix (measurementMat);
-
-                Mat processNoiseCovMat = new Mat (4, 4, CvType.CV_32FC1);
-                Core.setIdentity (processNoiseCovMat, Scalar.all(1e-4));
-                KF.set_processNoiseCov (processNoiseCovMat);
-
-                Mat measurementNoiseCovMat = new Mat (2, 2, CvType.CV_32FC1);
-                Core.setIdentity (measurementNoiseCovMat, Scalar.all(10));
-                KF.set_measurementNoiseCov (measurementNoiseCovMat);
-
-                Mat errorCovPostMat = new Mat (4, 4, CvType.CV_32FC1);
-                Core.setIdentity (errorCovPostMat, Scalar.all(.1));
-                KF.set_errorCovPost (errorCovPostMat);
 
                 break;
             } else {
@@ -336,24 +303,64 @@ public class Tracer : MonoBehaviour {
         } else {
             Camera.main.orthographicSize = height / 2;
         }
+                KF = new KalmanFilter (4, 2, 0, CvType.CV_32FC1);
+
+                // intialization of KF...
+                Mat transitionMat = new Mat (4, 4, CvType.CV_32F);
+                transitionMat.put (0, 0, new float[] {1,0,1,0,   0,1,0,1,  0,0,1,0,  0,0,0,1});
+                KF.set_transitionMatrix (transitionMat);
+
+                measurement = new Mat (2, 1, CvType.CV_32FC1); measurement.setTo (Scalar.all(0));
+
+                cursorPos = new Point ();
+                GetCursorPos(cursorPos);
+
+                // Set initial state estimate.
+                Mat statePreMat = KF.get_statePre ();
+                statePreMat.put (0, 0, new float[] {(float)cursorPos.x,(float)cursorPos.y,0,0});
+                Mat statePostMat = KF.get_statePost ();
+                statePostMat.put (0, 0, new float[] {(float)cursorPos.x,(float)cursorPos.y,0,0});
+
+                Mat measurementMat = new Mat (2, 4, CvType.CV_32FC1);
+                Core.setIdentity (measurementMat);
+                KF.set_measurementMatrix (measurementMat);
+
+                Mat processNoiseCovMat = new Mat (4, 4, CvType.CV_32FC1);
+                Core.setIdentity (processNoiseCovMat, Scalar.all(1e-4));
+                KF.set_processNoiseCov (processNoiseCovMat);
+
+                Mat measurementNoiseCovMat = new Mat (2, 2, CvType.CV_32FC1);
+                Core.setIdentity (measurementNoiseCovMat, Scalar.all(10));
+                KF.set_measurementNoiseCov (measurementNoiseCovMat);
+
+                Mat errorCovPostMat = new Mat (4, 4, CvType.CV_32FC1);
+                Core.setIdentity (errorCovPostMat, Scalar.all(.1));
+                KF.set_errorCovPost (errorCovPostMat);
+
+                /*Imgproc.rectangle (
+                    rgbaMatFinal,
+                    new Point (0, 0),
+                    new Point (rgbaMatFinal.width (), rgbaMatFinal.height ()),
+                    new Scalar (0, 0, 0, 255), -1);
+                    */
     }
 
     int framecnt = 0;
     // Update is called once per frame
+    bool firstIntercept = false;
     void Update ()
     {
-        if (KF != null) TraceUpdate();
-        return;
+        //if (KF != null) TraceUpdate();
+        //return;
         framecnt++;
         if (hasInitDone && webCamTexture.isPlaying && webCamTexture.didUpdateThisFrame) {
             if (framecnt % 1 == 0) {
                 Utils.webCamTextureToMat (webCamTexture, rgbaMat, colors);
-                Imgproc.resize(rgbaMat, rgbaMatFinal, new Size(requestedWidth, requestedHeight));
+                //Imgproc.resize(rgbaMat, rgbaMatFinal, new Size(requestedWidth, requestedHeight));
                 //Imgproc.blur(rgbaMat, rgbaMat2, new Size(5, 5));
 
                 //Imgproc.putText (rgbaMat, "W:" + rgbaMat.width () + " H:" + rgbaMat.height () + " SO:" + Screen.orientation, new Point (5, rgbaMat.rows () - 10), Core.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar (255, 255, 255, 255), 2, Imgproc.LINE_AA, false);
-                Mat imgHSV;
-                Imgproc.cvtColor(rgbaMatFinal, rgbaMat2, Imgproc.COLOR_RGB2HSV);
+                Imgproc.cvtColor(rgbaMat, rgbaMat2, Imgproc.COLOR_RGB2HSV);
 
                 Core.inRange(rgbaMat2, new Scalar(iLowH, iLowS, iLowV), new Scalar(iHighH, iHighS, iHighV), rgbaMat3);
                 Imgproc.dilate(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
@@ -376,7 +383,13 @@ public class Tracer : MonoBehaviour {
                     //if (showCam) {
                     //    Utils.matToTexture2D (rgbaMat, texture, colors);
                     //} else {
-                        Utils.matToTexture2D (rgbaMat3, texture, colors);
+                    //rgbaMatFinal = rgbaMat3.clone();
+                    if (!firstIntercept) {
+                        rgbaMatFinal = rgbaMat3.clone();
+                        firstIntercept = true;
+                    }
+                    Core.addWeighted(rgbaMat3, 1, rgbaMatFinal.clone(), 0.9, 0, rgbaMatFinal);
+                    Utils.matToTexture2D (rgbaMatFinal, texture, colors);
                     //}
                 } else {
                     Debug.Log("not found " + dArea);
