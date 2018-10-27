@@ -144,6 +144,7 @@ public class Tracer : MonoBehaviour {
     {
         if (isInitWaiting)
             return;
+        Cursor.visible = false;
 
         StartCoroutine (_Initialize ());
     }
@@ -265,6 +266,7 @@ public class Tracer : MonoBehaviour {
     /// </summary>
     private void OnInited ()
     {
+        prevPos = new Vector2(webCamTexture.width/2, webCamTexture.height);
         if (colors == null || colors.Length != webCamTexture.width * webCamTexture.height)
             colors = new Color32[webCamTexture.width * webCamTexture.height];
         if (texture == null || texture.width != webCamTexture.width || texture.height != webCamTexture.height)
@@ -350,6 +352,55 @@ public class Tracer : MonoBehaviour {
     bool firstIntercept = false;
     void Update ()
     {
+        if (KF != null) TraceUpdate();
+        return;
+        if (hasInitDone && webCamTexture.isPlaying && webCamTexture.didUpdateThisFrame) {
+            Utils.webCamTextureToMat (webCamTexture, rgbaMat, colors);
+            Core.flip(rgbaMat, rgbaMat3, 0); // upside down
+            Imgproc.cvtColor(rgbaMat3, rgbaMat2, Imgproc.COLOR_RGB2HSV);
+
+            Core.inRange(rgbaMat2, new Scalar(iLowH, iLowS, iLowV), new Scalar(iHighH, iHighS, iHighV), rgbaMat3);
+            Imgproc.dilate(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+            Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+            Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+            //Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+            //Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+            //Imgproc.erode(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
+
+            var moments = Imgproc.moments(rgbaMat3);
+            var dM01 = moments.m01;
+            var dM10 = moments.m10;
+            var dArea = moments.m00;
+            // if the area <= 10000, I consider that the there are no object in the image and it's because of the noise, the area is not zero
+            if (showCam) {
+                Utils.matToTexture2D (rgbaMat, texture, colors);
+                return;
+            }
+            if (dArea > detectionArea) {
+                //calculate the position of the ball
+                var posX = dM10 / dArea;
+                var posY = dM01 / dArea;
+                Debug.Log("X = " + posX + " Y = " + posY + " Area = " + dArea);
+                if (showCam) {
+                    Utils.matToTexture2D (rgbaMat, texture, colors);
+                    return;
+                } else {
+                    rgbaMatFinal = rgbaMat3.clone();
+                }
+            }
+            if (!firstIntercept) {
+                rgbaMatFinal = rgbaMat3.clone();
+                firstIntercept = true;
+            }
+            //Core.flip(rgbaMatFinal, rgbaMat2, 0);
+            //Core.addWeighted(rgbaMat3, 1, rgbaMat2, 0.98, 0, rgbaMatFinal);
+            Utils.matToTexture2D (rgbaMatFinal, texture, colors);
+        }
+    }
+
+    /*
+    void Update ()
+    {
         //if (KF != null) TraceUpdate();
         //return;
         framecnt++;
@@ -404,6 +455,7 @@ public class Tracer : MonoBehaviour {
             }
         }
     }
+    */
 
     void TraceUpdate() {
         Imgproc.rectangle (
@@ -439,7 +491,7 @@ public class Tracer : MonoBehaviour {
         cursorTrajectoryPoints.AddLast (measurementPt);
         //estimatedTrajectoryPoints.AddLast (estimatedPt);
 
-        DrawCross(rgbaMatFinal, measurementPt, new Scalar(0,255,0,255), 300 );
+        //DrawCross(rgbaMatFinal, measurementPt, new Scalar(0,255,0,255), 300 );
         //DrawCross(rgbaMatFinal, estimatedPt, new Scalar(255,0,0,255), 300 );
 
         LinkedListNode<Point> node = cursorTrajectoryPoints.First;
@@ -453,7 +505,7 @@ public class Tracer : MonoBehaviour {
         }
 
         //if (predictedTrajectoryPoints.Count > 300) predictedTrajectoryPoints.RemoveFirst();
-        if (cursorTrajectoryPoints.Count > 50) cursorTrajectoryPoints.RemoveFirst();
+        if (cursorTrajectoryPoints.Count > 100) cursorTrajectoryPoints.RemoveFirst();
         //if (estimatedTrajectoryPoints.Count > 300) estimatedTrajectoryPoints.RemoveFirst();
 
         Utils.matToTexture2D (rgbaMatFinal, texture, colors);
@@ -462,7 +514,8 @@ public class Tracer : MonoBehaviour {
     Vector2 _GetTrackerPosition() {
         if (hasInitDone && webCamTexture.isPlaying && webCamTexture.didUpdateThisFrame) {
             Utils.webCamTextureToMat (webCamTexture, rgbaMat, colors);
-            Imgproc.cvtColor(rgbaMat, rgbaMat2, Imgproc.COLOR_RGB2HSV);
+            Core.flip(rgbaMat, rgbaMat3, 0); // upside down
+            Imgproc.cvtColor(rgbaMat3, rgbaMat2, Imgproc.COLOR_RGB2HSV);
 
             Core.inRange(rgbaMat2, new Scalar(iLowH, iLowS, iLowV), new Scalar(iHighH, iHighS, iHighV), rgbaMat3);
             Imgproc.dilate(rgbaMat3, rgbaMat3, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(4,4)));
